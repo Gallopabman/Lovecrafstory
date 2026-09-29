@@ -22,6 +22,7 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 
 Sanity="*res://scripts/autoload/sanity_manager.gd"
 Inventory="*res://scripts/autoload/inventory.gd"
+GameState="*res://scripts/autoload/game_state.gd"
 
 [display]
 
@@ -110,6 +111,19 @@ pause={
 menu={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":4194306), Object(InputEventKey,"device":-1,"physical_keycode":73), Object(InputEventJoypadButton,"device":-1,"button_index":4)]
+}
+
+inventory_move={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":82), Object(InputEventJoypadButton,"device":-1,"button_index":2)]
+}
+inventory_rotate={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":81), Object(InputEventJoypadButton,"device":-1,"button_index":10)]
+}
+inventory_drop={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":88), Object(InputEventJoypadButton,"device":-1,"button_index":3)]
 }
 
 [gui]

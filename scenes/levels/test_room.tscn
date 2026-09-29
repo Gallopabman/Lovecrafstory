@@ -19,6 +19,22 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/game_ui.tscn" id="17_ui"]
 [ext_resource type="FontFile" path="res://assets/fonts/pixel_operator/PixelOperator.ttf" id="18_font"]
 
+[ext_resource type="PackedScene" path="res://scenes/enemies/stalker.tscn" id="19_stalker"]
+[ext_resource type="Resource" path="res://assets/items/food_water_bottle.tres" id="20_water"]
+[ext_resource type="Resource" path="res://assets/items/food_chocolate_bar.tres" id="21_choc"]
+[ext_resource type="Script" path="res://scripts/world/runtime_nav_bake.gd" id="22_nav"]
+[ext_resource type="Script" path="res://scripts/world/world_persistence.gd" id="23_persist"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_room"]
+geometry_parsed_geometry_type = 1
+geometry_source_geometry_mode = 1
+geometry_source_group_name = &"nav_source"
+cell_size = 0.25
+cell_height = 0.25
+agent_height = 2.25
+agent_radius = 0.5
+agent_max_climb = 0.25
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_refuge"]
 size = Vector3(10, 4, 10)
 
@@ -40,7 +56,7 @@ transform = Transform3D(1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, 
 light_color = Color(0.85, 0.85, 0.9, 1)
 light_energy = 0.5
 
-[node name="Geometry" type="Node3D" parent="." unique_id=670877662]
+[node name="Geometry" type="Node3D" parent="." unique_id=670877662 groups=["nav_source"]]
 
 [node name="Floor" type="StaticBody3D" parent="Geometry" unique_id=1647812248]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
@@ -155,7 +171,7 @@ script = ExtResource("2_greybox")
 size = Vector3(0.5, 3, 3.5)
 material = ExtResource("4_wall")
 
-[node name="Refuge" type="Node3D" parent="."]
+[node name="Refuge" type="Node3D" parent="." groups=["nav_source"]]
 
 [node name="RefugeZone" type="Area3D" parent="Refuge"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2, 15)
@@ -246,8 +262,42 @@ item = ExtResource("14_movie")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -18.5)
 item = ExtResource("15_letter")
 
-[node name="Horror" parent="." instance=ExtResource("16_horror")]
+[node name="Peaches3" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 12)
+item = ExtResource("12_food")
+
+[node name="Water1" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, 14)
+item = ExtResource("20_water")
+
+[node name="Water2" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 2)
+item = ExtResource("20_water")
+
+[node name="Chocolate1" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -12)
+item = ExtResource("21_choc")
+
+[node name="Chocolate2" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, -4)
+item = ExtResource("21_choc")
+
+[node name="Hallucination" type="Node3D" parent="."]
+script = ExtResource("10_gated")
+threshold = 1
+
+[node name="Horror" parent="Hallucination" instance=ExtResource("16_horror")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 4)
+
+[node name="Navigation" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavigationMesh_room")
+script = ExtResource("22_nav")
+
+[node name="WorldPersistence" type="Node3D" parent="."]
+script = ExtResource("23_persist")
+
+[node name="Stalker" parent="." instance=ExtResource("19_stalker")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -8)
 
 [node name="Player" parent="." unique_id=1683962500 instance=ExtResource("6_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 0.05, 15.5)

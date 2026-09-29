@@ -6,6 +6,7 @@
 script = ExtResource("1_item")
 id = &"letter_marta_01"
 display_name = "Carta de Marta"
+short_name = "CARTA"
 description = "Un sobre arrugado, escondido donde nadie cuerdo miraría."
 kind = 3
 max_sanity_bonus = 10.0

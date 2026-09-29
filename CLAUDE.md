@@ -22,6 +22,10 @@ en vez de inventarlo.
 - **Cordura 0 fuera de casa** → el personaje se convierte en **el Perdido** (mini-jefe que vaga por
   la zona donde cayó, con lo que llevaba encima y habilidades según cómo se jugó) y un nuevo
   sobreviviente empieza en el mismo refugio. Se conservan refugio y mundo; se pierde el inventario.
+- **Cordura 0 dentro del refugio** (decisión del usuario, no está en el GDD) → muere de un ataque
+  cardíaco y **el cuerpo queda en el piso** con todo lo que llevaba; el siguiente puede revisarlo.
+- **Inventario estilo Resident Evil**: mochila en cuadrícula (6x4), cada objeto ocupa su tamaño y
+  se puede mover, girar y tirar. Las cartas van en una lista aparte y no ocupan lugar.
 - **Refugio**: blueprints de slots fijos (fuego, electricidad, cama, decoración, ventanas,
   estaciones). Un solo refugio activo; mudarse es una decisión. Bono de llegada según logros de la salida.
 - **Mundo interconectado** ("lineal abierto", atajos estilo RE2/Dark Souls). Primer tramo:
@@ -47,20 +51,32 @@ en vez de inventarlo.
     que interpola entre valores "Lúcido" y "Al borde" según `Sanity.insanity()`.
 - **Autoloads**:
   - `Sanity` ([scripts/autoload/sanity_manager.gd](scripts/autoload/sanity_manager.gd)): cordura,
-    estados, goteo, refugios, golpes (`take_hit`), horrores vistos (`register_sighting`), señal `lost`.
-  - `Inventory` ([scripts/autoload/inventory.gd](scripts/autoload/inventory.gd)): entradas
-    `{item, count}`, `use()` aplica efectos según `ItemData.Kind`.
+    estados, goteo, refugios, golpes (`take_hit`), horrores vistos (`register_sighting`), señal `lost`
+    + `lost_in_refuge`.
+  - `Inventory` ([scripts/autoload/inventory.gd](scripts/autoload/inventory.gd)): cuadrícula
+    `grid_size`, entradas `{item, cell, rotated}`, `letters` aparte; `add()` devuelve false si no
+    entra; `use(item, entry)`, `move`, `drop` (emite `item_dropped`).
+  - `GameState` ([scripts/autoload/game_state.gd](scripts/autoload/game_state.gd)): persiste entre
+    sobrevivientes (pickups recogidos por ruta de nodo, objetos tirados, cuerpos, `lost_ones` para el
+    Perdido, número de sobreviviente) y `post_message()` para avisos. Todavía no guarda a disco.
 - **Objetos**: `ItemData` ([scripts/items/item_data.gd](scripts/items/item_data.gd)), un `.tres` por
-  objeto en `assets/items/`. En el mundo: [scenes/world/pickup.tscn](scenes/world/pickup.tscn).
+  objeto en `assets/items/` (`grid_size`, `short_name` de 3 letras para la cuadrícula).
+  En el mundo: [scenes/world/pickup.tscn](scenes/world/pickup.tscn).
 - **Componentes de mundo** (`scripts/world/`): `GreyBox` (blockout con malla subdividida),
   `RefugeZone` (Area3D: goteo reducido + electricidad), `SanityGated` (muestra/oculta hijos
-  y su colisión según el estado), `HorrorSighting` (baja cordura la primera vez que se ve).
-- **Interacción**: el jugador busca Areas del grupo `interactable` (capa de colisión 3) y llama `interact(player)`.
-- **UI** ([scenes/ui/game_ui.tscn](scenes/ui/game_ui.tscn), CanvasLayer 50): menú (pausa el juego),
-  lector de cartas, aviso al recoger, pantalla "te perdiste". Tema global
-  [assets/ui/ps1_theme.tres](assets/ui/ps1_theme.tres) con fuente Pixel Operator 8px sin antialiasing.
+  y su colisión según el estado), `HorrorSighting` (baja cordura la primera vez que se ve),
+  `WorldPersistence` (reconstruye objetos tirados y cuerpos al cargar), `Corpse`,
+  `RuntimeNavBake` (hornea el navmesh al cargar desde el grupo `nav_source`).
+- **Enemigos** (`scripts/enemies/`): `Stalker` — deambula, persigue si ve u oye correr, golpea la
+  cordura; se escapa corriendo (no hay combate: pregunta abierta del GDD). Usa NavigationAgent3D.
+- **Capas de colisión**: 1 escenario + jugador, 2 enemigos, 3 interactuables.
+- **Interacción**: el jugador busca Areas del grupo `interactable` (capa 3) y llama `interact(player)`.
+- **UI** ([scenes/ui/game_ui.tscn](scenes/ui/game_ui.tscn), CanvasLayer 50): menú (pausa el juego;
+  entrada propia en `_input`), cuadrícula `InventoryGrid`, lector de cartas, avisos breves, pantalla de
+  muerte. Tema global [assets/ui/ps1_theme.tres](assets/ui/ps1_theme.tres), Pixel Operator 8px.
 - **Input**: `move_*`, `look_*` (stick der.), `run`, `interact` (E), `flashlight` (F), `menu`
-  (Tab / I / Back), `pause` (Esc). Debug: F3 overlay, F9 golpe, F10 −25 %, F11 +25 %.
+  (Tab / I / Back), `pause` (Esc), `inventory_move` (R), `inventory_rotate` (Q), `inventory_drop` (X).
+  Debug: F3 overlay, F9 golpe, F10 −25 %, F11 +25 %.
 - Assets de terceros: registrar siempre en [CREDITS.md](CREDITS.md) (preferir CC0).
 
 ## Estructura
@@ -93,7 +109,13 @@ Godot **4.7.2** (no está en el PATH):
 - Los parámetros globales tipo `color` llegan al shader en sRGB: convertir a lineal antes de usarlos.
 - PowerShell 5 escribe UTF-8 **con BOM** (`Set-Content -Encoding utf8`): para archivos de Godot usar
   la herramienta Write o `[IO.File]::WriteAllText` con `UTF8Encoding($false)`.
-- Git todavía no está instalado.
+- El test no puede usar `class_name` del juego (compila antes que los autoloads) y el mouse sobre la
+  ventana lo altera.
+- **Git**: repo https://github.com/Gallopabman/Lovecrafstory (rama `main`), binarios en Git LFS
+  (ver `.gitattributes`). Identidad local: `Gallopabman <Gallopabman@users.noreply.github.com>`.
+  El PATH de la sesión puede no tener git: refrescarlo con
+  `$env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")`.
+  Mensajes de commit: escribirlos a un archivo y usar `git commit -F` (los here-strings de PowerShell fallan).
 
 ## Estado / roadmap
 
@@ -107,8 +129,13 @@ Godot **4.7.2** (no está en el PATH):
 - [x] Muerte a 0 → "te perdiste" → nuevo sobreviviente en el refugio (sin Perdido todavía)
 - [x] Modelo del superviviente (Quaternius, CC0) con idle/caminar/correr/golpe/interactuar/muerte
 
+**Prototipo 2.5** — hecho: mochila en cuadrícula, muerte en el refugio con cuerpo recuperable,
+mundo persistente entre sobrevivientes (en memoria), acechador (Quaternius, CC0), silueta como
+alucinación desde Inquieto.
+
 Pendiente / preguntas abiertas:
-- ¿Qué pasa a cordura 0 **dentro** del refugio? (el GDD solo define "fuera de casa"; hoy se pierde igual).
-- Mundo persistente entre personajes (hoy se recarga la escena y reaparecen los objetos).
-- El Perdido, alucinaciones, cámaras fijas en interiores, bono de llegar a casa, límite del inventario.
+- ¿Combate o solo esconderse y huir? (GDD). Hoy el acechador solo se esquiva corriendo.
+- El Perdido (ya se registran posición e inventario en `GameState.lost_ones`), alucinaciones
+  inofensivas "de verdad", cámaras fijas en interiores, bono de llegar a casa, guardado a disco.
+- Íconos de objetos para la cuadrícula (hoy: color + abreviatura).
 - **Prototipo 3** (GDD): refugio con un slot de mejora y el bono de llegar a casa.

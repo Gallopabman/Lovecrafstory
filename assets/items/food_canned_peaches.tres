@@ -6,6 +6,8 @@
 script = ExtResource("1_item")
 id = &"food_canned_peaches"
 display_name = "Lata de duraznos"
+short_name = "DUR"
+grid_size = Vector2i(1, 1)
 description = "Duraznos en almíbar. La etiqueta todavía tiene el precio del supermercado de la esquina."
 kind = 0
 sanity_restore = 6.0

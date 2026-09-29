@@ -1,53 +1,66 @@
 class_name GameMenu
 extends Control
 ## Menú de estado e inventario. El juego no tiene HUD: la cordura solo se ve
-## acá. Abrirlo pausa el juego.
+## acá. Abrirlo pausa el juego. Mochila en cuadrícula estilo Resident Evil
+## (usar, mover, girar, tirar) y lista de cartas aparte.
+
+enum Section { GRID, LETTERS }
+
+const HINT_GRID := "E: usar   R: mover   X: tirar   Tab: cerrar"
+const HINT_HOLD := "Q: girar   R: soltar   Esc: cancelar"
+const HINT_LETTERS := "E: leer   Tab: cerrar"
+const DIRECTIONS := {
+	"ui_left": Vector2i.LEFT, "move_left": Vector2i.LEFT,
+	"ui_right": Vector2i.RIGHT, "move_right": Vector2i.RIGHT,
+	"ui_up": Vector2i.UP, "move_forward": Vector2i.UP,
+	"ui_down": Vector2i.DOWN, "move_back": Vector2i.DOWN,
+}
 
 @export var bar_pixels_per_point := 1.6
 @export var bar_max_width := 296.0
 
+var _section := Section.GRID
+
 @onready var sanity_bar: ProgressBar = %SanityBar
 @onready var state_label: Label = %StateLabel
-@onready var item_list: ItemList = %ItemList
+@onready var grid: InventoryGrid = %InventoryGrid
+@onready var letter_list: ItemList = %LetterList
 @onready var name_label: Label = %NameLabel
 @onready var description_label: Label = %DescriptionLabel
 @onready var result_label: Label = %ResultLabel
-@onready var empty_label: Label = %EmptyLabel
+@onready var hint_label: Label = %HintLabel
 @onready var letter_panel: Panel = %LetterPanel
 @onready var letter_label: Label = %LetterLabel
-
-var _entries: Array[Dictionary] = []
 
 
 func _ready() -> void:
 	hide()
 	letter_panel.hide()
-	item_list.item_selected.connect(func(_index: int) -> void: _show_selected())
-	item_list.item_activated.connect(func(_index: int) -> void: _use_selected())
-	Inventory.changed.connect(_refresh_items)
+	Inventory.changed.connect(_refresh)
 	Inventory.letter_opened.connect(_open_letter)
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("menu"):
 		if visible:
 			close()
-		elif Sanity.active:
+		elif Sanity.active and not get_tree().paused:
 			open()
 		get_viewport().set_input_as_handled()
-	elif not visible:
 		return
-	elif letter_panel.visible:
-		if event.is_action_pressed("ui_cancel") or event.is_action_pressed("interact") or event.is_action_pressed("ui_accept"):
+	if not visible:
+		return
+	# Mientras el menú está abierto, toda la entrada es del menú.
+	get_viewport().set_input_as_handled()
+	if letter_panel.visible:
+		if _pressed(event, ["ui_cancel", "pause", "interact", "ui_accept"]):
 			letter_panel.hide()
-			item_list.grab_focus()
-			get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
-		close()
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("interact"):
-		_use_selected()
-		get_viewport().set_input_as_handled()
+		return
+	var direction := _direction(event)
+	if _section == Section.GRID:
+		_grid_input(event, direction)
+	else:
+		_letters_input(event, direction)
 
 
 func open() -> void:
@@ -55,66 +68,145 @@ func open() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	result_label.text = ""
 	letter_panel.hide()
-	_refresh_sanity()
-	_refresh_items()
+	_section = Section.GRID
 	show()
-	item_list.grab_focus()
+	_refresh()
 
 
 func close() -> void:
+	grid.cancel_move()
 	letter_panel.hide()
 	hide()
 	get_tree().paused = false
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
-func _refresh_sanity() -> void:
+func _grid_input(event: InputEvent, direction: Vector2i) -> void:
+	if direction != Vector2i.ZERO:
+		if not grid.move_cursor(direction) and not Inventory.letters.is_empty():
+			_set_section(Section.LETTERS)
+		_show_details()
+	elif grid.is_holding():
+		if _pressed(event, ["inventory_move", "interact", "ui_accept"]):
+			if not grid.try_place():
+				result_label.text = "No entra ahí."
+		elif event.is_action_pressed("inventory_rotate"):
+			grid.rotate_held()
+		elif _pressed(event, ["ui_cancel", "pause"]):
+			grid.cancel_move()
+		_show_details()
+	elif _pressed(event, ["interact", "ui_accept"]):
+		var entry := grid.hovered_entry()
+		if not entry.is_empty():
+			result_label.text = Inventory.use(entry.item, entry)
+	elif event.is_action_pressed("inventory_move"):
+		var entry := grid.hovered_entry()
+		if not entry.is_empty():
+			grid.begin_move(entry)
+			result_label.text = ""
+			_show_details()
+	elif event.is_action_pressed("inventory_drop"):
+		var entry := grid.hovered_entry()
+		if not entry.is_empty():
+			Inventory.drop(entry)
+			result_label.text = "Lo dejé en el piso."
+	elif _pressed(event, ["ui_cancel", "pause"]):
+		close()
+
+
+func _letters_input(event: InputEvent, direction: Vector2i) -> void:
+	var index := _letter_index()
+	if direction.y < 0:
+		if index <= 0:
+			_set_section(Section.GRID)
+		else:
+			letter_list.select(index - 1)
+		_show_details()
+	elif direction.y > 0:
+		letter_list.select(mini(index + 1, Inventory.letters.size() - 1))
+		_show_details()
+	elif _pressed(event, ["interact", "ui_accept"]) and index >= 0:
+		result_label.text = Inventory.use(Inventory.letters[index])
+	elif _pressed(event, ["ui_cancel", "pause"]):
+		close()
+
+
+func _set_section(section: Section) -> void:
+	_section = section
+	if section == Section.LETTERS:
+		letter_list.select(0)
+	else:
+		letter_list.deselect_all()
+	grid.queue_redraw()
+	_refresh_hint()
+
+
+func _refresh() -> void:
+	if not is_node_ready():
+		return
 	sanity_bar.max_value = Sanity.maximum
 	sanity_bar.value = Sanity.current
 	# La barra crece con las cartas: su ancho es proporcional a la cordura máxima.
 	sanity_bar.size.x = minf(bar_pixels_per_point * Sanity.maximum, bar_max_width)
 	state_label.text = Sanity.state_name()
+	var selected := _letter_index()
+	letter_list.clear()
+	for letter in Inventory.letters:
+		letter_list.add_item(letter.display_name)
+	if _section == Section.LETTERS:
+		if Inventory.letters.is_empty():
+			_section = Section.GRID
+		else:
+			letter_list.select(clampi(selected, 0, Inventory.letters.size() - 1))
+	grid.queue_redraw()
+	_show_details()
 
 
-func _refresh_items() -> void:
-	var previous := item_list.get_selected_items()
-	item_list.clear()
-	_entries = Inventory.entries.duplicate()
-	for entry in _entries:
-		var item: ItemData = entry.item
-		var text := item.display_name
-		if entry.count > 1:
-			text += "  x%d" % entry.count
-		item_list.add_item(text)
-	empty_label.visible = _entries.is_empty()
-	if not _entries.is_empty():
-		var index := clampi(previous[0] if not previous.is_empty() else 0, 0, _entries.size() - 1)
-		item_list.select(index)
-	_show_selected()
-	if visible:
-		_refresh_sanity()
-
-
-func _selected_item() -> ItemData:
-	var selected := item_list.get_selected_items()
-	if selected.is_empty() or selected[0] >= _entries.size():
-		return null
-	return _entries[selected[0]].item
-
-
-func _show_selected() -> void:
-	var item := _selected_item()
+func _show_details() -> void:
+	var item: ItemData = null
+	if _section == Section.LETTERS:
+		var index := _letter_index()
+		item = Inventory.letters[index] if index >= 0 else null
+	elif grid.is_holding():
+		item = grid.held.item
+	else:
+		var entry := grid.hovered_entry()
+		item = entry.item if not entry.is_empty() else null
 	name_label.text = item.display_name if item else ""
 	description_label.text = item.description if item else ""
+	_refresh_hint()
 
 
-func _use_selected() -> void:
-	var item := _selected_item()
-	if item:
-		result_label.text = Inventory.use(item)
-		_refresh_sanity()
+func _refresh_hint() -> void:
+	if _section == Section.LETTERS:
+		hint_label.text = HINT_LETTERS
+	else:
+		hint_label.text = HINT_HOLD if grid.is_holding() else HINT_GRID
+
+
+func _letter_index() -> int:
+	var selected := letter_list.get_selected_items()
+	return selected[0] if not selected.is_empty() else -1
 
 
 func _open_letter(item: ItemData) -> void:
 	letter_label.text = item.letter_text
 	letter_panel.show()
+
+
+static func _pressed(event: InputEvent, actions: Array[String]) -> bool:
+	for action in actions:
+		if event.is_action_pressed(action):
+			return true
+	return false
+
+
+static func _direction(event: InputEvent) -> Vector2i:
+	for action: String in DIRECTIONS:
+		if not event.is_action_pressed(action, true):
+			continue
+		# El stick manda eventos continuos: solo cuenta el primero.
+		if event is InputEventJoypadMotion and not Input.is_action_just_pressed(action):
+			continue
+		return DIRECTIONS[action]
+	return Vector2i.ZERO

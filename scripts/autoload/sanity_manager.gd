@@ -9,6 +9,7 @@ signal state_changed(new_state: State, old_state: State)
 signal shocked(strength: float)
 signal hit_taken(amount: float)
 signal horror_seen(horror_id: StringName)
+## Cordura en 0. Ver `lost_in_refuge` para saber cómo terminó.
 signal lost
 
 ## Rangos en % de la cordura máxima (tabla "Estados de cordura" del GDD).
@@ -32,6 +33,9 @@ var maximum := base_maximum
 var current := base_maximum
 var state := State.LUCID
 var active := true
+## Cómo terminó el último sobreviviente: en el refugio muere (ataque cardíaco y
+## el cuerpo queda en el piso); afuera se convierte en el Perdido.
+var lost_in_refuge := false
 
 var _refuges: Array[RefugeZone] = []
 var _seen_horrors: Dictionary = {}
@@ -167,4 +171,5 @@ func _update_state() -> void:
 	state_changed.emit(new_state, old_state)
 	if new_state == State.LOST:
 		active = false
+		lost_in_refuge = in_refuge()
 		lost.emit()

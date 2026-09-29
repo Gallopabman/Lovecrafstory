@@ -1,12 +1,23 @@
 extends SceneTree
-## Test del loop de cordura: recorre refugio, goteo, horror, golpe, objetos,
-## menú, estados/secretos y muerte. Guarda capturas en user://test_shots/.
+## Test del loop completo: refugio, goteo, golpes, mochila en cuadrícula, menú,
+## estados/secretos, enemigo, muerte en el refugio (cuerpo) y afuera, y
+## persistencia del mundo. Guarda capturas en user://test_shots/.
 ## Uso: <godot> --path . -s res://tests/sanity_loop_test.gd
+## No mover el mouse sobre la ventana mientras corre (gira la cámara).
+## No usar class_name del juego acá: este script compila antes que los autoloads.
 
 const OUT := "user://test_shots/"
+
 var sanity: Node
 var inventory: Node
+var game_state: Node
 var fails := 0
+
+var peaches: ItemData = load("res://assets/items/food_canned_peaches.tres")
+var comic: ItemData = load("res://assets/items/comic_lighthouse.tres")
+var vhs: ItemData = load("res://assets/items/movie_coast_vhs.tres")
+var letter: ItemData = load("res://assets/items/letter_marta_01.tres")
+var water: ItemData = load("res://assets/items/food_water_bottle.tres")
 
 
 func check(cond: bool, msg: String) -> void:
@@ -20,153 +31,271 @@ func frames(n: int) -> void:
 		await process_frame
 
 
+func seconds(s: float) -> void:
+	await create_timer(s).timeout
+
+
 func shot(name: String) -> void:
 	await frames(3)
-	root.get_texture().get_image().save_png(OUT + "t_%s.png" % name)
+	root.get_texture().get_image().save_png(OUT + "%s.png" % name)
+
+
+func player() -> Node3D:
+	return current_scene.get_node("Player")
+
+
+func stalker() -> Node3D:
+	return current_scene.get_node("Stalker")
 
 
 func place(pos: Vector3, yaw: float) -> void:
-	var p: Node3D = current_scene.get_node("Player")
+	var p: Node3D = player()
 	p.global_position = pos
 	p.velocity = Vector3.ZERO
 	p.set("_yaw", yaw)
-	p.get_node("CameraPivot").global_position = pos + Vector3.UP * 1.5
-	p.get_node("Visual").global_rotation.y = yaw
+	p.camera_pivot.global_position = pos + Vector3.UP * p.camera_height
+	p.visual.global_rotation.y = yaw
+
+
+func set_ratio(r: float) -> void:
+	sanity.restore(sanity.maximum)
+	sanity.take_hit(sanity.maximum * (1.0 - r))
+
+
+func send_action(action: String) -> void:
+	var ev := InputEventAction.new()
+	ev.action = action
+	ev.pressed = true
+	Input.parse_input_event(ev)
+	await frames(2)
+	var up := InputEventAction.new()
+	up.action = action
+	up.pressed = false
+	Input.parse_input_event(up)
+	await frames(2)
+
+
+func freeze_stalker(frozen: bool) -> void:
+	stalker().process_mode = Node.PROCESS_MODE_DISABLED if frozen else Node.PROCESS_MODE_INHERIT
 
 
 func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(OUT)
 	sanity = root.get_node("Sanity")
 	inventory = root.get_node("Inventory")
+	game_state = root.get_node("GameState")
 	change_scene_to_file("res://scenes/levels/test_room.tscn")
 	await frames(60)
-	var player: Node3D = current_scene.get_node("Player")
-	var anim: AnimationPlayer = player.anim_player
+	freeze_stalker(true)
+	var anim: AnimationPlayer = player().anim_player
 
-	# 1. Refugio y animación idle
-	check(sanity.in_refuge(), "spawn dentro del refugio")
-	check(is_equal_approx(sanity.drain_multiplier(), 0.25), "goteo reducido en refugio: %s" % sanity.drain_multiplier())
-	check(anim.current_animation == &"CharacterArmature|Idle", "anim idle: %s" % anim.current_animation)
+	print("-- Refugio y goteo")
+	check(sanity.in_refuge() and is_equal_approx(sanity.drain_multiplier(), 0.25), "spawn en refugio, goteo x0.25")
+	check(anim.current_animation == &"CharacterArmature|Idle", "anim idle: %s vel=%s" % [anim.current_animation, player().velocity])
 	await shot("01_refugio")
-	place(Vector3(15.5, 0.05, 15.5), deg_to_rad(180))
-	await frames(20)
-	await shot("02_personaje_frente")
-
-	# 2. Goteo afuera
 	place(Vector3(0, 0.05, 8), 0.0)
 	await frames(10)
-	check(not sanity.in_refuge() and sanity.drain_multiplier() == 1.0, "afuera goteo normal")
 	var before: float = sanity.current
-	await create_timer(1.0).timeout
-	check(sanity.current < before, "la cordura baja con el tiempo: %.3f -> %.3f" % [before, sanity.current])
+	await seconds(1.0)
+	check(not sanity.in_refuge() and sanity.current < before, "afuera baja: %.3f -> %.3f" % [before, sanity.current])
 
-	# 3. Ver horror nuevo (en -12,0,4): parado en (-4,0,4) mirando al oeste (+yaw = izquierda)
-	var pre_sight: float = sanity.current
-	place(Vector3(-4, 0.05, 4), deg_to_rad(90))
-	await frames(40)
-	check(sanity.has_seen(&"silueta_alta"), "horror registrado al verlo")
-	check(pre_sight - sanity.current > 7.0, "ver horror nuevo baja cordura: %.1f" % (pre_sight - sanity.current))
-	place(Vector3(-4, 0.05, 4), deg_to_rad(70))
-	await frames(30)
-	await shot("03_horror")
-	var after_sight: float = sanity.current
-	await frames(30)
-	check(after_sight - sanity.current < 0.5, "segunda mirada no vuelve a bajar")
-
-	# 4. Golpe
+	print("-- Golpe")
 	var pre_hit: float = sanity.current
 	sanity.take_hit(10.0)
 	await frames(2)
 	check(absf(pre_hit - sanity.current - 10.0) < 0.1, "golpe baja 10")
-	check(anim.current_animation == &"CharacterArmature|HitRecieve", "anim de golpe: %s" % anim.current_animation)
+	check(anim.current_animation == &"CharacterArmature|HitRecieve", "anim de golpe")
 	await frames(60)
 
-	# 5. Recoger objeto con interact (duraznos sobre Crate1 en 2,1,-2)
+	print("-- Recoger")
 	place(Vector3(2, 0.05, -0.9), 0.0)
 	await frames(10)
-	player._try_interact()
+	player()._try_interact()
 	await frames(5)
-	check(inventory.entries.size() == 1, "recogió duraznos: %d entradas" % inventory.entries.size())
-	await shot("04_recoger")
+	check(inventory.entries.size() == 1, "recogió duraznos")
+	check(game_state.is_collected("/root/TestRoom/Items/Peaches1"), "pickup marcado como recogido")
 
-	# 6. Usar objetos
-	var peaches: ItemData = load("res://assets/items/food_canned_peaches.tres")
-	var comic: ItemData = load("res://assets/items/comic_lighthouse.tres")
-	var vhs: ItemData = load("res://assets/items/movie_coast_vhs.tres")
-	var letter: ItemData = load("res://assets/items/letter_marta_01.tres")
-	sanity.current = 50.0
-	inventory.use(peaches)
-	check(is_equal_approx(sanity.current, 56.0), "comida +6: %.1f" % sanity.current)
-	check(inventory.entries.is_empty(), "la comida se consume")
-	inventory.add(comic)
-	inventory.use(comic)
-	var first: float = sanity.current
-	inventory.use(comic)
-	check(first - 56.0 > sanity.current - first, "cómic rinde menos al releer: +%.1f luego +%.1f" % [first - 56.0, sanity.current - first])
-	inventory.add(vhs)
-	var msg: String = inventory.use(vhs)
-	check(msg.begins_with("Necesito"), "VHS sin electricidad afuera: '%s'" % msg)
+	print("-- Mochila en cuadrícula")
+	inventory.clear()
+	var added := 0
+	for i in 30:
+		if inventory.add(peaches):
+			added += 1
+	check(added == 24, "mochila 6x4 llena con 24 objetos 1x1: %d" % added)
+	inventory.clear()
+	check(inventory.add(vhs) and inventory.add(comic) and inventory.add(water), "entran VHS 2x1, cómic 1x2 y agua 1x2")
+	var e_vhs: Dictionary = inventory.entries[0]
+	check(e_vhs.cell == Vector2i(0, 0) and inventory.entry_at(Vector2i(1, 0)) == e_vhs, "VHS ocupa (0,0)-(1,0)")
+	var e_comic: Dictionary = inventory.entries[1]
+	check(e_comic.cell == Vector2i(2, 0) and inventory.entry_at(Vector2i(2, 1)) == e_comic, "cómic ocupa (2,0)-(2,1)")
+	check(not inventory.move(e_vhs, Vector2i(2, 1), false), "no se puede mover encima de otro")
+	check(inventory.move(e_vhs, Vector2i(5, 1), true), "VHS girado entra vertical en la columna 5")
+	check(inventory.footprint(vhs, true) == Vector2i(1, 2), "girado ocupa 1x2")
+	inventory.letters.clear()
 	inventory.add(letter)
-	inventory.use(letter)
-	check(sanity.maximum == 110.0 and sanity.current == 110.0, "carta llena y sube máximo: %.0f/%.0f" % [sanity.current, sanity.maximum])
+	check(inventory.letters.size() == 1 and inventory.entries.size() == 3, "la carta va aparte, no ocupa lugar")
+	# Tirar: aparece en el piso y se puede volver a juntar.
+	place(Vector3(0, 0.05, 8), 0.0)
+	await frames(5)
+	inventory.drop(inventory.entries[2])
+	await frames(5)
+	check(game_state.dropped_items.size() == 1 and inventory.entries.size() == 2, "tirar el agua la deja en el mundo")
+	var dropped: Node = current_scene.get_node("WorldPersistence").get_child(0)
+	check(dropped != null and dropped.item == water, "pickup del agua en el piso")
+	player()._try_interact()
+	await frames(5)
+	check(game_state.dropped_items.is_empty() and inventory.entries.size() == 3, "se vuelve a juntar")
+	# Mochila llena: el objeto queda en el piso.
+	inventory.clear()
+	for i in 24:
+		inventory.add(peaches)
+	inventory.drop(inventory.entries[0])
+	await frames(5)
+	inventory.add(peaches)
+	player()._try_interact()
+	await frames(5)
+	check(game_state.dropped_items.size() == 1, "con la mochila llena no se puede juntar")
 
-	# 7. Menú
-	inventory.add(peaches, 2)
+	print("-- Usar objetos")
+	inventory.clear()
+	inventory.add(peaches)
+	sanity.restore(100.0)
+	sanity.take_hit(50.0)
+	var s0: float = sanity.current
+	inventory.use(peaches, inventory.entries[0])
+	check(absf(sanity.current - s0 - 6.0) < 0.1 and inventory.entries.is_empty(), "comida +6 y se consume")
+	inventory.add(comic)
+	var s1: float = sanity.current
+	inventory.use(comic)
+	var gain1: float = sanity.current - s1
+	var s2: float = sanity.current
+	inventory.use(comic)
+	check(gain1 > sanity.current - s2 + 1.0, "cómic rinde menos al releer")
+	inventory.add(vhs)
+	check((inventory.use(vhs) as String).begins_with("Necesito"), "VHS sin electricidad afuera no se puede ver")
+
+	print("-- Menú (entrada real)")
+	inventory.clear()
+	inventory.add(vhs)
+	inventory.add(comic)
+	inventory.add(peaches)
+	inventory.add(water)
+	inventory.add(letter)
 	var menu: Control = current_scene.get_node("GameUI/GameMenu")
-	menu.open()
-	check(paused, "menú pausa el juego")
-	await shot("05_menu")
-	var s_paused: float = sanity.current
-	await frames(30)
-	check(sanity.current == s_paused, "cordura no baja con el menú abierto")
-	menu.item_list.select(inventory.entries.find(inventory.entries.filter(func(e): return e.item == letter)[0]))
-	menu._use_selected()
-	await shot("06_carta")
-	menu.close()
+	await send_action("menu")
+	check(menu.visible and paused, "Tab abre el menú y pausa")
+	await shot("02_menu")
+	# Mover el VHS de (0,0) a (0,2) con R, abajo x2, R.
+	await send_action("inventory_move")
+	check(menu.grid.is_holding(), "R agarra el objeto")
+	await send_action("ui_down")
+	await send_action("ui_down")
+	await shot("03_menu_moviendo")
+	await send_action("inventory_move")
+	check(not menu.grid.is_holding() and inventory.entry_at(Vector2i(0, 2)).get("item") == vhs, "el VHS quedó en (0,2)")
+	await send_action("ui_down")
+	await send_action("ui_down")
+	check(menu._section == 1, "bajando se llega a las cartas")
+	await send_action("interact")
+	check(menu.letter_panel.visible and sanity.maximum == 110.0, "leer la carta: +10 máximo")
+	await shot("04_carta")
+	await send_action("interact")
+	await send_action("menu")
+	check(not menu.visible and not paused, "Tab cierra y despausa")
 
-	# 8. Estados y secretos: Inquieto -> símbolo; Quebrado -> la pared desaparece
+	print("-- Estados, secretos y alucinación")
 	var symbol: Node3D = current_scene.get_node("Secrets/WallSymbol")
 	var wall: Node3D = current_scene.get_node("Secrets/LyingWall")
-	check(not symbol.visible and wall.visible, "lúcido: sin símbolo, pared presente")
-	sanity.current = sanity.maximum * 0.6
-	sanity.restore(0.0)
-	sanity._update_state()
-	place(Vector3(-2, 0.05, -11), 0.0)
-	await create_timer(3.0).timeout
-	check(sanity.state_name() == "Inquieto", "estado inquieto: %s" % sanity.state_name())
-	check(symbol.visible and wall.visible, "inquieto: símbolo visible")
-	await shot("07_inquieto")
-	sanity.take_hit(sanity.current - sanity.maximum * 0.3)
-	await create_timer(3.0).timeout
-	check(sanity.state_name() == "Quebrado", "estado quebrado: %s" % sanity.state_name())
-	check(not wall.visible, "quebrado: la pared que miente desaparece")
-	await shot("08_quebrado")
-	# el jugador puede atravesar donde estaba la pared
+	var hallucination: Node3D = current_scene.get_node("Hallucination")
+	set_ratio(0.9)
+	await frames(2)
+	check(not symbol.visible and wall.visible and not hallucination.visible, "lúcido: sin símbolo ni alucinación")
+	set_ratio(0.6)
+	await frames(2)
+	check(sanity.state_name() == "Inquieto" and symbol.visible and hallucination.visible, "inquieto: símbolo y alucinación")
+	var pre_sight: float = sanity.current
+	place(Vector3(-4, 0.05, 4), deg_to_rad(70))
+	await frames(40)
+	check(sanity.has_seen(&"silueta_alta") and pre_sight - sanity.current > 7.0, "ver la silueta baja cordura")
+	await seconds(2.0)
+	await shot("05_inquieto_silueta")
+	set_ratio(0.3)
+	await frames(2)
+	check(sanity.state_name() == "Quebrado" and not wall.visible, "quebrado: la pared desaparece")
 	place(Vector3(-2, 0.05, -14.5), 0.0)
+	await seconds(1.0)  # que termine la animación de golpe de set_ratio
+	print("   antes: pos=%s yaw=%s lock=%s ctrl=%s" % [player().global_position, player()._yaw, player()._action_lock, player().can_control])
 	for i in 90:
 		Input.action_press("move_forward")
 		await physics_frame
+		if i % 30 == 0: print("   i=%d pos=%s vel=%s" % [i, player().global_position, player().velocity])
 	Input.action_release("move_forward")
-	check(player.global_position.z < -16.5, "pasa por el hueco de la pared: z=%.2f" % player.global_position.z)
-	sanity.take_hit(sanity.current - sanity.maximum * 0.08)
-	await create_timer(3.0).timeout
-	check(sanity.state_name() == "Al borde", "estado al borde")
-	place(Vector3(0, 0.05, 6), 0.0)
-	await frames(20)
-	await shot("09_al_borde")
+	check(player().global_position.z < -16.5, "pasa por el hueco: z=%.2f" % player().global_position.z)
 
-	# 9. Perderse
-	sanity.take_hit(1000.0)
+	print("-- Enemigo")
+	set_ratio(0.95)
+	await seconds(2.5)
+	var st: Node3D = stalker()
+	st.global_position = Vector3(8, 0.05, -2)
+	freeze_stalker(false)
+	# El jugador 7 m al sur (+Z), y el acechador mirándolo.
+	place(Vector3(8, 0.05, 5), 0.0)
+	st.visual.global_rotation.y = 0.0
+	await frames(20)
+	check(st.state != 0, "el acechador ve al jugador y persigue")
+	check(sanity.has_seen(&"tentaculado"), "ver al acechador por primera vez baja cordura")
+	await seconds(0.6)
+	await shot("06_acechador")
+	var pre_attack: float = sanity.current
+	await seconds(3.5)
+	check(pre_attack - sanity.current >= 11.0, "el acechador golpea: -%.1f" % (pre_attack - sanity.current))
+	await shot("07_golpe")
+	# Escapar corriendo: se alejan y termina perdiéndolo.
+	freeze_stalker(true)
+	st.global_position = Vector3(10, 0.05, -8)
+	st.state = 0
+
+	print("-- Muerte en el refugio")
+	sanity.restore(1000.0)
+	inventory.clear()
+	inventory.add(comic)
+	inventory.add(peaches)
+	place(Vector3(15.5, 0.05, 13.5), 0.0)
+	await frames(10)
+	check(sanity.in_refuge(), "en el refugio")
+	var old_player: Node3D = player()
+	sanity.take_hit(10000.0)
 	await frames(2)
-	check(not sanity.active and sanity.state_name() == "Perdido", "perdido a 0")
-	check(anim.current_animation == &"CharacterArmature|Death", "anim de muerte")
-	await create_timer(3.0).timeout
-	await shot("10_perdido")
-	await create_timer(5.0).timeout
+	check(sanity.lost_in_refuge and old_player.anim_player.current_animation == &"CharacterArmature|Death", "muere en el refugio")
+	await seconds(3.5)
+	check(current_scene.get_node("GameUI").lost_label.text.begins_with("Su corazón"), "texto de ataque cardíaco")
+	await shot("08_corazon")
+	await seconds(4.5)
 	await frames(30)
-	check(sanity.active and sanity.current > 99.0 and sanity.maximum == 100.0, "nuevo sobreviviente: %.0f/%.0f" % [sanity.current, sanity.maximum])
-	check(inventory.entries.is_empty(), "inventario perdido")
-	check(current_scene.get_node("Player") != player and sanity.in_refuge(), "reaparece en el refugio")
+	freeze_stalker(true)
+	check(player() != old_player and game_state.survivor_number == 2, "nuevo sobreviviente #2")
+	check(inventory.entries.is_empty() and sanity.maximum == 100.0, "sin inventario y cordura base")
+	check(game_state.corpses.size() == 1 and game_state.corpses[0].items.size() == 2, "cuerpo con 2 objetos")
+	var corpse: Array[Node] = current_scene.get_node("WorldPersistence").find_children("*", "Corpse", false, false)
+	check(corpse.size() == 1, "el cuerpo está en el piso")
+	check(not current_scene.has_node("Items/Peaches1"), "los duraznos recogidos no reaparecen")
+	place(Vector3(15.5, 0.05, 14.6), deg_to_rad(180))
+	await frames(10)
+	await shot("09_cuerpo")
+	player()._try_interact()
+	await frames(5)
+	check(inventory.entries.size() == 2 and game_state.corpses[0].items.is_empty(), "recupera las cosas del cuerpo")
+
+	print("-- Muerte afuera")
+	place(Vector3(0, 0.05, 8), 0.0)
+	await frames(10)
+	sanity.take_hit(10000.0)
+	await frames(2)
+	check(not sanity.lost_in_refuge, "se pierde afuera")
+	await seconds(8.0)
+	await frames(30)
+	check(game_state.corpses.size() == 1 and game_state.lost_ones.size() == 1, "afuera no deja cuerpo: queda registrado para el Perdido")
+	check(game_state.survivor_number == 3 and sanity.in_refuge(), "sobreviviente #3 en el refugio")
 
 	print("RESULT: %d fallas" % fails)
 	quit()

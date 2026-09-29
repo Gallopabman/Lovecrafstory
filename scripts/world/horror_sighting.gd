@@ -47,6 +47,7 @@ func _is_seen(player: Node3D) -> bool:
 	var from := camera.global_position
 	if from.distance_to(eye) > max_distance:
 		return false
-	var query := PhysicsRayQueryParameters3D.create(from, eye)
+	# Solo el escenario (capa 1) tapa la vista; el jugador y los enemigos no.
+	var query := PhysicsRayQueryParameters3D.create(from, eye, 1)
 	query.exclude = [(player as CollisionObject3D).get_rid()]
 	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()

@@ -6,6 +6,8 @@
 script = ExtResource("1_item")
 id = &"movie_coast_vhs"
 display_name = "VHS: Vacaciones en la costa"
+short_name = "VHS"
+grid_size = Vector2i(2, 1)
 description = "Un video casero. Una familia en la playa, riéndose de algo que no se ve. Necesita electricidad."
 kind = 2
 sanity_restore = 25.0

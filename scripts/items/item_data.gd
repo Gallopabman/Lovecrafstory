@@ -7,8 +7,12 @@ enum Kind { FOOD, COMIC, MOVIE, LETTER }
 
 @export var id: StringName
 @export var display_name := ""
+## Abreviatura que se dibuja dentro de la cuadrícula del inventario.
+@export var short_name := ""
 @export_multiline var description := ""
 @export var kind := Kind.FOOD
+## Celdas que ocupa en la mochila (ancho x alto). Las cartas no ocupan lugar.
+@export var grid_size := Vector2i(1, 1)
 
 @export_group("Cordura")
 ## Cuánto sube la cordura al usarlo (no aplica a cartas: llenan la barra).
@@ -23,13 +27,9 @@ enum Kind { FOOD, COMIC, MOVIE, LETTER }
 @export_multiline var letter_text := ""
 
 @export_group("Mundo")
-## Color del placeholder en el mundo hasta tener modelos.
+## Color del placeholder en el mundo y en la mochila hasta tener modelos e íconos.
 @export var world_color := Color(0.6, 0.6, 0.6)
 
 
-func is_consumable() -> bool:
-	return kind == Kind.FOOD
-
-
-func is_stackable() -> bool:
-	return kind == Kind.FOOD
+func is_letter() -> bool:
+	return kind == Kind.LETTER
