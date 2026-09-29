@@ -17,6 +17,16 @@ extends StaticBody3D
 	set(value):
 		material = value
 		_rebuild()
+## Sin malla: solo colisión (p. ej. la rampa invisible de una escalera).
+@export var mesh_visible := true:
+	set(value):
+		mesh_visible = value
+		_rebuild()
+## Sin colisión: solo visual (p. ej. los escalones que cubren esa rampa).
+@export var collision_enabled := true:
+	set(value):
+		collision_enabled = value
+		_rebuild()
 
 var _mesh_instance: MeshInstance3D
 var _collision: CollisionShape3D
@@ -36,14 +46,17 @@ func _rebuild() -> void:
 		_collision = CollisionShape3D.new()
 		add_child(_collision)
 
-	var mesh := BoxMesh.new()
-	mesh.size = size
-	mesh.subdivide_width = _subdivisions(size.x)
-	mesh.subdivide_height = _subdivisions(size.y)
-	mesh.subdivide_depth = _subdivisions(size.z)
-	mesh.material = material
-	_mesh_instance.mesh = mesh
+	_mesh_instance.visible = mesh_visible
+	if mesh_visible:
+		var mesh := BoxMesh.new()
+		mesh.size = size
+		mesh.subdivide_width = _subdivisions(size.x)
+		mesh.subdivide_height = _subdivisions(size.y)
+		mesh.subdivide_depth = _subdivisions(size.z)
+		mesh.material = material
+		_mesh_instance.mesh = mesh
 
+	_collision.disabled = not collision_enabled
 	var shape := BoxShape3D.new()
 	shape.size = size
 	_collision.shape = shape

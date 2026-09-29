@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Lovacrafstory"
-run/main_scene="res://scenes/levels/test_room.tscn"
+run/main_scene="res://scenes/levels/hospital.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
 [autoload]

@@ -6,6 +6,7 @@ const LOST_TEXT := "Te perdiste.\n\nAlguien más llegará al refugio."
 const HEART_TEXT := "Su corazón no aguantó.\n\nAlguien más llegará al refugio."
 
 @export var message_duration := 2.5
+@export var reading_chars_per_second := 14.0
 @export var lost_fade_delay := 1.5
 @export var lost_fade_time := 2.5
 @export var lost_hold_time := 3.0
@@ -49,7 +50,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func _show_message(text: String) -> void:
 	pickup_label.text = text
 	pickup_label.modulate.a = 1.0
-	_message_timer = message_duration
+	# Los textos largos (objetos examinados) quedan más tiempo en pantalla.
+	_message_timer = maxf(message_duration, text.length() / reading_chars_per_second)
 
 
 ## Cordura 0. En el refugio el sobreviviente muere y su cuerpo queda con sus

@@ -15,6 +15,8 @@ global uniform vec2 ps1_snap_resolution;
 global uniform float ps1_insanity;
 
 uniform vec4 albedo_color : source_color = vec4(1.0);
+// Luz propia (tubos fluorescentes, pantallas). Negro = sin emisión.
+uniform vec4 emission_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
 uniform sampler2D albedo_texture : source_color, hint_default_white, filter_nearest, repeat_enable;
 // Fuerza una resolución de textura virtual (texels por unidad UV). 0 = desactivado.
 uniform float texture_resolution = 0.0;
@@ -74,6 +76,7 @@ void fragment() {
 		uv = (floor(uv * texture_resolution) + 0.5) / texture_resolution;
 	}
 	ALBEDO = albedo_color.rgb * texture(albedo_texture, uv).rgb;
+	EMISSION = emission_color.rgb;
 	if (fog_enabled) {
 		// El global llega en sRGB; FOG se mezcla en espacio lineal.
 		FOG = vec4(srgb_to_linear(ps1_fog_color.rgb), fog_amount);

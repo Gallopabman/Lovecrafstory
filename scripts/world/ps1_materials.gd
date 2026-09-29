@@ -7,8 +7,9 @@ const PS1_SHADER := preload("res://shaders/ps1_spatial.gdshader")
 
 
 ## `tint` multiplica el color original (útil para apagar o teñir un asset).
+## `colors` reemplaza el color de materiales puntuales por nombre.
 ## Devuelve los materiales creados (p. ej. para hacerlos destellar al recibir daño).
-static func apply(root: Node, tint := Color.WHITE) -> Array[ShaderMaterial]:
+static func apply(root: Node, tint := Color.WHITE, colors: Dictionary = {}) -> Array[ShaderMaterial]:
 	var cache: Dictionary = {}
 	for node in root.find_children("*", "MeshInstance3D", true, false):
 		var mesh_instance := node as MeshInstance3D
@@ -19,17 +20,18 @@ static func apply(root: Node, tint := Color.WHITE) -> Array[ShaderMaterial]:
 			if source == null:
 				continue
 			if not cache.has(source):
-				cache[source] = _convert(source, tint)
+				cache[source] = _convert(source, tint, colors)
 			mesh_instance.set_surface_override_material(surface, cache[source])
 	var materials: Array[ShaderMaterial] = []
 	materials.assign(cache.values())
 	return materials
 
 
-static func _convert(source: BaseMaterial3D, tint: Color) -> ShaderMaterial:
+static func _convert(source: BaseMaterial3D, tint: Color, colors: Dictionary) -> ShaderMaterial:
 	var material := ShaderMaterial.new()
 	material.shader = PS1_SHADER
-	material.set_shader_parameter(&"albedo_color", source.albedo_color * tint)
+	var color: Color = colors.get(source.resource_name, source.albedo_color)
+	material.set_shader_parameter(&"albedo_color", color * tint)
 	if source.albedo_texture:
 		material.set_shader_parameter(&"albedo_texture", source.albedo_texture)
 	return material

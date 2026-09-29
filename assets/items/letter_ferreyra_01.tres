@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_ferreyra_01"
+display_name = "Informe del Dr. Ferreyra"
+short_name = "INF"
+description = "Tres hojas con membrete del Hospital San Judas, dobladas en cuatro. Nunca se enviaron."
+kind = 3
+max_sanity_bonus = 10.0
+letter_text = "Dr. A. Ferreyra, Director. Informe que nadie va a leer.
+
+Día 3 de la niebla. Evacuamos a los que pudimos. Los que quedaron en internación dicen que la niebla les habla con la voz de sus familias.
+
+Día 6. El de la cama 4 salió caminando hacia la niebla. Volvió a la noche. No era él. Tenía demasiados ojos.
+
+Día 9. Soldé las rejas y encadené la entrada. No para que nada entre. Para que nadie salga.
+
+Si leés esto: no confíes en tu cabeza cuando se nubla. Lo que ves cuando estás mal también es real, solo que no todo te quiere lastimar.
+
+Dejé la pistola en el cajón de mi escritorio. Yo no pude."
+world_color = Color(0.92, 0.9, 0.82, 1)

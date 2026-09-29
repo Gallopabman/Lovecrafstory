@@ -95,7 +95,28 @@ en vez de inventarlo.
   ([scripts/world/animation_retarget.gd](scripts/world/animation_retarget.gd)) copia en runtime
   Jump / Jump_Idle / Jump_Land del rig del alien (mismos nombres de huesos Quaternius, solo rotaciones).
   Debug: F3 overlay, F9 golpe, F10 −25 %, F11 +25 %.
-- Assets de terceros: registrar siempre en [CREDITS.md](CREDITS.md) (preferir CC0).
+- Assets de terceros: registrar siempre en [CREDITS.md](CREDITS.md) (preferir CC0; los CC-BY
+  necesitan atribución en los créditos del juego).
+
+## Zona 1: Hospital San Judas
+
+[scenes/levels/hospital.tscn](scenes/levels/hospital.tscn) es la **escena principal** (la sala de
+prueba queda para los tests). La generó [tools/build_hospital.gd](tools/build_hospital.gd), un andamio
+de **una sola pasada**: si ya se editó la escena en el editor, no volver a correrlo (pisa los cambios);
+modificar la escena a mano o actualizar el script y avisar.
+- Planta de 36x20 m, dos pisos de 3.5 m. PB: refugio (sala del personal, NE), farmacia,
+  consultorios, seguridad (barreta), hall/recepción/sala de espera, baños. P1: internación (6 camas),
+  quirófano, dirección (pistola + carta del Dr. Ferreyra), enfermería, depósito a oscuras, archivo y
+  cuarto tapiado (secreto: aparece en Quebrado; carta de Marta).
+- Límites reales: ventanas con rejas soldadas, entrada encadenada, salida de emergencia trabada (lleva a
+  la próxima zona, "la calle"), ascensor muerto. Escalera recta con rampa invisible + `NavigationLink3D`.
+- Lore: el hospital se aisló el día 9 de la niebla; Ferreyra soldó las rejas "para que nadie salga".
+  Los `Inspectable` (E) cuentan la historia con textos cortos.
+- Componentes nuevos: `Prop` (@tool, modelo + escala por `fit_height`/`fit_largest` + anchor
+  FLOOR/CEILING/WALL + colores por material + colisión de caja), `Inspectable`, `FlickerLight`;
+  `GreyBox` ahora tiene `mesh_visible` / `collision_enabled`; el shader PS1 tiene `emission_color`.
+- Muebles de Kenney: el frente mira a +Z; escalar por altura real (sus transformaciones internas
+  varían). Modelos de Poly Pizza: medirlos dentro de un `Prop`, no a mano (la escala engaña).
 
 ## Estructura
 
@@ -105,6 +126,7 @@ scenes/      .tscn por dominio (player, levels, world, enemies, effects, ui)
 scripts/     .gd por dominio (player, world, items, ui, autoload)
 shaders/     .gdshader
 tests/       scripts de test (extends SceneTree)
+tools/       generadores de contenido (extends SceneTree, se corren una vez)
 ```
 
 ## Convenciones
@@ -124,6 +146,11 @@ Godot **4.7.2** (no está en el PATH):
   (`--check-only` sobre un script da falsos errores porque no carga los autoloads).
 - **Test del loop de cordura**: `<godot> --path . -s res://tests/sanity_loop_test.gd` → imprime
   OK/FAIL y guarda capturas en `%APPDATA%\Godot\app_userdata\Lovacrafstory\test_shots\`. Mirar las capturas.
+- **Test del hospital**: `<godot> --path . -s res://tests/hospital_tour_test.gd` (carga, escalera,
+  navmesh entre pisos, límites, una captura por ambiente en `test_shots\hospital\`).
+- Regenerar el hospital: `<godot> --headless --path . -s res://tools/build_hospital.gd`.
+- Un hook de seguridad bloquea comandos de PowerShell con ciertos patrones (`.Replace(...)` con
+  comillas, `Remove-Item`): para editar archivos usar la herramienta Edit.
 - Los parámetros globales tipo `color` llegan al shader en sRGB: convertir a lineal antes de usarlos.
 - PowerShell 5 escribe UTF-8 **con BOM** (`Set-Content -Encoding utf8`): para archivos de Godot usar
   la herramienta Write o `[IO.File]::WriteAllText` con `UTF8Encoding($false)`.
@@ -154,6 +181,8 @@ alucinación desde Inquieto.
 
 **Prototipo 2.6** — hecho: combate con pistola (Quaternius, CC0) y barreta (CreativeTrio, CC0),
 munición apilable, arma equipada, dos acechadores en la sala.
+
+**Zona 1** — hecho: Hospital San Judas (ver arriba), tres acechadores, alucinación en el quirófano.
 
 Pendiente / preguntas abiertas:
 - ¿Los horrores reaparecen en zonas limpias? (pregunta abierta del GDD; hoy no).

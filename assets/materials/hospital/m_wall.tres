@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/ps1_spatial.gdshader" id="1_x7n7o"]
+[ext_resource type="Texture2D" path="res://assets/textures/hospital/wall_hospital.png" id="2_8f8ys"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_x7n7o")
+shader_parameter/albedo_color = Color(1, 1, 1, 1)
+shader_parameter/emission_color = null
+shader_parameter/albedo_texture = ExtResource("2_8f8ys")
+shader_parameter/texture_resolution = null
+shader_parameter/uv_scale = null
+shader_parameter/world_uv = true
+shader_parameter/world_uv_scale = 0.2857142857142857
+shader_parameter/vertex_snap = null
+shader_parameter/affine_mapping = null
+shader_parameter/fog_enabled = null

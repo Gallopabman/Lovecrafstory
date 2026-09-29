@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/ps1_spatial.gdshader" id="1_y7yfh"]
+[ext_resource type="Texture2D" path="res://assets/textures/hospital/floor_tiles_dirty.png" id="2_08pvm"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_y7yfh")
+shader_parameter/albedo_color = Color(0.68, 0.68, 0.64, 1)
+shader_parameter/emission_color = null
+shader_parameter/albedo_texture = ExtResource("2_08pvm")
+shader_parameter/texture_resolution = null
+shader_parameter/uv_scale = null
+shader_parameter/world_uv = true
+shader_parameter/world_uv_scale = 0.35
+shader_parameter/vertex_snap = null
+shader_parameter/affine_mapping = null
+shader_parameter/fog_enabled = null
