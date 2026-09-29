@@ -38,6 +38,9 @@ const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN]
 @export var hearing_range := 7.0
 ## Distancia a la que lo nota siempre, aunque esté de espaldas.
 @export var sense_range := 2.5
+## Agachado, la distancia a la que te nota aunque esté de espaldas se multiplica por
+## esto (0.4: de 2.5 m a 1 m). La vista usa `Player.visibility()` (agachado x0.5, linterna x1.4).
+@export var crouch_sense_multiplier := 0.4
 ## Segundos sin ver al jugador antes de abandonar la persecución.
 @export var lose_time := 4.0
 @export var eye_height := 2.1
@@ -238,17 +241,20 @@ func _attack(delta: float, player: Player, player_valid: bool) -> void:
 func _perceives(player: Player) -> bool:
 	var to_player := player.global_position - global_position
 	var distance := to_player.length()
-	if distance <= sense_range:
+	# Agachado cuesta verte (y notarte de cerca); con la linterna prendida, menos.
+	var visibility := player.visibility()
+	if distance <= sense_range * (crouch_sense_multiplier if player.is_crouching else 1.0):
 		return true
 	if player.is_running and distance <= hearing_range:
 		return true
-	if distance > sight_range:
+	if distance > sight_range * visibility:
 		return false
 	var forward := visual.global_basis.z
 	if rad_to_deg(forward.angle_to(Vector3(to_player.x, 0.0, to_player.z))) > sight_half_angle:
 		return false
+	# Mira a la altura de los ojos del jugador: agachado detrás de un mostrador, no te ve.
 	var from := global_position + Vector3.UP * eye_height
-	var query := PhysicsRayQueryParameters3D.create(from, player.global_position + Vector3.UP * 1.4, 1)
+	var query := PhysicsRayQueryParameters3D.create(from, player.global_position + Vector3.UP * player.eye_height(), 1)
 	query.exclude = [get_rid(), player.get_rid()]
 	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 

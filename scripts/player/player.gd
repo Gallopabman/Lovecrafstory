@@ -15,7 +15,12 @@ const ANIM_JUMP := &"CharacterArmature|Jump"
 const ANIM_AIRBORNE := &"CharacterArmature|Jump_Idle"
 const ANIM_LAND := &"CharacterArmature|Jump_Land"
 const JUMP_ANIM_SOURCE := preload("res://assets/models/enemies/tentacled/tentacled.glb")
-const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN, ANIM_AIRBORNE]
+## Agacharse: tampoco viene con el modelo. La pose sale del primer cuadro del "Duck" del
+## alien y la caminata agachada se genera mezclando Walk con esa pose.
+const ANIM_DUCK := &"CharacterArmature|Duck"
+const ANIM_CROUCH_IDLE := &"CrouchIdle"
+const ANIM_CROUCH_WALK := &"CrouchWalk"
+const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN, ANIM_AIRBORNE, ANIM_CROUCH_WALK]
 
 @export_group("Movimiento")
 @export var walk_speed := 2.2
@@ -31,6 +36,20 @@ const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN, ANIM_A
 ## Caídas más largas que esto (segundos en el aire) hacen la animación de aterrizaje.
 @export var hard_landing_time := 0.6
 
+@export_group("Agacharse")
+@export var crouch_speed := 1.2
+## Alto de la cápsula agachado (parado: 1.8).
+@export var crouch_height := 1.2
+@export var crouch_camera_height := 1.0
+## Cuánto de la pose agachada se mezcla en la caminata (0 = caminar normal, 1 = pose fija).
+@export_range(0.0, 1.0) var crouch_walk_blend := 0.7
+
+@export_group("Sigilo")
+## Multiplicador de la distancia a la que te ven los enemigos (1 = parado a la luz).
+@export var crouch_visibility := 0.5
+## La linterna encendida te delata en la oscuridad.
+@export var flashlight_visibility := 1.4
+
 @export_group("Cámara")
 @export var camera_height := 1.5
 @export var mouse_sensitivity := 0.003
@@ -45,6 +64,7 @@ const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN, ANIM_A
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var is_running := false
+var is_crouching := false
 var can_control := true
 
 var _yaw := 0.0
@@ -54,6 +74,8 @@ var _action_lock := 0.0
 var _air_time := 0.0
 ## Tiempo desde que despegó, para dejar terminar la animación de impulso.
 var _jump_timer := 0.0
+var _stand_height := 1.8
+var _current_camera_height := 0.0
 
 @onready var visual: Node3D = $Visual
 @onready var model: Node3D = $Visual/Model
@@ -63,10 +85,15 @@ var _jump_timer := 0.0
 @onready var spring_arm: SpringArm3D = $CameraPivot/SpringArm3D
 @onready var anim_player: AnimationPlayer = model.find_child("AnimationPlayer") as AnimationPlayer
 @onready var combat: PlayerCombat = $Combat
+@onready var body_shape: CollisionShape3D = $CollisionShape3D
 
 
 func _ready() -> void:
 	add_to_group(&"player")
+	# La cápsula cambia de alto al agacharse: copia propia para no tocar el recurso de la escena.
+	body_shape.shape = body_shape.shape.duplicate()
+	_stand_height = (body_shape.shape as CapsuleShape3D).height
+	_current_camera_height = camera_height
 	# El pivote se independiza del transform del jugador para poder suavizar el seguimiento.
 	camera_pivot.top_level = true
 	camera_pivot.global_position = _camera_target()
@@ -76,7 +103,9 @@ func _ready() -> void:
 
 	PS1Materials.apply(model)
 	var skeleton := model.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
-	AnimationRetarget.import_animations(JUMP_ANIM_SOURCE, [ANIM_JUMP, ANIM_AIRBORNE, ANIM_LAND], anim_player, skeleton)
+	AnimationRetarget.import_animations(JUMP_ANIM_SOURCE, [ANIM_JUMP, ANIM_AIRBORNE, ANIM_LAND, ANIM_DUCK], anim_player, skeleton)
+	AnimationRetarget.make_pose(anim_player, ANIM_DUCK, 0.0, ANIM_CROUCH_IDLE)
+	AnimationRetarget.make_blend(anim_player, ANIM_WALK, ANIM_DUCK, 0.0, crouch_walk_blend, ANIM_CROUCH_WALK)
 	for anim_name in LOOPING_ANIMS:
 		anim_player.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
 	anim_player.play(ANIM_IDLE)
@@ -100,6 +129,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		flashlight.visible = not flashlight.visible
 	elif event.is_action_pressed("interact"):
 		_try_interact()
+	elif event.is_action_pressed("crouch"):
+		set_crouching(not is_crouching)
 
 
 func _physics_process(delta: float) -> void:
@@ -117,8 +148,12 @@ func _physics_process(delta: float) -> void:
 		_air_time = 0.0
 
 	combat.physics_update(delta)
+	# Apuntar, correr o saltar agachado primero te pone de pie (si hay lugar arriba).
+	if is_crouching and (combat.aiming or Input.is_action_just_pressed("run") \
+			or Input.is_action_just_pressed("jump")):
+		set_crouching(false)
 	if Input.is_action_just_pressed("jump") and on_floor and can_control \
-			and not combat.aiming and not is_busy():
+			and not combat.aiming and not is_busy() and not is_crouching:
 		velocity.y = jump_velocity
 		_jump_timer = 0.0
 		anim_player.speed_scale = 1.0
@@ -128,8 +163,9 @@ func _physics_process(delta: float) -> void:
 	if can_control and _action_lock <= 0.0 and not combat.aiming:
 		input = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, _yaw)
-	is_running = Input.is_action_pressed("run") and direction.length_squared() > 0.01
-	var target_velocity := direction * (run_speed if is_running else walk_speed)
+	is_running = Input.is_action_pressed("run") and direction.length_squared() > 0.01 and not is_crouching
+	var speed := crouch_speed if is_crouching else (run_speed if is_running else walk_speed)
+	var target_velocity := direction * speed
 
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
 	# En el aire se conserva el impulso y se controla poco.
@@ -145,6 +181,8 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_update_animation(horizontal.length())
 
+	var target_height := crouch_camera_height if is_crouching else camera_height
+	_current_camera_height = lerpf(_current_camera_height, target_height, 1.0 - exp(-8.0 * delta))
 	camera_pivot.global_position = camera_pivot.global_position.lerp(
 		_camera_target(), 1.0 - exp(-camera_follow_speed * delta))
 
@@ -175,7 +213,10 @@ func _update_animation(speed: float) -> void:
 		return
 	var anim := ANIM_IDLE
 	var reference_speed := 1.0
-	if speed > walk_speed * 1.15:
+	if is_crouching:
+		anim = ANIM_CROUCH_WALK if speed > 0.2 else ANIM_CROUCH_IDLE
+		reference_speed = crouch_speed * 1.6
+	elif speed > walk_speed * 1.15:
 		anim = ANIM_RUN
 		reference_speed = run_speed
 	elif speed > 0.3:
@@ -184,7 +225,8 @@ func _update_animation(speed: float) -> void:
 	if anim_player.current_animation != anim:
 		anim_player.play(anim, anim_blend_time)
 	# Ajusta la cadencia de pasos a la velocidad real para que no patine.
-	anim_player.speed_scale = 1.0 if anim == ANIM_IDLE else clampf(speed / reference_speed, 0.6, 1.3)
+	var still := anim == ANIM_IDLE or anim == ANIM_CROUCH_IDLE
+	anim_player.speed_scale = 1.0 if still else clampf(speed / reference_speed, 0.6, 1.3)
 
 
 ## Reproduce una animación de acción que bloquea el movimiento hasta terminar.
@@ -202,6 +244,43 @@ func is_busy() -> bool:
 ## Orientación horizontal de la cámara.
 func yaw() -> float:
 	return _yaw
+
+
+## Agacharse o pararse. Para pararse tiene que haber lugar arriba (debajo de una
+## mesa, no). Devuelve si quedó en el estado pedido.
+func set_crouching(crouch: bool) -> bool:
+	if crouch == is_crouching:
+		return true
+	if crouch and not (can_control and is_on_floor()):
+		return false
+	if not crouch and not _has_headroom():
+		return false
+	is_crouching = crouch
+	var capsule := body_shape.shape as CapsuleShape3D
+	capsule.height = crouch_height if crouch else _stand_height
+	body_shape.position.y = capsule.height / 2.0
+	return true
+
+
+## Altura de los ojos: los enemigos miran a este punto (cubrirse detrás de algo bajo sirve).
+func eye_height() -> float:
+	return 0.85 if is_crouching else 1.4
+
+
+## Qué tan fácil es verte: agachado cuesta más; con la linterna prendida, menos.
+func visibility() -> float:
+	var factor := crouch_visibility if is_crouching else 1.0
+	if flashlight.visible:
+		factor *= flashlight_visibility
+	return factor
+
+
+func _has_headroom() -> bool:
+	var from := global_position + Vector3.UP * (crouch_height - 0.05)
+	var to := global_position + Vector3.UP * (_stand_height + 0.05)
+	var query := PhysicsRayQueryParameters3D.create(from, to, 1)
+	query.exclude = [get_rid()]
+	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
 func _try_interact() -> void:
@@ -231,4 +310,4 @@ func _on_lost() -> void:
 
 
 func _camera_target() -> Vector3:
-	return global_position + Vector3.UP * camera_height
+	return global_position + Vector3.UP * _current_camera_height

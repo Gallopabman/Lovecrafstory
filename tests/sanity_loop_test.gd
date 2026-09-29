@@ -162,6 +162,80 @@ func _initialize() -> void:
 	check(player().is_on_floor(), "vuelve al piso")
 	check(air_anims.has(&"CharacterArmature|Jump") or air_anims.has(&"CharacterArmature|Jump_Idle"), "anim de salto en el aire: %s" % [air_anims.keys()])
 
+	print("-- Agacharse y sigilo")
+	var p := player()
+	place(Vector3(0, 0.05, 8), 0.0)
+	await seconds(0.5)
+	check(p.set_crouching(true) and p.is_crouching, "se agacha")
+	check(is_equal_approx((p.body_shape.shape as CapsuleShape3D).height, 1.2), "la cápsula se achica")
+	await frames(10)
+	check(anim.current_animation == &"CrouchIdle", "pose agachada: %s" % anim.current_animation)
+	Input.action_press("move_forward")
+	for i in 40:
+		await physics_frame
+	var crouch_speed := Vector2(p.velocity.x, p.velocity.z).length()
+	check(crouch_speed < 1.4 and anim.current_animation == &"CrouchWalk", "camina agachado: %.1f m/s, %s" % [crouch_speed, anim.current_animation])
+	await shot("00_agachado")
+	Input.action_release("move_forward")
+	var ev_run := InputEventAction.new()
+	ev_run.action = "run"
+	ev_run.pressed = true
+	Input.parse_input_event(ev_run)
+	await frames(3)
+	var ev_run_up := InputEventAction.new()
+	ev_run_up.action = "run"
+	Input.parse_input_event(ev_run_up)
+	await frames(3)
+	check(not p.is_crouching, "correr lo pone de pie")
+	# Techo bajo: no se puede parar.
+	place(Vector3(0, 0.05, 8), 0.0)
+	await frames(5)
+	p.set_crouching(true)
+	var low := StaticBody3D.new()
+	var low_shape := CollisionShape3D.new()
+	low_shape.shape = BoxShape3D.new()
+	(low_shape.shape as BoxShape3D).size = Vector3(2, 0.1, 2)
+	low.add_child(low_shape)
+	current_scene.add_child(low)
+	low.global_position = Vector3(0, 1.45, 8)
+	await physics_frame
+	await physics_frame
+	check(not p.set_crouching(false) and p.is_crouching, "con techo bajo no se puede parar")
+	low.queue_free()
+	await physics_frame
+	await physics_frame
+	# Detección: el acechador en (0,0,0) mirando hacia +Z (hacia el jugador).
+	var watcher: Node3D = stalker()
+	watcher.global_position = Vector3(0, 0.05, 0)
+	watcher.visual.global_rotation.y = 0.0
+	p.set_crouching(false)
+	place(Vector3(0, 0.05, 7), 0.0)
+	await physics_frame
+	check(watcher._perceives(p), "parado a 7 m: lo ve")
+	p.set_crouching(true)
+	check(not watcher._perceives(p), "agachado a 7 m: no lo ve")
+	p.flashlight.visible = true
+	check(watcher._perceives(p), "agachado a 7 m con la linterna prendida: lo ve")
+	p.flashlight.visible = false
+	place(Vector3(0, 0.05, 4), 0.0)
+	await physics_frame
+	check(watcher._perceives(p), "agachado a 4 m al descubierto: lo ve")
+	var cover := StaticBody3D.new()
+	var cover_shape := CollisionShape3D.new()
+	cover_shape.shape = BoxShape3D.new()
+	(cover_shape.shape as BoxShape3D).size = Vector3(2, 1.5, 0.3)
+	cover.add_child(cover_shape)
+	current_scene.add_child(cover)
+	cover.global_position = Vector3(0, 0.75, 2.5)
+	await physics_frame
+	await physics_frame
+	check(not watcher._perceives(p), "agachado detrás de algo bajo: no lo ve")
+	p.set_crouching(false)
+	check(watcher._perceives(p), "parado detrás de lo mismo: lo ve")
+	cover.queue_free()
+	watcher.global_position = Vector3(10, 0.05, -8)
+	await frames(3)
+
 	print("-- Recoger")
 	place(Vector3(2, 0.05, -0.9), 0.0)
 	await frames(10)

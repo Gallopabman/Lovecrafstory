@@ -114,6 +114,10 @@ menu={
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":4194306), Object(InputEventKey,"device":-1,"physical_keycode":73), Object(InputEventJoypadButton,"device":-1,"button_index":4)]
 }
 
+crouch={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":67), Object(InputEventKey,"device":-1,"physical_keycode":4194326), Object(InputEventJoypadButton,"device":-1,"button_index":7)]
+}
 jump={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":32), Object(InputEventJoypadButton,"device":-1,"button_index":0)]

@@ -93,13 +93,19 @@ en vez de inventarlo.
   entrada propia en `_input`), cuadrícula `InventoryGrid`, lector de cartas, avisos breves, pantalla de
   muerte. Tema global [assets/ui/ps1_theme.tres](assets/ui/ps1_theme.tres), Pixel Operator 8px.
 - **Input** (teclado / gamepad): `move_*`, `look_*` (stick der.), `run` (Shift / B), `jump`
-  (Espacio / A), `interact` (E / X), `flashlight` (F / cruceta arriba), `reload` (R / Y),
+  (Espacio / A), `crouch` (C o Ctrl / L3, alterna), `interact` (E / X), `flashlight` (F / cruceta arriba), `reload` (R / Y),
   `aim` (clic der. / L2), `attack` (clic izq. / R2), `menu` (Tab o I / Back), `pause` (Esc / Start).
   En el menú: usar (E, Enter / A), `inventory_move` (R / X), `inventory_rotate` (Q / RB),
   `inventory_drop` (X / Y). En el menú "usar" solo acepta la E del teclado, no `interact` del gamepad.
 - **Salto**: el superviviente no trae animación de salto; `AnimationRetarget`
   ([scripts/world/animation_retarget.gd](scripts/world/animation_retarget.gd)) copia en runtime
   Jump / Jump_Idle / Jump_Land del rig del alien (mismos nombres de huesos Quaternius, solo rotaciones).
+- **Agacharse / sigilo**: `Player.set_crouching()` (cápsula 1.2 m, 1.2 m/s, cámara baja; no se para
+  con techo bajo; correr, saltar o apuntar lo pone de pie). Animaciones generadas en runtime:
+  `CrouchIdle` = primer cuadro del "Duck" del alien (`AnimationRetarget.make_pose`), `CrouchWalk` =
+  Walk mezclado con esa pose (`make_blend`). `Player.visibility()` (agachado x0.5, linterna x1.4) escala
+  la vista del `Stalker`; agachado te nota de 1 m en vez de 2.5; mira a `Player.eye_height()` (1.4 / 0.85),
+  así que agacharse detrás de algo bajo (mostrador, cama, escritorio) corta la línea de visión.
   Debug: F3 overlay, F9 golpe, F10 −25 %, F11 +25 %.
 - Assets de terceros: registrar siempre en [CREDITS.md](CREDITS.md) (preferir CC0; los CC-BY
   necesitan atribución en los créditos del juego).
@@ -168,6 +174,8 @@ Godot **4.7.2** (no está en el PATH):
 - Los parámetros globales tipo `color` llegan al shader en sRGB: convertir a lineal antes de usarlos.
 - PowerShell 5 escribe UTF-8 **con BOM** (`Set-Content -Encoding utf8`): para archivos de Godot usar
   la herramienta Write o `[IO.File]::WriteAllText` con `UTF8Encoding($false)`.
+- La ventana de los tests toma el foco: si el usuario usa teclado o mouse mientras corren, puede
+  haber fallas aleatorias (sobre todo en los menús). Volver a correr antes de sospechar del código.
 - El test no puede usar `class_name` del juego (compila antes que los autoloads). Ignora la entrada
   real (`isolate_input`) y congela enemigos con `set_physics_process(false)`: `PROCESS_MODE_DISABLED`
   los saca del mundo físico y las balas los atraviesan.
