@@ -7,7 +7,8 @@ const PS1_SHADER := preload("res://shaders/ps1_spatial.gdshader")
 
 
 ## `tint` multiplica el color original (útil para apagar o teñir un asset).
-static func apply(root: Node, tint := Color.WHITE) -> void:
+## Devuelve los materiales creados (p. ej. para hacerlos destellar al recibir daño).
+static func apply(root: Node, tint := Color.WHITE) -> Array[ShaderMaterial]:
 	var cache: Dictionary = {}
 	for node in root.find_children("*", "MeshInstance3D", true, false):
 		var mesh_instance := node as MeshInstance3D
@@ -20,6 +21,9 @@ static func apply(root: Node, tint := Color.WHITE) -> void:
 			if not cache.has(source):
 				cache[source] = _convert(source, tint)
 			mesh_instance.set_surface_override_material(surface, cache[source])
+	var materials: Array[ShaderMaterial] = []
+	materials.assign(cache.values())
+	return materials
 
 
 static func _convert(source: BaseMaterial3D, tint: Color) -> ShaderMaterial:

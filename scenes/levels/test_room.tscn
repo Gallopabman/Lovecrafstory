@@ -24,6 +24,9 @@
 [ext_resource type="Resource" path="res://assets/items/food_chocolate_bar.tres" id="21_choc"]
 [ext_resource type="Script" path="res://scripts/world/runtime_nav_bake.gd" id="22_nav"]
 [ext_resource type="Script" path="res://scripts/world/world_persistence.gd" id="23_persist"]
+[ext_resource type="Resource" path="res://assets/items/weapon_pistol.tres" id="24_pistol"]
+[ext_resource type="Resource" path="res://assets/items/weapon_crowbar.tres" id="25_crowbar"]
+[ext_resource type="Resource" path="res://assets/items/ammo_9mm.tres" id="26_ammo"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_room"]
 geometry_parsed_geometry_type = 1
@@ -282,6 +285,24 @@ item = ExtResource("21_choc")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, -4)
 item = ExtResource("21_choc")
 
+[node name="Pistol" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0, 17)
+item = ExtResource("24_pistol")
+
+[node name="Crowbar" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 0, 12.5)
+item = ExtResource("25_crowbar")
+
+[node name="Ammo1" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 10)
+item = ExtResource("26_ammo")
+count = 8
+
+[node name="Ammo2" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -10)
+item = ExtResource("26_ammo")
+count = 8
+
 [node name="Hallucination" type="Node3D" parent="."]
 script = ExtResource("10_gated")
 threshold = 1
@@ -298,6 +319,9 @@ script = ExtResource("23_persist")
 
 [node name="Stalker" parent="." instance=ExtResource("19_stalker")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -8)
+
+[node name="Stalker2" parent="." instance=ExtResource("19_stalker")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -14)
 
 [node name="Player" parent="." unique_id=1683962500 instance=ExtResource("6_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 0.05, 15.5)

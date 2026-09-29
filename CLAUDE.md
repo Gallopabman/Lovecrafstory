@@ -26,6 +26,10 @@ en vez de inventarlo.
   cardíaco y **el cuerpo queda en el piso** con todo lo que llevaba; el siguiente puede revisarlo.
 - **Inventario estilo Resident Evil**: mochila en cuadrícula (6x4), cada objeto ocupa su tamaño y
   se puede mover, girar y tirar. Las cartas van en una lista aparte y no ocupan lugar.
+- **Combate** (decisión del usuario, responde la pregunta abierta del GDD): armas de fuego y cuerpo a
+  cuerpo. Fuego: apuntar deja quieto, auto-apuntado al enemigo más cercano (estilo SH1), cargador +
+  munición en la mochila, los disparos atraen enemigos, **la locura abre la dispersión**. Cuerpo a
+  cuerpo: golpe en arco; sin arma, trompadas. Los enemigos muertos no reaparecen.
 - **Refugio**: blueprints de slots fijos (fuego, electricidad, cama, decoración, ventanas,
   estaciones). Un solo refugio activo; mudarse es una decisión. Bono de llegada según logros de la salida.
 - **Mundo interconectado** ("lineal abierto", atajos estilo RE2/Dark Souls). Primer tramo:
@@ -67,15 +71,23 @@ en vez de inventarlo.
   y su colisión según el estado), `HorrorSighting` (baja cordura la primera vez que se ve),
   `WorldPersistence` (reconstruye objetos tirados y cuerpos al cargar), `Corpse`,
   `RuntimeNavBake` (hornea el navmesh al cargar desde el grupo `nav_source`).
-- **Enemigos** (`scripts/enemies/`): `Stalker` — deambula, persigue si ve u oye correr, golpea la
-  cordura; se escapa corriendo (no hay combate: pregunta abierta del GDD). Usa NavigationAgent3D.
+- **Enemigos** (`scripts/enemies/`): `Stalker` — deambula, persigue si ve, oye correr u oye un
+  disparo (`hear_noise`), golpea la cordura; tiene vida (`take_damage`), se tambalea, destella en rojo
+  y muere (queda el cuerpo, `GameState.mark_killed`). Grupo `enemies`. Usa NavigationAgent3D.
+- **Combate** ([scripts/player/player_combat.gd](scripts/player/player_combat.gd), nodo `Combat` hijo
+  del jugador; su `setup()` lo llama Player): apuntar/disparar/recargar, cuerpo a cuerpo, arma en la
+  mano vía BoneAttachment3D en `Wrist.R`. Las escenas `scenes/weapons/*_held.tscn` están en metros en
+  el espacio del hueso (el esqueleto del glTF viene x100 y se compensa al equipar).
+  Armas = `ItemData` kind WEAPON (grupo "Arma": `is_ranged`, `damage`, `magazine_size`, `ammo_item`,
+  `noise_radius`, `held_scene`); munición = kind AMMO con `max_stack`.
 - **Capas de colisión**: 1 escenario + jugador, 2 enemigos, 3 interactuables.
 - **Interacción**: el jugador busca Areas del grupo `interactable` (capa 3) y llama `interact(player)`.
 - **UI** ([scenes/ui/game_ui.tscn](scenes/ui/game_ui.tscn), CanvasLayer 50): menú (pausa el juego;
   entrada propia en `_input`), cuadrícula `InventoryGrid`, lector de cartas, avisos breves, pantalla de
   muerte. Tema global [assets/ui/ps1_theme.tres](assets/ui/ps1_theme.tres), Pixel Operator 8px.
 - **Input**: `move_*`, `look_*` (stick der.), `run`, `interact` (E), `flashlight` (F), `menu`
-  (Tab / I / Back), `pause` (Esc), `inventory_move` (R), `inventory_rotate` (Q), `inventory_drop` (X).
+  (Tab / I / Back), `pause` (Esc), `inventory_move` (R), `inventory_rotate` (Q), `inventory_drop` (X),
+  `aim` (clic der. / L2), `attack` (clic izq. / R2), `reload` (R / X del gamepad).
   Debug: F3 overlay, F9 golpe, F10 −25 %, F11 +25 %.
 - Assets de terceros: registrar siempre en [CREDITS.md](CREDITS.md) (preferir CC0).
 
@@ -109,8 +121,9 @@ Godot **4.7.2** (no está en el PATH):
 - Los parámetros globales tipo `color` llegan al shader en sRGB: convertir a lineal antes de usarlos.
 - PowerShell 5 escribe UTF-8 **con BOM** (`Set-Content -Encoding utf8`): para archivos de Godot usar
   la herramienta Write o `[IO.File]::WriteAllText` con `UTF8Encoding($false)`.
-- El test no puede usar `class_name` del juego (compila antes que los autoloads) y el mouse sobre la
-  ventana lo altera.
+- El test no puede usar `class_name` del juego (compila antes que los autoloads). Ignora la entrada
+  real (`isolate_input`) y congela enemigos con `set_physics_process(false)`: `PROCESS_MODE_DISABLED`
+  los saca del mundo físico y las balas los atraviesan.
 - **Git**: repo https://github.com/Gallopabman/Lovecrafstory (rama `main`), binarios en Git LFS
   (ver `.gitattributes`). Identidad local: `Gallopabman <Gallopabman@users.noreply.github.com>`.
   El PATH de la sesión puede no tener git: refrescarlo con
@@ -133,8 +146,12 @@ Godot **4.7.2** (no está en el PATH):
 mundo persistente entre sobrevivientes (en memoria), acechador (Quaternius, CC0), silueta como
 alucinación desde Inquieto.
 
+**Prototipo 2.6** — hecho: combate con pistola (Quaternius, CC0) y barreta (CreativeTrio, CC0),
+munición apilable, arma equipada, dos acechadores en la sala.
+
 Pendiente / preguntas abiertas:
-- ¿Combate o solo esconderse y huir? (GDD). Hoy el acechador solo se esquiva corriendo.
+- Combate: ¿durabilidad de armas cuerpo a cuerpo? ¿matar horrores afecta la cordura? ¿los horrores
+  reaparecen en zonas limpias? (pregunta abierta del GDD). Sonido (disparos, golpes) todavía no hay.
 - El Perdido (ya se registran posición e inventario en `GameState.lost_ones`), alucinaciones
   inofensivas "de verdad", cámaras fijas en interiores, bono de llegar a casa, guardado a disco.
 - Íconos de objetos para la cuadrícula (hoy: color + abreviatura).

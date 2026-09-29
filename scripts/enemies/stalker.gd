@@ -1,19 +1,25 @@
 class_name Stalker
 extends CharacterBody3D
 ## Enemigo acechador: deambula cerca de donde aparece, persigue al jugador
-## cuando lo ve o lo oye correr, y lo golpea (el daño es a la cordura).
-## Se lo pierde de vista escapando: no hay combate todavía (pregunta abierta del GDD).
+## cuando lo ve, lo oye correr u oye un disparo, y lo golpea (el daño es a la
+## cordura). Tiene vida: se tambalea con cada golpe y muere para siempre
+## (el mundo sigue como quedó).
 
-enum State { WANDER, CHASE, ATTACK }
+signal died
+
+enum State { WANDER, CHASE, ATTACK, STAGGER, DEAD }
 
 const ANIM_IDLE := &"CharacterArmature|Idle"
 const ANIM_WALK := &"CharacterArmature|Walk"
 const ANIM_RUN := &"CharacterArmature|Run"
 const ANIM_ATTACK := &"CharacterArmature|Punch"
+const ANIM_HIT := &"CharacterArmature|HitReact"
+const ANIM_DEATH := &"CharacterArmature|Death"
 const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN]
 
 ## Multiplica los colores del modelo (apagarlo lo vuelve más inquietante en la niebla).
 @export var tint := Color(0.55, 0.5, 0.55)
+@export var max_health := 100.0
 
 @export_group("Movimiento")
 @export var wander_speed := 1.0
@@ -41,7 +47,14 @@ const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN]
 ## Momento de la animación en que el golpe conecta.
 @export var attack_hit_time := 0.45
 
+@export_group("Daño recibido")
+## Segundos que queda aturdido al recibir un golpe.
+@export var stagger_time := 0.45
+@export var hit_flash_color := Color(1.0, 0.15, 0.1)
+@export var hit_flash_time := 0.12
+
 var state := State.WANDER
+var health := max_health
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 var _home := Vector3.ZERO
@@ -50,6 +63,10 @@ var _since_seen := 0.0
 var _attack_timer := 0.0
 var _attack_hit_pending := false
 var _cooldown := 0.0
+var _stagger_timer := 0.0
+var _flash_timer := 0.0
+var _materials: Array[ShaderMaterial] = []
+var _base_colors: Array[Color] = []
 
 @onready var visual: Node3D = $Visual
 @onready var model: Node3D = $Visual/Model
@@ -58,8 +75,15 @@ var _cooldown := 0.0
 
 
 func _ready() -> void:
+	if GameState.is_killed(_key()):
+		queue_free()
+		return
+	add_to_group(&"enemies")
+	health = max_health
 	_home = global_position
-	PS1Materials.apply(model, tint)
+	_materials = PS1Materials.apply(model, tint)
+	for material in _materials:
+		_base_colors.append(material.get_shader_parameter(&"albedo_color"))
 	for anim_name in LOOPING_ANIMS:
 		anim_player.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
 	anim_player.play(ANIM_IDLE)
@@ -71,6 +95,11 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 	_cooldown = maxf(_cooldown - delta, 0.0)
+	_update_flash(delta)
+	if state == State.DEAD:
+		_move_towards(Vector3.ZERO, 0.0, delta)
+		move_and_slide()
+		return
 
 	var player := get_tree().get_first_node_in_group(&"player") as Player
 	var player_valid := player != null and player.can_control and Sanity.active
@@ -88,7 +117,65 @@ func _physics_process(delta: float) -> void:
 			_chase(delta, player, player_valid)
 		State.ATTACK:
 			_attack(delta, player, player_valid)
+		State.STAGGER:
+			_move_towards(Vector3.ZERO, 0.0, delta)
+			_stagger_timer -= delta
+			if _stagger_timer <= 0.0:
+				state = State.CHASE
 	move_and_slide()
+
+
+## Punto al que apunta el auto-apuntado del jugador.
+func aim_point() -> Vector3:
+	return global_position + Vector3.UP * 1.5
+
+
+func is_dead() -> bool:
+	return state == State.DEAD
+
+
+func take_damage(amount: float) -> void:
+	if state == State.DEAD:
+		return
+	health -= amount
+	_flash_timer = hit_flash_time
+	# Un golpe siempre lo alerta.
+	_since_seen = 0.0
+	if health <= 0.0:
+		_die()
+		return
+	state = State.STAGGER
+	_stagger_timer = stagger_time
+	_attack_hit_pending = false
+	anim_player.play(ANIM_HIT, 0.05)
+
+
+## Un ruido fuerte (disparo) dentro de `radius` lo pone a perseguir.
+func hear_noise(origin: Vector3, radius: float) -> void:
+	if state == State.WANDER and global_position.distance_to(origin) <= radius:
+		_since_seen = 0.0
+		state = State.CHASE
+
+
+func _die() -> void:
+	state = State.DEAD
+	GameState.mark_killed(_key())
+	# El cuerpo queda en el piso pero ya no bloquea ni se puede golpear.
+	collision_layer = 0
+	remove_from_group(&"enemies")
+	anim_player.play(ANIM_DEATH, 0.1)
+	died.emit()
+
+
+func _update_flash(delta: float) -> void:
+	if _flash_timer <= 0.0 and _flash_timer > -1.0:
+		return
+	_flash_timer -= delta
+	var amount := clampf(_flash_timer / hit_flash_time, 0.0, 1.0)
+	for i in _materials.size():
+		_materials[i].set_shader_parameter(&"albedo_color", _base_colors[i].lerp(hit_flash_color, amount))
+	if _flash_timer <= 0.0:
+		_flash_timer = 0.0
 
 
 func _wander(delta: float) -> void:
@@ -188,3 +275,7 @@ func _face(target: Vector3, delta: float) -> void:
 func _play(anim: StringName) -> void:
 	if anim_player.current_animation != anim:
 		anim_player.play(anim, 0.25)
+
+
+func _key() -> String:
+	return String(get_path())

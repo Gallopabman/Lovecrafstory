@@ -164,16 +164,22 @@ func _refresh() -> void:
 
 func _show_details() -> void:
 	var item: ItemData = null
+	var entry: Dictionary = {}
 	if _section == Section.LETTERS:
 		var index := _letter_index()
 		item = Inventory.letters[index] if index >= 0 else null
-	elif grid.is_holding():
-		item = grid.held.item
 	else:
-		var entry := grid.hovered_entry()
+		entry = grid.held if grid.is_holding() else grid.hovered_entry()
 		item = entry.item if not entry.is_empty() else null
 	name_label.text = item.display_name if item else ""
-	description_label.text = item.description if item else ""
+	var description := item.description if item else ""
+	if item and item.is_weapon():
+		if Inventory.is_equipped(entry):
+			name_label.text += "  (en la mano)"
+		if item.is_ranged:
+			description += "\n\nCargador: %d/%d   Balas: %d" % [
+				entry.loaded, item.magazine_size, Inventory.ammo_count(item.ammo_item)]
+	description_label.text = description
 	_refresh_hint()
 
 

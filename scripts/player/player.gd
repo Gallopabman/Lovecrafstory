@@ -48,6 +48,7 @@ var _action_lock := 0.0
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var spring_arm: SpringArm3D = $CameraPivot/SpringArm3D
 @onready var anim_player: AnimationPlayer = model.find_child("AnimationPlayer") as AnimationPlayer
+@onready var combat: PlayerCombat = $Combat
 
 
 func _ready() -> void:
@@ -63,6 +64,7 @@ func _ready() -> void:
 	for anim_name in LOOPING_ANIMS:
 		anim_player.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
 	anim_player.play(ANIM_IDLE)
+	combat.setup()
 
 	Sanity.hit_taken.connect(_on_hit_taken)
 	Sanity.lost.connect(_on_lost)
@@ -91,8 +93,10 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
+	combat.physics_update(delta)
 	var input := Vector2.ZERO
-	if can_control and _action_lock <= 0.0:
+	# Apuntar deja al personaje quieto (survival horror clásico).
+	if can_control and _action_lock <= 0.0 and not combat.aiming:
 		input = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var direction := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, _yaw)
 	is_running = Input.is_action_pressed("run") and direction.length_squared() > 0.01
@@ -125,6 +129,11 @@ func _update_camera_rotation(delta: float) -> void:
 func _update_animation(speed: float) -> void:
 	if not can_control or _action_lock > 0.0:
 		return
+	if combat.aiming:
+		anim_player.speed_scale = 1.0
+		if anim_player.current_animation != PlayerCombat.ANIM_AIM:
+			anim_player.play(PlayerCombat.ANIM_AIM, 0.12)
+		return
 	var anim := ANIM_IDLE
 	var reference_speed := 1.0
 	if speed > walk_speed * 1.15:
@@ -139,10 +148,21 @@ func _update_animation(speed: float) -> void:
 	anim_player.speed_scale = 1.0 if anim == ANIM_IDLE else clampf(speed / reference_speed, 0.6, 1.3)
 
 
-func _play_action(anim: StringName) -> void:
+## Reproduce una animación de acción que bloquea el movimiento hasta terminar.
+func play_action(anim: StringName) -> void:
 	anim_player.speed_scale = 1.0
 	anim_player.play(anim, 0.1)
 	_action_lock = anim_player.get_animation(anim).length
+
+
+## Hay una acción en curso (golpe recibido, ataque, interactuar, recargar).
+func is_busy() -> bool:
+	return _action_lock > 0.0
+
+
+## Orientación horizontal de la cámara.
+func yaw() -> float:
+	return _yaw
 
 
 func _try_interact() -> void:
@@ -156,13 +176,13 @@ func _try_interact() -> void:
 			closest = area
 			closest_distance = distance
 	if closest:
-		_play_action(ANIM_INTERACT)
+		play_action(ANIM_INTERACT)
 		closest.interact(self)
 
 
 func _on_hit_taken(_amount: float) -> void:
 	if can_control:
-		_play_action(ANIM_HIT)
+		play_action(ANIM_HIT)
 
 
 func _on_lost() -> void:

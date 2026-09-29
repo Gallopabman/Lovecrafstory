@@ -113,6 +113,18 @@ menu={
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":4194306), Object(InputEventKey,"device":-1,"physical_keycode":73), Object(InputEventJoypadButton,"device":-1,"button_index":4)]
 }
 
+aim={
+"deadzone": 0.3,
+"events": [Object(InputEventMouseButton,"device":-1,"button_index":2), Object(InputEventJoypadMotion,"device":-1,"axis":4,"axis_value":1.0)]
+}
+attack={
+"deadzone": 0.3,
+"events": [Object(InputEventMouseButton,"device":-1,"button_index":1), Object(InputEventJoypadMotion,"device":-1,"axis":5,"axis_value":1.0)]
+}
+reload={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"device":-1,"physical_keycode":82), Object(InputEventJoypadButton,"device":-1,"button_index":2)]
+}
 inventory_move={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"device":-1,"physical_keycode":82), Object(InputEventJoypadButton,"device":-1,"button_index":2)]

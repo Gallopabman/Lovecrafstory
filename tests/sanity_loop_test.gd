@@ -18,6 +18,9 @@ var comic: ItemData = load("res://assets/items/comic_lighthouse.tres")
 var vhs: ItemData = load("res://assets/items/movie_coast_vhs.tres")
 var letter: ItemData = load("res://assets/items/letter_marta_01.tres")
 var water: ItemData = load("res://assets/items/food_water_bottle.tres")
+var pistol: ItemData = load("res://assets/items/weapon_pistol.tres")
+var crowbar: ItemData = load("res://assets/items/weapon_crowbar.tres")
+var ammo: ItemData = load("res://assets/items/ammo_9mm.tres")
 
 
 func check(cond: bool, msg: String) -> void:
@@ -75,8 +78,24 @@ func send_action(action: String) -> void:
 	await frames(2)
 
 
+## Ignora el mouse/teclado reales (la ventana del test no debe capturar el mouse).
+func isolate_input() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	player().set_process_unhandled_input(false)
+	player().get_node("Combat").set_process_unhandled_input(false)
+
+
 func freeze_stalker(frozen: bool) -> void:
-	stalker().process_mode = Node.PROCESS_MODE_DISABLED if frozen else Node.PROCESS_MODE_INHERIT
+	# Solo se apaga la IA: deshabilitar el nodo lo sacaría del mundo físico (las balas lo atravesarían).
+	stalker().set_physics_process(not frozen)
+	freeze_others()
+
+
+## El resto de los enemigos queda siempre congelado para no interferir.
+func freeze_others() -> void:
+	for enemy in current_scene.get_tree().get_nodes_in_group(&"enemies"):
+		if enemy != stalker():
+			enemy.set_physics_process(false)
 
 
 func _initialize() -> void:
@@ -86,6 +105,7 @@ func _initialize() -> void:
 	game_state = root.get_node("GameState")
 	change_scene_to_file("res://scenes/levels/test_room.tscn")
 	await frames(60)
+	isolate_input()
 	freeze_stalker(true)
 	var anim: AnimationPlayer = player().anim_player
 
@@ -255,6 +275,87 @@ func _initialize() -> void:
 	st.global_position = Vector3(10, 0.05, -8)
 	st.state = 0
 
+	print("-- Combate: pistola")
+	sanity.restore(1000.0)
+	await seconds(1.5)
+	var combat: Node = player().get_node("Combat")
+	inventory.clear()
+	inventory.add(pistol)
+	for i in 10:
+		inventory.add(ammo)
+	var e_pistol: Dictionary = inventory.entries[0]
+	check(e_pistol.loaded == 8 and inventory.ammo_count(ammo) == 10 and inventory.entries.size() == 2, "pistola cargada (8) y 10 balas apiladas")
+	inventory.use(pistol, e_pistol)
+	check(inventory.is_equipped(e_pistol) and combat._held_model != null, "pistola equipada y en la mano")
+	# Acechador congelado 7 m al frente.
+	st.global_position = Vector3(8, 0.05, -2)
+	place(Vector3(8, 0.05, 5), 0.0)
+	await frames(5)
+	Input.action_press("aim")
+	await frames(10)
+	check(combat.aiming and combat.target == st, "apuntar engancha al acechador")
+	check(player().anim_player.current_animation == &"CharacterArmature|Idle_Gun_Pointing", "pose de apuntar")
+	await shot("10_apuntando")
+	var shots_fired := 0
+	for i in 8:
+		if st.is_dead():
+			break
+		combat.attack()
+		shots_fired += 1
+		if i == 0:
+			await frames(4)
+			await shot("11_disparo")
+		await seconds(0.7)
+	Input.action_release("aim")
+	check(st.is_dead() and shots_fired == 4, "4 tiros matan al acechador (%d)" % shots_fired)
+	check(e_pistol.loaded == 4, "quedan 4 en el cargador: %d" % e_pistol.loaded)
+	check(game_state.is_killed("/root/TestRoom/Stalker"), "muerte registrada en GameState")
+	await seconds(1.5)
+	await shot("12_acechador_muerto")
+	combat.reload()
+	await seconds(1.2)
+	check(e_pistol.loaded == 8 and inventory.ammo_count(ammo) == 6, "recargar: 8 cargadas, 6 en la mochila")
+	# Sin balas: aviso.
+	e_pistol.loaded = 0
+	inventory.take_ammo(ammo, 100)
+	Input.action_press("aim")
+	await frames(5)
+	combat.attack()
+	await frames(3)
+	Input.action_release("aim")
+	check(current_scene.get_node("GameUI").pickup_label.text == "Está vacía.", "sin balas avisa")
+	# Los disparos se oyen.
+	var other: Node3D = current_scene.get_node("Stalker2")
+	other.hear_noise(other.global_position + Vector3(10, 0, 0), 20.0)
+	check(other.state == 1, "un disparo cercano pone a perseguir")
+	other.state = 0
+
+	print("-- Combate: barreta")
+	await seconds(0.8)
+	inventory.add(crowbar)
+	var e_bar: Dictionary = inventory.entries.filter(func(e): return e.item == crowbar)[0]
+	inventory.use(crowbar, e_bar)
+	check(inventory.is_equipped(e_bar) and not inventory.is_equipped(e_pistol), "barreta equipada (reemplaza la pistola)")
+	other.global_position = Vector3(8, 0.05, 3.8)
+	place(Vector3(8, 0.05, 5), 0.0)
+	await frames(10)
+	var swings := 0
+	for i in 8:
+		if other.is_dead():
+			break
+		combat.attack()
+		swings += 1
+		if i == 0:
+			await seconds(0.3)
+			await shot("13_barretazo")
+			await seconds(0.8)
+		else:
+			await seconds(1.1)
+	check(other.is_dead() and swings == 4, "4 barretazos matan (%d)" % swings)
+	# Guardar el arma: mano vacía.
+	inventory.use(crowbar, e_bar)
+	check(inventory.equipped.is_empty() and combat._held_model == null, "guardar deja las manos vacías")
+
 	print("-- Muerte en el refugio")
 	sanity.restore(1000.0)
 	inventory.clear()
@@ -262,6 +363,7 @@ func _initialize() -> void:
 	inventory.add(peaches)
 	place(Vector3(15.5, 0.05, 13.5), 0.0)
 	await frames(10)
+	print("   pos=%s active=%s state=%s ctrl=%s cordura=%.1f" % [player().global_position, sanity.active, sanity.state_name(), player().can_control, sanity.current])
 	check(sanity.in_refuge(), "en el refugio")
 	var old_player: Node3D = player()
 	sanity.take_hit(10000.0)
@@ -272,7 +374,8 @@ func _initialize() -> void:
 	await shot("08_corazon")
 	await seconds(4.5)
 	await frames(30)
-	freeze_stalker(true)
+	isolate_input()
+	check(not current_scene.has_node("Stalker") and not current_scene.has_node("Stalker2"), "los enemigos muertos no reaparecen")
 	check(player() != old_player and game_state.survivor_number == 2, "nuevo sobreviviente #2")
 	check(inventory.entries.is_empty() and sanity.maximum == 100.0, "sin inventario y cordura base")
 	check(game_state.corpses.size() == 1 and game_state.corpses[0].items.size() == 2, "cuerpo con 2 objetos")

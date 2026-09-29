@@ -18,6 +18,9 @@ var corpses: Array[Dictionary] = []
 ## { "survivor": int, "position": Vector3, "items": Array[ItemData] }
 var lost_ones: Array[Dictionary] = []
 
+## Enemigos muertos (clave: ruta del nodo). No reaparecen.
+var killed_enemies: Dictionary = {}
+
 var _next_id := 1
 
 
@@ -31,6 +34,14 @@ func mark_collected(key: String) -> void:
 
 func is_collected(key: String) -> bool:
 	return collected_pickups.has(key)
+
+
+func mark_killed(key: String) -> void:
+	killed_enemies[key] = true
+
+
+func is_killed(key: String) -> bool:
+	return killed_enemies.has(key)
 
 
 func add_dropped(item: ItemData, position: Vector3) -> Dictionary:

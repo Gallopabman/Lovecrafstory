@@ -19,7 +19,15 @@ func _ready() -> void:
 		queue_free()
 		return
 	add_to_group(&"interactable")
-	if item:
+	if item and item.held_scene:
+		# Armas: se muestra su modelo real, acostado y girando.
+		var model := item.held_scene.instantiate() as Node3D
+		model.rotation_degrees = item.pickup_rotation
+		model.position.y = 0.1
+		_mesh.mesh = null
+		_mesh.add_child(model)
+		PS1Materials.apply(model)
+	elif item:
 		var material := ShaderMaterial.new()
 		material.shader = PS1_SHADER
 		material.set_shader_parameter(&"albedo_color", item.world_color)

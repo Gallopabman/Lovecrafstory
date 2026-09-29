@@ -9,6 +9,7 @@ extends Control
 @export var cursor_color := Color(0.95, 0.85, 0.6, 1)
 @export var valid_color := Color(0.3, 0.8, 0.35, 0.55)
 @export var invalid_color := Color(0.85, 0.2, 0.15, 0.55)
+@export var equipped_color := Color(0.95, 0.75, 0.3, 1)
 
 var cursor := Vector2i.ZERO
 ## Entrada que se está moviendo (vacía si ninguna) y su posición tentativa.
@@ -99,12 +100,12 @@ func _draw() -> void:
 
 	for entry in Inventory.entries:
 		var faded := is_same(entry, held)
-		_draw_item(entry.item, Inventory.entry_rect(entry), faded, font, font_size)
+		_draw_item(entry, Inventory.entry_rect(entry), faded, font, font_size)
 
 	if is_holding():
 		var fp := Inventory.footprint(held.item, held_rotated)
 		var rect := Rect2i(held_cell, fp)
-		_draw_item(held.item, rect, false, font, font_size)
+		_draw_item(held, rect, false, font, font_size)
 		var ok := Inventory.can_place(held.item, held_cell, held_rotated, held)
 		draw_rect(_to_pixels(rect), valid_color if ok else invalid_color)
 	else:
@@ -113,17 +114,28 @@ func _draw() -> void:
 		draw_rect(_to_pixels(rect).grow(-1), cursor_color, false, 1.0)
 
 
-func _draw_item(item: ItemData, rect: Rect2i, faded: bool, font: Font, font_size: int) -> void:
+func _draw_item(entry: Dictionary, rect: Rect2i, faded: bool, font: Font, font_size: int) -> void:
+	var item: ItemData = entry.item
 	var pixels := _to_pixels(rect).grow(-2)
 	var color := item.world_color.darkened(0.35)
 	if faded:
 		color.a = 0.3
 	draw_rect(pixels, color)
-	draw_rect(pixels, item.world_color.lightened(0.2) if not faded else Color(1, 1, 1, 0.2), false)
+	var equipped := Inventory.is_equipped(entry)
+	var border := equipped_color if equipped else item.world_color.lightened(0.2)
+	draw_rect(pixels, border if not faded else Color(1, 1, 1, 0.2), false, 2.0 if equipped else 1.0)
 	var text_color := Color(1, 0.96, 0.9, 0.3 if faded else 1.0)
 	draw_string(font, pixels.position + Vector2(2, font_size + 1), item.short_name,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, text_color)
-
+	# Abajo a la derecha: cantidad de la pila o balas en el cargador.
+	var corner := ""
+	if item.max_stack > 1:
+		corner = str(entry.count)
+	elif item.is_weapon() and item.is_ranged:
+		corner = str(entry.loaded)
+	if corner:
+		draw_string(font, pixels.end + Vector2(-pixels.size.x, -2), corner,
+			HORIZONTAL_ALIGNMENT_RIGHT, pixels.size.x - 2, font_size, text_color)
 
 func _to_pixels(rect: Rect2i) -> Rect2:
 	return Rect2(Vector2(rect.position * cell_size), Vector2(rect.size * cell_size))
