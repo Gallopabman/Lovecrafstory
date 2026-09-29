@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"comic_lighthouse"
+display_name = "Cómic: Los Vigilantes del Faro"
+description = "Número 12. Las esquinas están gastadas de tanto pasar las páginas. Rinde menos cada vez que se relee."
+kind = 1
+sanity_restore = 15.0
+reuse_falloff = 0.5
+world_color = Color(0.2, 0.45, 0.85, 1)

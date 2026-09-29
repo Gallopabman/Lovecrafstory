@@ -1,0 +1,176 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/game_ui.gd" id="1_ui"]
+[ext_resource type="Script" path="res://scripts/ui/game_menu.gd" id="2_menu"]
+
+[node name="GameUI" type="CanvasLayer"]
+layer = 50
+script = ExtResource("1_ui")
+
+[node name="PickupLabel" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = 12.0
+offset_top = 212.0
+offset_right = 308.0
+offset_bottom = 224.0
+horizontal_alignment = 1
+
+[node name="DebugLabel" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 220.0
+offset_bottom = 26.0
+
+[node name="GameMenu" type="Control" parent="."]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_menu")
+
+[node name="Background" type="ColorRect" parent="GameMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="Title" type="Label" parent="GameMenu"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 9.0
+offset_right = 100.0
+offset_bottom = 19.0
+text = "CORDURA"
+
+[node name="StateLabel" type="Label" parent="GameMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 180.0
+offset_top = 9.0
+offset_right = 308.0
+offset_bottom = 19.0
+horizontal_alignment = 2
+
+[node name="SanityBar" type="ProgressBar" parent="GameMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 21.0
+offset_right = 172.0
+offset_bottom = 27.0
+show_percentage = false
+
+[node name="ItemList" type="ItemList" parent="GameMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 36.0
+offset_right = 150.0
+offset_bottom = 206.0
+
+[node name="EmptyLabel" type="Label" parent="GameMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 17.0
+offset_top = 41.0
+offset_right = 147.0
+offset_bottom = 53.0
+modulate = Color(1, 1, 1, 0.6)
+text = "No llevo nada encima."
+
+[node name="NameLabel" type="Label" parent="GameMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 158.0
+offset_top = 37.0
+offset_right = 308.0
+offset_bottom = 49.0
+autowrap_mode = 3
+
+[node name="DescriptionLabel" type="Label" parent="GameMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 158.0
+offset_top = 56.0
+offset_right = 308.0
+offset_bottom = 160.0
+modulate = Color(1, 1, 1, 0.75)
+autowrap_mode = 3
+
+[node name="ResultLabel" type="Label" parent="GameMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 158.0
+offset_top = 168.0
+offset_right = 308.0
+offset_bottom = 206.0
+modulate = Color(1, 0.8, 0.7, 1)
+autowrap_mode = 3
+
+[node name="HintLabel" type="Label" parent="GameMenu"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 216.0
+offset_right = 308.0
+offset_bottom = 228.0
+modulate = Color(1, 1, 1, 0.5)
+text = "E / Enter: usar       Tab: cerrar"
+
+[node name="LetterPanel" type="Panel" parent="GameMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 12.0
+offset_right = 296.0
+offset_bottom = 228.0
+
+[node name="LetterLabel" type="Label" parent="GameMenu/LetterPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 262.0
+offset_bottom = 192.0
+autowrap_mode = 3
+
+[node name="LetterHint" type="Label" parent="GameMenu/LetterPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 200.0
+offset_right = 262.0
+offset_bottom = 210.0
+modulate = Color(1, 1, 1, 0.5)
+text = "E: guardar la carta"
+horizontal_alignment = 2
+
+[node name="LostScreen" type="ColorRect" parent="."]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="LostLabel" type="Label" parent="LostScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+modulate = Color(0.75, 0.2, 0.15, 1)
+text = "Te perdiste.
+
+Alguien más llegará al refugio."
+horizontal_alignment = 1
+vertical_alignment = 1

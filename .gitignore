@@ -1,0 +1,24 @@
+# Godot 4
+.godot/
+/android/
+*.translation
+
+# Godot (C#/mono, por si acaso)
+.mono/
+data_*/
+mono_crash.*.json
+
+# Exportaciones
+/builds/
+/export/
+export_credentials.cfg
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
+
+# Configuración local del editor
+.vscode/

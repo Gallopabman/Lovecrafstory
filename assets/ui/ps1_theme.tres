@@ -1,0 +1,50 @@
+[gd_resource type="Theme" load_steps=7 format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/pixel_operator/PixelOperator8.ttf" id="1_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.04, 0.035, 0.035, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.32, 0.27, 0.22, 1)
+content_margin_left = 3.0
+content_margin_top = 3.0
+content_margin_right = 3.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_selected"]
+bg_color = Color(0.36, 0.09, 0.07, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_none"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.1, 0.09, 0.09, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.32, 0.27, 0.22, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
+bg_color = Color(0.58, 0.13, 0.1, 1)
+
+[resource]
+default_font = ExtResource("1_font")
+default_font_size = 8
+ItemList/colors/font_color = Color(0.72, 0.69, 0.62, 1)
+ItemList/colors/font_hovered_color = Color(0.9, 0.86, 0.78, 1)
+ItemList/colors/font_selected_color = Color(1, 0.95, 0.85, 1)
+ItemList/constants/v_separation = 3
+ItemList/styles/cursor = SubResource("StyleBoxEmpty_none")
+ItemList/styles/cursor_unfocused = SubResource("StyleBoxEmpty_none")
+ItemList/styles/focus = SubResource("StyleBoxEmpty_none")
+ItemList/styles/hovered = SubResource("StyleBoxEmpty_none")
+ItemList/styles/panel = SubResource("StyleBoxFlat_panel")
+ItemList/styles/selected = SubResource("StyleBoxFlat_selected")
+ItemList/styles/selected_focus = SubResource("StyleBoxFlat_selected")
+Label/colors/font_color = Color(0.8, 0.77, 0.7, 1)
+Panel/styles/panel = SubResource("StyleBoxFlat_panel")
+ProgressBar/styles/background = SubResource("StyleBoxFlat_bar_bg")
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_bar_fill")

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_marta_01"
+display_name = "Carta de Marta"
+description = "Un sobre arrugado, escondido donde nadie cuerdo miraría."
+kind = 3
+max_sanity_bonus = 10.0
+letter_text = "A quien encuentre esto:\n\nLlevo once días en este edificio. La niebla no se levanta nunca, pero aprendí a leerla: cuando se cierra, es que algo se acerca, o que yo me estoy yendo.\n\nLas paredes mienten. Cuando ya no das más, se abren. No sé si es un regalo o una trampa.\n\nComé algo. Leé algo. Acordate de quién eras.\n\nSi me ves ahí afuera y ya no parezco yo, no me esperes.\n\n- M."
+world_color = Color(0.9, 0.88, 0.8, 1)

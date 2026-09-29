@@ -1,0 +1,257 @@
+[gd_scene format=3 uid="uid://b44w2i3buqcdx"]
+
+[ext_resource type="Script" uid="uid://3exr3afq6mmy" path="res://scripts/world/atmosphere.gd" id="1_atmosphere"]
+[ext_resource type="Script" uid="uid://b4k6ey6fyiiem" path="res://scripts/world/grey_box.gd" id="2_greybox"]
+[ext_resource type="Material" path="res://assets/materials/ps1_floor.tres" id="3_floor"]
+[ext_resource type="Material" path="res://assets/materials/ps1_wall.tres" id="4_wall"]
+[ext_resource type="Material" path="res://assets/materials/ps1_crate.tres" id="5_crate"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="6_player"]
+[ext_resource type="PackedScene" path="res://scenes/effects/ps1_post_process.tscn" id="7_post"]
+[ext_resource type="Material" path="res://assets/materials/ps1_rug.tres" id="8_rug"]
+[ext_resource type="Script" path="res://scripts/world/refuge_zone.gd" id="9_refuge"]
+[ext_resource type="Script" path="res://scripts/world/sanity_gated.gd" id="10_gated"]
+[ext_resource type="PackedScene" path="res://scenes/world/pickup.tscn" id="11_pickup"]
+[ext_resource type="Resource" path="res://assets/items/food_canned_peaches.tres" id="12_food"]
+[ext_resource type="Resource" path="res://assets/items/comic_lighthouse.tres" id="13_comic"]
+[ext_resource type="Resource" path="res://assets/items/movie_coast_vhs.tres" id="14_movie"]
+[ext_resource type="Resource" path="res://assets/items/letter_marta_01.tres" id="15_letter"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/horror_placeholder.tscn" id="16_horror"]
+[ext_resource type="PackedScene" path="res://scenes/ui/game_ui.tscn" id="17_ui"]
+[ext_resource type="FontFile" path="res://assets/fonts/pixel_operator/PixelOperator.ttf" id="18_font"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_refuge"]
+size = Vector3(10, 4, 10)
+
+[sub_resource type="Environment" id="Environment_room"]
+background_mode = 1
+background_color = Color(0.5, 0.5, 0.52, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.55, 0.55, 0.6, 1)
+ambient_light_energy = 0.7
+
+[node name="TestRoom" type="Node3D" unique_id=429517942]
+
+[node name="Atmosphere" type="WorldEnvironment" parent="." unique_id=1952054859]
+environment = SubResource("Environment_room")
+script = ExtResource("1_atmosphere")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=267983407]
+transform = Transform3D(1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, 0, 10, 0)
+light_color = Color(0.85, 0.85, 0.9, 1)
+light_energy = 0.5
+
+[node name="Geometry" type="Node3D" parent="." unique_id=670877662]
+
+[node name="Floor" type="StaticBody3D" parent="Geometry" unique_id=1647812248]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+script = ExtResource("2_greybox")
+size = Vector3(40, 0.5, 40)
+material = ExtResource("3_floor")
+
+[node name="WallNorth" type="StaticBody3D" parent="Geometry" unique_id=343579011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -20)
+script = ExtResource("2_greybox")
+size = Vector3(40, 5, 0.5)
+material = ExtResource("4_wall")
+
+[node name="WallSouth" type="StaticBody3D" parent="Geometry" unique_id=1233313576]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 20)
+script = ExtResource("2_greybox")
+size = Vector3(40, 5, 0.5)
+material = ExtResource("4_wall")
+
+[node name="WallEast" type="StaticBody3D" parent="Geometry" unique_id=200610599]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 2.5, 0)
+script = ExtResource("2_greybox")
+size = Vector3(0.5, 5, 40)
+material = ExtResource("4_wall")
+
+[node name="WallWest" type="StaticBody3D" parent="Geometry" unique_id=2118642717]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 2.5, 0)
+script = ExtResource("2_greybox")
+size = Vector3(0.5, 5, 40)
+material = ExtResource("4_wall")
+
+[node name="InnerWallA" type="StaticBody3D" parent="Geometry" unique_id=2023110110]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.5, -4)
+script = ExtResource("2_greybox")
+size = Vector3(12, 3, 0.5)
+material = ExtResource("4_wall")
+
+[node name="InnerWallB" type="StaticBody3D" parent="Geometry" unique_id=1235890606]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1.5, 6)
+script = ExtResource("2_greybox")
+size = Vector3(0.5, 3, 10)
+material = ExtResource("4_wall")
+
+[node name="Pillar1" type="StaticBody3D" parent="Geometry" unique_id=1640925947]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.5, -8)
+script = ExtResource("2_greybox")
+size = Vector3(0.8, 5, 0.8)
+material = ExtResource("4_wall")
+
+[node name="Pillar2" type="StaticBody3D" parent="Geometry" unique_id=46192477]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.5, 10)
+script = ExtResource("2_greybox")
+size = Vector3(0.8, 5, 0.8)
+material = ExtResource("4_wall")
+
+[node name="Pillar3" type="StaticBody3D" parent="Geometry" unique_id=1512097557]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.5, 12)
+script = ExtResource("2_greybox")
+size = Vector3(0.8, 5, 0.8)
+material = ExtResource("4_wall")
+
+[node name="Ramp" type="StaticBody3D" parent="Geometry" unique_id=693696555]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.258819, 0, 0.258819, 0.965926, -14, 0.58, -7)
+script = ExtResource("2_greybox")
+size = Vector3(3, 0.3, 6)
+material = ExtResource("3_floor")
+
+[node name="Platform" type="StaticBody3D" parent="Geometry" unique_id=356800449]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0.75, -11.75)
+script = ExtResource("2_greybox")
+size = Vector3(4, 1.5, 4)
+material = ExtResource("4_wall")
+
+[node name="Crates" type="Node3D" parent="Geometry" unique_id=2091346982]
+
+[node name="Crate1" type="StaticBody3D" parent="Geometry/Crates" unique_id=1178681548]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, -2)
+script = ExtResource("2_greybox")
+material = ExtResource("5_crate")
+
+[node name="Crate2" type="StaticBody3D" parent="Geometry/Crates" unique_id=1263807643]
+transform = Transform3D(0.939693, 0, 0.34202, 0, 1, 0, -0.34202, 0, 0.939693, 3.2, 0.5, -1.4)
+script = ExtResource("2_greybox")
+material = ExtResource("5_crate")
+
+[node name="Crate3" type="StaticBody3D" parent="Geometry/Crates" unique_id=1148210152]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.75, 3)
+script = ExtResource("2_greybox")
+size = Vector3(1.5, 1.5, 1.5)
+material = ExtResource("5_crate")
+
+[node name="Crate4" type="StaticBody3D" parent="Geometry/Crates" unique_id=1763339128]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, -3.1, 2, 3.1)
+script = ExtResource("2_greybox")
+material = ExtResource("5_crate")
+
+[node name="Crate5" type="StaticBody3D" parent="Geometry/Crates" unique_id=1445588789]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1, -14)
+script = ExtResource("2_greybox")
+size = Vector3(2, 2, 2)
+material = ExtResource("5_crate")
+
+[node name="AlcoveWallWest" type="StaticBody3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.25, 1.5, -18)
+script = ExtResource("2_greybox")
+size = Vector3(0.5, 3, 3.5)
+material = ExtResource("4_wall")
+
+[node name="AlcoveWallEast" type="StaticBody3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 1.5, -18)
+script = ExtResource("2_greybox")
+size = Vector3(0.5, 3, 3.5)
+material = ExtResource("4_wall")
+
+[node name="Refuge" type="Node3D" parent="."]
+
+[node name="RefugeZone" type="Area3D" parent="Refuge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2, 15)
+script = ExtResource("9_refuge")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Refuge/RefugeZone"]
+shape = SubResource("BoxShape3D_refuge")
+
+[node name="WallWest" type="StaticBody3D" parent="Refuge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.5, 17.5)
+script = ExtResource("2_greybox")
+size = Vector3(0.5, 3, 5)
+material = ExtResource("4_wall")
+
+[node name="WallNorth" type="StaticBody3D" parent="Refuge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 1.5, 10)
+script = ExtResource("2_greybox")
+size = Vector3(5, 3, 0.5)
+material = ExtResource("4_wall")
+
+[node name="Rug" type="StaticBody3D" parent="Refuge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 0.01, 15.5)
+script = ExtResource("2_greybox")
+size = Vector3(4, 0.02, 3)
+material = ExtResource("8_rug")
+
+[node name="TVStand" type="StaticBody3D" parent="Refuge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.2, 0.25, 15.5)
+script = ExtResource("2_greybox")
+size = Vector3(0.6, 0.5, 1)
+material = ExtResource("5_crate")
+
+[node name="TV" type="StaticBody3D" parent="Refuge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.2, 0.8, 15.5)
+script = ExtResource("2_greybox")
+size = Vector3(0.5, 0.6, 0.7)
+material = ExtResource("4_wall")
+
+[node name="WarmLight" type="OmniLight3D" parent="Refuge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 2.6, 15.5)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.5
+omni_range = 7.0
+
+[node name="Secrets" type="Node3D" parent="."]
+
+[node name="WallSymbol" type="Node3D" parent="Secrets"]
+script = ExtResource("10_gated")
+threshold = 1
+
+[node name="Label3D" type="Label3D" parent="Secrets/WallSymbol"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.9, -15.72)
+pixel_size = 0.01
+modulate = Color(0.55, 0.05, 0.03, 1)
+text = "LA PARED MIENTE"
+font = ExtResource("18_font")
+font_size = 32
+
+[node name="LyingWall" type="Node3D" parent="Secrets"]
+script = ExtResource("10_gated")
+mode = 1
+
+[node name="Wall" type="StaticBody3D" parent="Secrets/LyingWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, -16)
+script = ExtResource("2_greybox")
+size = Vector3(4.5, 3, 0.5)
+material = ExtResource("4_wall")
+
+[node name="Items" type="Node3D" parent="."]
+
+[node name="Peaches1" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, -2)
+item = ExtResource("12_food")
+
+[node name="Peaches2" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -6)
+item = ExtResource("12_food")
+
+[node name="Comic" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 1.5, -12.5)
+item = ExtResource("13_comic")
+
+[node name="VHS" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, -14)
+item = ExtResource("14_movie")
+
+[node name="Letter" parent="Items" instance=ExtResource("11_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -18.5)
+item = ExtResource("15_letter")
+
+[node name="Horror" parent="." instance=ExtResource("16_horror")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 4)
+
+[node name="Player" parent="." unique_id=1683962500 instance=ExtResource("6_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.5, 0.05, 15.5)
+
+[node name="PS1PostProcess" parent="." unique_id=612361333 instance=ExtResource("7_post")]
+
+[node name="GameUI" parent="." instance=ExtResource("17_ui")]
