@@ -7,8 +7,10 @@ que aparecer en los créditos del juego cuando se publique.
 
 | Asset | Autor | Licencia | Fuente | Ubicación |
 | --- | --- | --- | --- | --- |
-| Adventurer (modelo del superviviente, con animaciones) | Quaternius | CC0 | [poly.pizza/m/5EGWBMpuXq](https://poly.pizza/m/5EGWBMpuXq) | `assets/models/characters/survivor/survivor.glb` |
-| Alien (modelo del acechador, con animaciones) | Quaternius | CC0 | [poly.pizza/m/RRliSQBP7r](https://poly.pizza/m/RRliSQBP7r) | `assets/models/enemies/tentacled/tentacled.glb` |
+| Universal Base Characters (cabeza del superviviente) | Quaternius | CC0 | [quaternius.itch.io/universal-base-characters](https://quaternius.itch.io/universal-base-characters) | `assets/models/characters/survivor_v2/survivor.glb` |
+| Modular Character Outfits - Fantasy (ropa "Peasant", con manos) | Quaternius | CC0 | [quaternius.itch.io/modular-character-outfits-fantasy](https://quaternius.itch.io/modular-character-outfits-fantasy) | `assets/models/characters/survivor_v2/survivor.glb` (armado con [tools/blender/build_survivor.py](tools/blender/build_survivor.py)) |
+| Universal Animation Library 1 y 2 | Quaternius | CC0 | [opengameart.org/content/universal-animation-library](https://opengameart.org/content/universal-animation-library) | `assets/animations/ual/` |
+| Thin Zombie (Awake Zombie), con 17 animaciones | Rosswet Mobile | **CC-BY 3.0** | [opengameart.org/content/thin-zombie-awake-zombie-asset](https://opengameart.org/content/thin-zombie-awake-zombie-asset) | `assets/models/enemies/thin_zombie/` |
 | Pistol (pistola) | Quaternius | CC0 | [poly.pizza/m/J3i9KDQ3kt](https://poly.pizza/m/J3i9KDQ3kt) | `assets/models/weapons/pistol.glb` |
 | Crowbar (barreta) | CreativeTrio | CC0 | [poly.pizza/m/MkTjC7C7bN](https://poly.pizza/m/MkTjC7C7bN) | `assets/models/weapons/crowbar.glb` |
 | Pixel Operator (fuente) | Jayvee Enaguas | CC0 | [dafont.com/pixel-operator.font](https://www.dafont.com/pixel-operator.font) | `assets/fonts/pixel_operator/` |

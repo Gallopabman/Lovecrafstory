@@ -3,8 +3,6 @@ extends Area3D
 ## Cuerpo de un sobreviviente que murió en el refugio (su corazón no aguantó).
 ## Queda en el piso con todo lo que llevaba; el siguiente puede revisarlo.
 
-const ANIM_DEATH := &"CharacterArmature|Death"
-
 var corpse_id := -1
 
 @onready var model: Node3D = $Model
@@ -14,9 +12,9 @@ func _ready() -> void:
 	add_to_group(&"interactable")
 	PS1Materials.apply(model, Color(0.75, 0.72, 0.72))
 	# Congela la última pose de la animación de muerte.
-	var anim_player := model.find_child("AnimationPlayer") as AnimationPlayer
-	anim_player.play(ANIM_DEATH)
-	anim_player.seek(anim_player.get_animation(ANIM_DEATH).length, true)
+	var anim_player := SurvivorRig.setup(model)
+	anim_player.play(SurvivorRig.DEATH)
+	anim_player.seek(anim_player.get_animation(SurvivorRig.DEATH).length, true)
 	anim_player.pause()
 
 

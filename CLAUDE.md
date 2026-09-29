@@ -41,7 +41,10 @@ en vez de inventarlo.
 ## Decisiones técnicas
 
 - Godot **4.7**, renderer **Forward+**. Sin C#: todo en GDScript.
-- Resolución interna **320x240** (`stretch/mode="viewport"`, escala entera, 4:3). Ventana 1280x960.
+- Resolución interna **640x480** ("PS1 mejorado", elegido por el usuario: `stretch/mode="viewport"`,
+  escala entera, 4:3). Ventana 1280x960. La UI está diseñada en 320x240 y su CanvasLayer escala x2
+  (los paneles de pantalla completa son de 320x240 fijo, no anclados). Jitter a 640x480 (160x120 al
+  borde), post-proceso 64 niveles de color (12 al borde). Texturas de ambiente a 128 px, de props a 256.
 - **Look PS1**:
   - [shaders/ps1_spatial.gdshader](shaders/ps1_spatial.gdshader): vertex snapping, mapeo afín,
     texturas nearest, luz por vértice, niebla propia (`FOG`), texturas que "respiran" con la locura.
@@ -83,8 +86,8 @@ en vez de inventarlo.
   y muere (queda el cuerpo, `GameState.mark_killed`). Grupo `enemies`. Usa NavigationAgent3D.
 - **Combate** ([scripts/player/player_combat.gd](scripts/player/player_combat.gd), nodo `Combat` hijo
   del jugador; su `setup()` lo llama Player): apuntar/disparar/recargar, cuerpo a cuerpo, arma en la
-  mano vía BoneAttachment3D en `Wrist.R`. Las escenas `scenes/weapons/*_held.tscn` están en metros en
-  el espacio del hueso (el esqueleto del glTF viene x100 y se compensa al equipar).
+  mano vía BoneAttachment3D en `hand_r`. Las escenas `scenes/weapons/*_held.tscn` están en metros en
+  el espacio del hueso (si el esqueleto viene escalado se compensa al equipar).
   Armas = `ItemData` kind WEAPON (grupo "Arma": `is_ranged`, `damage`, `magazine_size`, `ammo_item`,
   `noise_radius`, `held_scene`); munición = kind AMMO con `max_stack`.
 - **Capas de colisión**: 1 escenario + jugador, 2 enemigos, 3 interactuables.
@@ -97,13 +100,21 @@ en vez de inventarlo.
   `aim` (clic der. / L2), `attack` (clic izq. / R2), `menu` (Tab o I / Back), `pause` (Esc / Start).
   En el menú: usar (E, Enter / A), `inventory_move` (R / X), `inventory_rotate` (Q / RB),
   `inventory_drop` (X / Y). En el menú "usar" solo acepta la E del teclado, no `interact` del gamepad.
-- **Salto**: el superviviente no trae animación de salto; `AnimationRetarget`
-  ([scripts/world/animation_retarget.gd](scripts/world/animation_retarget.gd)) copia en runtime
-  Jump / Jump_Idle / Jump_Land del rig del alien (mismos nombres de huesos Quaternius, solo rotaciones).
+- **Personajes**:
+  - Superviviente: [assets/models/characters/survivor_v2/survivor.glb](assets/models/characters/survivor_v2/survivor.glb),
+    cabeza de Universal Base Characters + ropa "Peasant" de Modular Outfits (Quaternius, CC0), armado con
+    [tools/blender/build_survivor.py](tools/blender/build_survivor.py) (Blender 4.2 portable en `%TEMP%\bl42`
+    si sigue ahí; si no, bajar Blender). Esqueleto UE-mannequin (65 huesos, `pelvis`, `hand_r`...), sin
+    animaciones propias: `SurvivorRig.setup(model)` ([scripts/player/survivor_rig.gd](scripts/player/survivor_rig.gd))
+    crea el AnimationPlayer y copia los clips de la **Universal Animation Library** (`assets/animations/ual/`,
+    CC0, mismo esqueleto) con `AnimationRetarget.import_animations` (rotaciones + posición de root/pelvis).
+    Los nombres de clips están en `SurvivorRig` (Idle, Walk, Jog_Fwd, Crouch_Idle, Crouch_Fwd, Jump, Jump_Land,
+    Pistol_Aim_Neutral, Pistol_Shoot, Pistol_Reload, Sword_Attack x1.5, Punch_Jab, Hit_Chest, PickUp_Table, Death01).
+    El importador de Godot quita el sufijo `_Loop` de los clips y los deja en loop.
+  - Enemigo: Thin Zombie (Rosswet Mobile, **CC-BY**) a escala 0.27 (el glb mide 8.4 m), textura aparte
+    (`Stalker.albedo_texture`); los nombres de sus animaciones son exports del `Stalker`.
 - **Agacharse / sigilo**: `Player.set_crouching()` (cápsula 1.2 m, 1.2 m/s, cámara baja; no se para
-  con techo bajo; correr, saltar o apuntar lo pone de pie). Animaciones generadas en runtime:
-  `CrouchIdle` = primer cuadro del "Duck" del alien (`AnimationRetarget.make_pose`), `CrouchWalk` =
-  Walk mezclado con esa pose (`make_blend`). `Player.visibility()` (agachado x0.5, linterna x1.4) escala
+  con techo bajo; correr, saltar o apuntar lo pone de pie). `Player.visibility()` (agachado x0.5, linterna x1.4) escala
   la vista del `Stalker`; agachado te nota de 1 m en vez de 2.5; mira a `Player.eye_height()` (1.4 / 0.85),
   así que agacharse detrás de algo bajo (mostrador, cama, escritorio) corta la línea de visión.
   Debug: F3 overlay, F9 golpe, F10 −25 %, F11 +25 %.
@@ -169,6 +180,12 @@ Godot **4.7.2** (no está en el PATH):
 - **Test del refugio**: `<godot> --path . -s res://tests/shelter_test.gd` (materiales, bono, plano,
   estaciones, persistencia; capturas en `test_shots\shelter\`).
 - Regenerar el hospital: `<godot> --headless --path . -s res://tools/build_hospital.gd`.
+- Muebles de Poly Haven: `powershell -File tools/fetch_polyhaven.ps1 -Ids <id>,...` y revisar escala y
+  frente con `<godot> --path . -s res://tools/preview_props.gd -- res://assets/models/props/polyhaven/ salida.png 4 id1,id2`.
+  Correcciones por modelo en `upgrades` / `ph_fixes` del generador.
+- Copiar archivos de rutas con corchetes (`[Standard]`) en PowerShell: usar `-LiteralPath`.
+- Los tests borran los bindings de input al arrancar (`InputMap.action_erase_events`): hay un gamepad
+  XInput conectado y cualquier toque movía la cámara.
 - Un hook de seguridad bloquea comandos de PowerShell con ciertos patrones (`.Replace(...)` con
   comillas, `Remove-Item`): para editar archivos usar la herramienta Edit.
 - Los parámetros globales tipo `color` llegan al shader en sRGB: convertir a lineal antes de usarlos.
@@ -205,6 +222,12 @@ alucinación desde Inquieto.
 munición apilable, arma equipada, dos acechadores en la sala.
 
 **Zona 1** — hecho: Hospital San Judas (ver arriba), tres acechadores, alucinación en el quirófano.
+
+**Mejora gráfica** — hecha: 640x480, texturas 128, 38 muebles de Poly Haven, arquitectura (marcos,
+pasamanos, carteles, mostradores, luminarias), superviviente realista con la Universal Animation Library
+y Thin Zombie. Quedan low-poly: inodoros, lavatorios, heladera y lámpara de pie de Kenney; lockers,
+archiveros, expendedora (Poly Pizza). La ropa del superviviente es medieval ("Peasant"): se podría
+recolorear o buscar un outfit moderno. Pendiente: variante femenina del superviviente (UBC trae pelo).
 
 **Prototipo 3** — hecho: refugio con blueprint (5 espacios x 2 niveles), materiales, nivel cozy,
 estaciones (cocinar, descansar, radio, TV con electricidad) y bono de llegar a casa. A afinar con el

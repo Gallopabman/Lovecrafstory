@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dlbtq7yc5ttey"
-path="res://.godot/imported/tentacled.glb-4eda0ecec9ca291f869cdb10614c0419.scn"
+uid="uid://6as15ha6j1xx"
+path="res://.godot/imported/thin_zombie.glb-4650707f369c783619f1fb14d0776d2c.scn"
 
 [deps]
 
-source_file="res://assets/models/enemies/tentacled/tentacled.glb"
-dest_files=["res://.godot/imported/tentacled.glb-4eda0ecec9ca291f869cdb10614c0419.scn"]
+source_file="res://assets/models/enemies/thin_zombie/thin_zombie.glb"
+dest_files=["res://.godot/imported/thin_zombie.glb-4650707f369c783619f1fb14d0776d2c.scn"]
 
 [params]
 

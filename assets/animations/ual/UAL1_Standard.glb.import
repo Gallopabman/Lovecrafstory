@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://unq4jpixm200"
-path="res://.godot/imported/survivor.glb-3709d59d7a9d8b4125aa1e75e1f820db.scn"
+uid="uid://do3me2hkuiosm"
+path="res://.godot/imported/UAL1_Standard.glb-052050ec3e18c11e2ad2213e29c4bd09.scn"
 
 [deps]
 
-source_file="res://assets/models/characters/survivor/survivor.glb"
-dest_files=["res://.godot/imported/survivor.glb-3709d59d7a9d8b4125aa1e75e1f820db.scn"]
+source_file="res://assets/animations/ual/UAL1_Standard.glb"
+dest_files=["res://.godot/imported/UAL1_Standard.glb-052050ec3e18c11e2ad2213e29c4bd09.scn"]
 
 [params]
 
@@ -24,7 +24,7 @@ nodes/import_as_skeleton_bones=false
 nodes/use_name_suffixes=true
 nodes/use_node_type_suffixes=true
 meshes/ensure_tangents=true
-meshes/generate_lods=false
+meshes/generate_lods=true
 meshes/create_shadow_meshes=true
 meshes/light_baking=1
 meshes/lightmap_texel_size=0.2

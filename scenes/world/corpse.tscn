@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/corpse.gd" id="1_corpse"]
-[ext_resource type="PackedScene" path="res://assets/models/characters/survivor/survivor.glb" id="2_model"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/survivor_v2/survivor.glb" id="2_model"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_corpse"]
 radius = 0.9

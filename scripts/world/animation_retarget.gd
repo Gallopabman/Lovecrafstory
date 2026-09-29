@@ -5,8 +5,11 @@ class_name AnimationRetarget
 ## las proporciones de cada modelo y se descartan.
 
 
+## `position_bones`: huesos cuya posición también se copia (p. ej. la pelvis, cuando los
+## dos esqueletos tienen las mismas proporciones y el cuerpo tiene que bajar al agacharse).
 static func import_animations(source: PackedScene, names: Array[StringName],
-		target_player: AnimationPlayer, target_skeleton: Skeleton3D) -> void:
+		target_player: AnimationPlayer, target_skeleton: Skeleton3D,
+		position_bones: Array[StringName] = []) -> void:
 	var source_root := source.instantiate()
 	var source_player := source_root.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
 	var target_root := target_player.get_node(target_player.root_node)
@@ -18,7 +21,10 @@ static func import_animations(source: PackedScene, names: Array[StringName],
 		var anim := source_player.get_animation(anim_name).duplicate(true) as Animation
 		for i in range(anim.get_track_count() - 1, -1, -1):
 			var bone := anim.track_get_path(i).get_concatenated_subnames()
-			if anim.track_get_type(i) != Animation.TYPE_ROTATION_3D or target_skeleton.find_bone(bone) < 0:
+			var track_type := anim.track_get_type(i)
+			var wanted := track_type == Animation.TYPE_ROTATION_3D \
+				or (track_type == Animation.TYPE_POSITION_3D and StringName(bone) in position_bones)
+			if not wanted or target_skeleton.find_bone(bone) < 0:
 				anim.remove_track(i)
 			else:
 				anim.track_set_path(i, NodePath("%s:%s" % [skeleton_path, bone]))

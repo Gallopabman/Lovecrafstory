@@ -85,6 +85,15 @@ func isolate_input() -> void:
 	player().get_node("Combat").set_process_unhandled_input(false)
 
 
+## Espera a que termine la acción en curso y el enfriamiento del arma (las animaciones
+## tienen duraciones distintas; el test no debe depender de ellas).
+func until_ready(combat: Node) -> void:
+	await frames(2)
+	while player().is_busy() or combat._cooldown > 0.0:
+		await physics_frame
+	await frames(2)
+
+
 func freeze_stalker(frozen: bool) -> void:
 	# Solo se apaga la IA: deshabilitar el nodo lo sacaría del mundo físico (las balas lo atravesarían).
 	stalker().set_physics_process(not frozen)
@@ -114,7 +123,7 @@ func _initialize() -> void:
 
 	print("-- Refugio y goteo")
 	check(sanity.in_refuge() and is_equal_approx(sanity.drain_multiplier(), 0.25), "spawn en refugio, goteo x0.25")
-	check(anim.current_animation == &"CharacterArmature|Idle", "anim idle: %s vel=%s" % [anim.current_animation, player().velocity])
+	check(anim.current_animation == &"Idle", "anim idle: %s vel=%s" % [anim.current_animation, player().velocity])
 	await shot("01_refugio")
 	place(Vector3(0, 0.05, 8), 0.0)
 	await frames(10)
@@ -127,7 +136,7 @@ func _initialize() -> void:
 	sanity.take_hit(10.0)
 	await frames(2)
 	check(absf(pre_hit - sanity.current - 10.0) < 0.1, "golpe baja 10")
-	check(anim.current_animation == &"CharacterArmature|HitRecieve", "anim de golpe")
+	check(anim.current_animation == &"Hit_Chest", "anim de golpe")
 	await frames(60)
 
 	print("-- Correr y saltar")
@@ -138,11 +147,11 @@ func _initialize() -> void:
 	for i in 40:
 		await physics_frame
 	var run_speed := Vector2(player().velocity.x, player().velocity.z).length()
-	check(run_speed > 4.0 and anim.current_animation == &"CharacterArmature|Run", "correr: %.1f m/s, anim %s" % [run_speed, anim.current_animation])
+	check(run_speed > 4.0 and anim.current_animation == &"Jog_Fwd", "correr: %.1f m/s, anim %s" % [run_speed, anim.current_animation])
 	Input.action_release("run")
 	Input.action_release("move_forward")
 	await seconds(0.8)
-	check(anim.has_animation(&"CharacterArmature|Jump_Idle"), "animaciones de salto importadas del rig del alien")
+	check(anim.has_animation(&"Jump"), "animaciones de salto importadas del rig del alien")
 	var ground_y: float = player().global_position.y
 	var max_y := ground_y
 	var air_anims := {}
@@ -163,7 +172,7 @@ func _initialize() -> void:
 	Input.parse_input_event(ev_up)
 	check(max_y - ground_y > 0.6, "salta %.2f m" % (max_y - ground_y))
 	check(player().is_on_floor(), "vuelve al piso")
-	check(air_anims.has(&"CharacterArmature|Jump") or air_anims.has(&"CharacterArmature|Jump_Idle"), "anim de salto en el aire: %s" % [air_anims.keys()])
+	check(air_anims.has(&"Jump_Start") or air_anims.has(&"Jump"), "anim de salto en el aire: %s" % [air_anims.keys()])
 
 	print("-- Agacharse y sigilo")
 	var p := player()
@@ -172,12 +181,12 @@ func _initialize() -> void:
 	check(p.set_crouching(true) and p.is_crouching, "se agacha")
 	check(is_equal_approx((p.body_shape.shape as CapsuleShape3D).height, 1.2), "la cápsula se achica")
 	await frames(10)
-	check(anim.current_animation == &"CrouchIdle", "pose agachada: %s" % anim.current_animation)
+	check(anim.current_animation == &"Crouch_Idle", "pose agachada: %s" % anim.current_animation)
 	Input.action_press("move_forward")
 	for i in 40:
 		await physics_frame
 	var crouch_speed := Vector2(p.velocity.x, p.velocity.z).length()
-	check(crouch_speed < 1.4 and anim.current_animation == &"CrouchWalk", "camina agachado: %.1f m/s, %s" % [crouch_speed, anim.current_animation])
+	check(crouch_speed < 1.4 and anim.current_animation == &"Crouch_Fwd", "camina agachado: %.1f m/s, %s" % [crouch_speed, anim.current_animation])
 	await shot("00_agachado")
 	Input.action_release("move_forward")
 	var ev_run := InputEventAction.new()
@@ -375,7 +384,7 @@ func _initialize() -> void:
 	st.visual.global_rotation.y = 0.0
 	await frames(20)
 	check(st.state != 0, "el acechador ve al jugador y persigue")
-	check(sanity.has_seen(&"tentaculado"), "ver al acechador por primera vez baja cordura")
+	check(sanity.has_seen(&"delgado"), "ver al acechador por primera vez baja cordura")
 	await seconds(0.6)
 	await shot("06_acechador")
 	var pre_attack: float = sanity.current
@@ -406,7 +415,7 @@ func _initialize() -> void:
 	Input.action_press("aim")
 	await frames(10)
 	check(combat.aiming and combat.target == st, "apuntar engancha al acechador")
-	check(player().anim_player.current_animation == &"CharacterArmature|Idle_Gun_Pointing", "pose de apuntar")
+	check(player().anim_player.current_animation == &"Pistol_Aim_Neutral", "pose de apuntar")
 	await shot("10_apuntando")
 	# Cordura por debajo del máximo (pero lúcido) para ver la recompensa al matar.
 	sanity.restore(1000.0)
@@ -421,7 +430,7 @@ func _initialize() -> void:
 		if i == 0:
 			await frames(4)
 			await shot("11_disparo")
-		await seconds(0.7)
+		await until_ready(combat)
 	Input.action_release("aim")
 	check(st.is_dead() and shots_fired == 4, "4 tiros matan al acechador (%d)" % shots_fired)
 	check(e_pistol.loaded == 4, "quedan 4 en el cargador: %d" % e_pistol.loaded)
@@ -429,8 +438,9 @@ func _initialize() -> void:
 	check(game_state.is_killed("/root/TestRoom/Stalker"), "muerte registrada en GameState")
 	await seconds(1.5)
 	await shot("12_acechador_muerto")
+	await until_ready(combat)
 	combat.reload()
-	await seconds(1.2)
+	await until_ready(combat)
 	check(e_pistol.loaded == 8 and inventory.ammo_count(ammo) == 6, "recargar: 8 cargadas, 6 en la mochila")
 	# Sin balas: aviso.
 	e_pistol.loaded = 0
@@ -465,9 +475,7 @@ func _initialize() -> void:
 		if i == 0:
 			await seconds(0.3)
 			await shot("13_barretazo")
-			await seconds(0.8)
-		else:
-			await seconds(1.1)
+		await until_ready(combat)
 	check(other.is_dead() and swings == 4, "4 barretazos matan (%d)" % swings)
 	# Guardar el arma: mano vacía.
 	inventory.use(crowbar, e_bar)
@@ -485,7 +493,7 @@ func _initialize() -> void:
 	var old_player: Node3D = player()
 	sanity.take_hit(10000.0)
 	await frames(2)
-	check(sanity.lost_in_refuge and old_player.anim_player.current_animation == &"CharacterArmature|Death", "muere en el refugio")
+	check(sanity.lost_in_refuge and old_player.anim_player.current_animation == &"Death01", "muere en el refugio")
 	await seconds(3.5)
 	check(current_scene.get_node("GameUI").lost_label.text.begins_with("Su corazón"), "texto de ataque cardíaco")
 	await shot("08_corazon")

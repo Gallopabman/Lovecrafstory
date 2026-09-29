@@ -9,16 +9,20 @@ signal died
 
 enum State { WANDER, CHASE, ATTACK, STAGGER, DEAD }
 
-const ANIM_IDLE := &"CharacterArmature|Idle"
-const ANIM_WALK := &"CharacterArmature|Walk"
-const ANIM_RUN := &"CharacterArmature|Run"
-const ANIM_ATTACK := &"CharacterArmature|Punch"
-const ANIM_HIT := &"CharacterArmature|HitReact"
-const ANIM_DEATH := &"CharacterArmature|Death"
-const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN]
-
 ## Multiplica los colores del modelo (apagarlo lo vuelve más inquietante en la niebla).
 @export var tint := Color(0.55, 0.5, 0.55)
+## Textura para modelos que la traen aparte (se aplica a los materiales sin textura).
+@export var albedo_texture: Texture2D
+
+@export_group("Animaciones")
+@export var anim_idle: StringName = &"idle"
+@export var anim_walk: StringName = &"walk"
+@export var anim_run: StringName = &"run"
+@export var anim_attack: StringName = &"attack1_r"
+@export var anim_hit: StringName = &"hurt"
+@export var anim_death: StringName = &"dead1"
+## Velocidad de reproducción de la animación de correr (para que no patine).
+@export var run_anim_speed := 1.0
 @export var max_health := 100.0
 ## Cordura que recupera el jugador al matarlo (alivio de sobrevivir al horror).
 @export var kill_sanity_reward := 5.0
@@ -86,12 +90,12 @@ func _ready() -> void:
 	add_to_group(&"enemies")
 	health = max_health
 	_home = global_position
-	_materials = PS1Materials.apply(model, tint)
+	_materials = PS1Materials.apply(model, tint, {}, albedo_texture)
 	for material in _materials:
 		_base_colors.append(material.get_shader_parameter(&"albedo_color"))
-	for anim_name in LOOPING_ANIMS:
+	for anim_name in [anim_idle, anim_walk, anim_run]:
 		anim_player.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
-	anim_player.play(ANIM_IDLE)
+	anim_player.play(anim_idle)
 	_wander_wait = randf_range(wander_pause.x, wander_pause.y)
 	nav_agent.target_position = global_position
 
@@ -152,7 +156,7 @@ func take_damage(amount: float) -> void:
 	state = State.STAGGER
 	_stagger_timer = stagger_time
 	_attack_hit_pending = false
-	anim_player.play(ANIM_HIT, 0.05)
+	anim_player.play(anim_hit, 0.05)
 
 
 ## Un ruido fuerte (disparo) dentro de `radius` lo pone a perseguir.
@@ -168,7 +172,7 @@ func _die() -> void:
 	# El cuerpo queda en el piso pero ya no bloquea ni se puede golpear.
 	collision_layer = 0
 	remove_from_group(&"enemies")
-	anim_player.play(ANIM_DEATH, 0.1)
+	anim_player.play(anim_death, 0.1)
 	Sanity.restore(kill_sanity_reward)
 	died.emit()
 
@@ -187,7 +191,7 @@ func _update_flash(delta: float) -> void:
 func _wander(delta: float) -> void:
 	if nav_agent.is_navigation_finished():
 		_move_towards(Vector3.ZERO, 0.0, delta)
-		_play(ANIM_IDLE)
+		_play(anim_idle)
 		_wander_wait -= delta
 		if _wander_wait <= 0.0:
 			var angle := randf() * TAU
@@ -196,7 +200,7 @@ func _wander(delta: float) -> void:
 			_wander_wait = randf_range(wander_pause.x, wander_pause.y)
 		return
 	_move_towards(nav_agent.get_next_path_position(), wander_speed, delta)
-	_play(ANIM_WALK)
+	_play(anim_walk)
 
 
 func _chase(delta: float, player: Player, player_valid: bool) -> void:
@@ -211,17 +215,17 @@ func _chase(delta: float, player: Player, player_valid: bool) -> void:
 		else:
 			_move_towards(Vector3.ZERO, 0.0, delta)
 			_face(player.global_position, delta)
-			_play(ANIM_IDLE)
+			_play(anim_idle)
 		return
 	_move_towards(nav_agent.get_next_path_position(), chase_speed, delta)
-	_play(ANIM_RUN)
+	_play(anim_run)
 
 
 func _start_attack() -> void:
 	state = State.ATTACK
 	_attack_timer = 0.0
 	_attack_hit_pending = true
-	anim_player.play(ANIM_ATTACK, 0.1)
+	anim_player.play(anim_attack, 0.1)
 
 
 func _attack(delta: float, player: Player, player_valid: bool) -> void:
@@ -233,7 +237,7 @@ func _attack(delta: float, player: Player, player_valid: bool) -> void:
 		_attack_hit_pending = false
 		if player_valid and global_position.distance_to(player.global_position) <= attack_range * 1.3:
 			Sanity.take_hit(attack_damage)
-	if _attack_timer >= anim_player.get_animation(ANIM_ATTACK).length:
+	if _attack_timer >= anim_player.get_animation(anim_attack).length:
 		_cooldown = attack_cooldown
 		state = State.CHASE
 

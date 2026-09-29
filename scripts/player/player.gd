@@ -4,23 +4,18 @@ extends CharacterBody3D
 ## cámara orbital con colisión (SpringArm3D), linterna, interacción y
 ## animaciones del modelo del superviviente.
 
-const ANIM_IDLE := &"CharacterArmature|Idle"
-const ANIM_WALK := &"CharacterArmature|Walk"
-const ANIM_RUN := &"CharacterArmature|Run"
-const ANIM_HIT := &"CharacterArmature|HitRecieve"
-const ANIM_INTERACT := &"CharacterArmature|Interact"
-const ANIM_DEATH := &"CharacterArmature|Death"
-## El modelo del superviviente no trae salto: se toman del rig (compatible) del alien.
-const ANIM_JUMP := &"CharacterArmature|Jump"
-const ANIM_AIRBORNE := &"CharacterArmature|Jump_Idle"
-const ANIM_LAND := &"CharacterArmature|Jump_Land"
-const JUMP_ANIM_SOURCE := preload("res://assets/models/enemies/tentacled/tentacled.glb")
-## Agacharse: tampoco viene con el modelo. La pose sale del primer cuadro del "Duck" del
-## alien y la caminata agachada se genera mezclando Walk con esa pose.
-const ANIM_DUCK := &"CharacterArmature|Duck"
-const ANIM_CROUCH_IDLE := &"CrouchIdle"
-const ANIM_CROUCH_WALK := &"CrouchWalk"
-const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN, ANIM_AIRBORNE, ANIM_CROUCH_WALK]
+## Animaciones de la Universal Animation Library (ver SurvivorRig).
+const ANIM_IDLE := SurvivorRig.IDLE
+const ANIM_WALK := SurvivorRig.WALK
+const ANIM_RUN := SurvivorRig.RUN
+const ANIM_HIT := SurvivorRig.HIT
+const ANIM_INTERACT := SurvivorRig.INTERACT
+const ANIM_DEATH := SurvivorRig.DEATH
+const ANIM_JUMP := SurvivorRig.JUMP
+const ANIM_AIRBORNE := SurvivorRig.AIRBORNE
+const ANIM_LAND := SurvivorRig.LAND
+const ANIM_CROUCH_IDLE := SurvivorRig.CROUCH_IDLE
+const ANIM_CROUCH_WALK := SurvivorRig.CROUCH_WALK
 
 @export_group("Movimiento")
 @export var walk_speed := 2.2
@@ -34,15 +29,13 @@ const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN, ANIM_A
 ## Control del movimiento en el aire (0 = ninguno, 1 = igual que en el piso).
 @export_range(0.0, 1.0) var air_control := 0.35
 ## Caídas más largas que esto (segundos en el aire) hacen la animación de aterrizaje.
-@export var hard_landing_time := 0.6
+@export var hard_landing_time := 1.1
 
 @export_group("Agacharse")
 @export var crouch_speed := 1.2
 ## Alto de la cápsula agachado (parado: 1.8).
 @export var crouch_height := 1.2
 @export var crouch_camera_height := 1.0
-## Cuánto de la pose agachada se mezcla en la caminata (0 = caminar normal, 1 = pose fija).
-@export_range(0.0, 1.0) var crouch_walk_blend := 0.7
 
 @export_group("Sigilo")
 ## Multiplicador de la distancia a la que te ven los enemigos (1 = parado a la luz).
@@ -83,7 +76,7 @@ var _current_camera_height := 0.0
 @onready var interaction_area: Area3D = $Visual/InteractionArea
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var spring_arm: SpringArm3D = $CameraPivot/SpringArm3D
-@onready var anim_player: AnimationPlayer = model.find_child("AnimationPlayer") as AnimationPlayer
+var anim_player: AnimationPlayer
 @onready var combat: PlayerCombat = $Combat
 @onready var body_shape: CollisionShape3D = $CollisionShape3D
 
@@ -102,12 +95,7 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 	PS1Materials.apply(model)
-	var skeleton := model.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
-	AnimationRetarget.import_animations(JUMP_ANIM_SOURCE, [ANIM_JUMP, ANIM_AIRBORNE, ANIM_LAND, ANIM_DUCK], anim_player, skeleton)
-	AnimationRetarget.make_pose(anim_player, ANIM_DUCK, 0.0, ANIM_CROUCH_IDLE)
-	AnimationRetarget.make_blend(anim_player, ANIM_WALK, ANIM_DUCK, 0.0, crouch_walk_blend, ANIM_CROUCH_WALK)
-	for anim_name in LOOPING_ANIMS:
-		anim_player.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
+	anim_player = SurvivorRig.setup(model)
 	anim_player.play(ANIM_IDLE)
 	combat.setup()
 
@@ -144,7 +132,7 @@ func _physics_process(delta: float) -> void:
 		_air_time += delta
 	else:
 		if _air_time > hard_landing_time and can_control:
-			play_action(ANIM_LAND)
+			play_action(ANIM_LAND, 1.8)
 		_air_time = 0.0
 
 	combat.physics_update(delta)
@@ -230,10 +218,11 @@ func _update_animation(speed: float) -> void:
 
 
 ## Reproduce una animación de acción que bloquea el movimiento hasta terminar.
-func play_action(anim: StringName) -> void:
-	anim_player.speed_scale = 1.0
+## `speed` acelera animaciones largas (el bloqueo se acorta en proporción).
+func play_action(anim: StringName, speed := 1.0) -> void:
+	anim_player.speed_scale = speed
 	anim_player.play(anim, 0.1)
-	_action_lock = anim_player.get_animation(anim).length
+	_action_lock = anim_player.get_animation(anim).length / speed
 
 
 ## Hay una acción en curso (golpe recibido, ataque, interactuar, recargar).

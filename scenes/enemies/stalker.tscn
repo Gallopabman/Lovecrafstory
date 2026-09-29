@@ -1,36 +1,40 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/stalker.gd" id="1_stalker"]
-[ext_resource type="PackedScene" path="res://assets/models/enemies/tentacled/tentacled.glb" id="2_model"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/thin_zombie/thin_zombie.glb" id="2_model"]
 [ext_resource type="Script" path="res://scripts/world/horror_sighting.gd" id="3_sighting"]
+[ext_resource type="Texture2D" path="res://assets/models/enemies/thin_zombie/thin_zombie.png" id="4_texture"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.4
-height = 2.3
+height = 2.2
 
 [node name="Stalker" type="CharacterBody3D"]
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_stalker")
+tint = Color(0.85, 0.8, 0.8, 1)
+albedo_texture = ExtResource("4_texture")
+attack_hit_time = 0.75
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("CapsuleShape3D_body")
 
 [node name="Visual" type="Node3D" parent="."]
 
 [node name="Model" parent="Visual" instance=ExtResource("2_model")]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
+transform = Transform3D(0.27, 0, 0, 0, 0.27, 0, 0, 0, 0.27, 0, 0, 0)
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 path_desired_distance = 0.6
 target_desired_distance = 0.6
-height = 2.3
+height = 2.2
 radius = 0.45
 
 [node name="HorrorSighting" type="Node3D" parent="."]
 script = ExtResource("3_sighting")
-horror_id = &"tentaculado"
+horror_id = &"delgado"
 first_sight_sanity = 10.0
 eye_height = 1.9
 face_player = false

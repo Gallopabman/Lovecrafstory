@@ -6,11 +6,13 @@ extends Node
 ## mano limpia sin arma): "attack" golpea en arco hacia adelante.
 ## La cordura baja empeora la puntería: la dispersión crece con la locura.
 
-const ANIM_AIM := &"CharacterArmature|Idle_Gun_Pointing"
-const ANIM_SHOOT := &"CharacterArmature|Gun_Shoot"
-const ANIM_SLASH := &"CharacterArmature|Sword_Slash"
-const ANIM_PUNCH := &"CharacterArmature|Punch_Right"
-const ANIM_RELOAD := &"CharacterArmature|Interact"
+const ANIM_AIM := SurvivorRig.AIM
+const ANIM_SHOOT := SurvivorRig.SHOOT
+const ANIM_SLASH := SurvivorRig.MELEE
+const ANIM_PUNCH := SurvivorRig.PUNCH
+const ANIM_RELOAD := SurvivorRig.RELOAD
+## Hueso de la mano derecha del esqueleto UE-mannequin.
+const HAND_BONE := "hand_r"
 
 @export_group("Apuntar")
 @export var auto_aim_range := 20.0
@@ -25,6 +27,8 @@ const ANIM_RELOAD := &"CharacterArmature|Interact"
 ## Momento del golpe dentro de la animación.
 @export var melee_hit_time := 0.4
 @export_range(0.0, 180.0) var melee_half_angle := 70.0
+## El golpe con arma de la animation library dura 1.5 s: se reproduce más rápido.
+@export var melee_anim_speed := 1.5
 @export var unarmed_damage := 6.0
 @export var unarmed_range := 1.3
 @export var unarmed_cooldown := 0.85
@@ -50,7 +54,7 @@ func setup() -> void:
 	_default_camera_distance = player.spring_arm.spring_length
 	var skeleton := player.model.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
 	_held_attachment = BoneAttachment3D.new()
-	_held_attachment.bone_name = "Wrist.R"
+	_held_attachment.bone_name = HAND_BONE
 	skeleton.add_child(_held_attachment)
 	_muzzle_flash = OmniLight3D.new()
 	_muzzle_flash.light_color = Color(1.0, 0.8, 0.5)
@@ -98,7 +102,7 @@ func attack() -> void:
 		if aiming:
 			_shoot(weapon)
 	else:
-		_melee(weapon.damage, weapon.attack_range, weapon.attack_cooldown, ANIM_SLASH)
+		_melee(weapon.damage, weapon.attack_range, weapon.attack_cooldown, ANIM_SLASH, melee_anim_speed)
 
 
 func reload() -> void:
@@ -144,13 +148,13 @@ func _shoot(weapon: ItemData) -> void:
 		hit.collider.take_damage(weapon.damage)
 
 
-func _melee(damage: float, reach: float, cooldown: float, anim: StringName) -> void:
+func _melee(damage: float, reach: float, cooldown: float, anim: StringName, anim_speed := 1.0) -> void:
 	_cooldown = cooldown
 	# Se orienta solo hacia el enemigo más cercano que tenga adelante.
 	var closest := _closest_enemy(reach * 1.6, 100.0)
 	if closest:
 		_face(closest.global_position, 0.0, 0.0)
-	player.play_action(anim)
+	player.play_action(anim, anim_speed)
 	await get_tree().create_timer(melee_hit_time, false).timeout
 	if not is_instance_valid(player) or not player.can_control:
 		return
@@ -229,8 +233,8 @@ func _on_equipped_changed(entry: Dictionary) -> void:
 		_held_model = null
 	var item: ItemData = entry.item if not entry.is_empty() else null
 	if item and item.held_scene:
-		# Las escenas "held" están armadas en metros en el espacio del hueso Wrist.R;
-		# el esqueleto del glTF viene escalado x100, así que se compensa acá.
+		# Las escenas "held" están armadas en metros en el espacio del hueso de la mano;
+		# si el esqueleto del glTF viene escalado, se compensa acá.
 		_held_model = item.held_scene.instantiate() as Node3D
 		_held_attachment.add_child(_held_model)
 		_held_model.scale = Vector3.ONE / _held_attachment.global_transform.basis.get_scale()
