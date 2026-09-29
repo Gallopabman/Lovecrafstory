@@ -106,6 +106,7 @@ func _initialize() -> void:
 	_ground_floor_rooms()
 	_first_floor_rooms()
 	_secrets()
+	_discovery()
 	_items()
 	_enemies()
 	_systems()
@@ -137,6 +138,15 @@ func _make_materials() -> void:
 		"bars": ["", Color(0.1, 0.1, 0.1), 1.0],
 		"lamp": ["", Color(0.9, 0.95, 0.9), 1.0],
 		"lamp_off": ["", Color(0.35, 0.36, 0.35), 1.0],
+		# Refugio
+		"ember": ["", Color(0.3, 0.1, 0.05), 1.0],
+		"photo": ["", Color(0.78, 0.62, 0.45), 1.0],
+		"photo2": ["", Color(0.48, 0.58, 0.68), 1.0],
+		"cloth": ["", Color(0.78, 0.76, 0.7), 1.0],
+		"cork": ["wood_floor", Color(0.62, 0.45, 0.3), 1.2],
+		"paper": ["", Color(0.88, 0.86, 0.78), 1.0],
+		"planks": ["wood_floor", Color(0.6, 0.48, 0.36), 0.8],
+		"soot": ["metal_green", Color(0.22, 0.2, 0.19), 0.9],
 	}
 	for key: String in defs:
 		var d: Array = defs[key]
@@ -149,6 +159,8 @@ func _make_materials() -> void:
 			m.set_shader_parameter(&"world_uv_scale", d[2])
 		if key == "lamp":
 			m.set_shader_parameter(&"emission_color", Color(0.85, 0.95, 0.85))
+		if key == "ember":
+			m.set_shader_parameter(&"emission_color", Color(1.0, 0.42, 0.12))
 		var path := MAT_DIR + "m_%s.tres" % key
 		ResourceSaver.save(m, path)
 		mats[key] = load(path)
@@ -280,16 +292,54 @@ func _prop(model_name: String, pos: Vector3, rot_y := 0.0, extra := {}) -> Node3
 		p.set("material_colors", extra.colors)
 	p.position = pos
 	p.rotation_degrees.y = rot_y
-	return _add(groups.Props, p, model_name)
+	return _add(extra.get("parent", groups.Props), p, model_name)
 
 
-func _inspect(pos: Vector3, texts: Array, radius := 0.9) -> void:
+func _inspect(pos: Vector3, texts: Array, radius := 0.9, parent: Node = null) -> void:
 	var a := Area3D.new()
 	a.set_script(InspectableScript)
 	a.set("texts", PackedStringArray(texts))
 	a.set("radius", radius)
 	a.position = pos
-	_add(groups.Inspectables, a, "Inspect")
+	_add(parent if parent else groups.Inspectables, a, "Inspect")
+
+
+## Espacio del blueprint del refugio. Sus hijos "Only<n>" / "From<n>" se muestran según el nivel.
+func _slot(slot_id: String, base_name: String, pos: Vector3) -> Node3D:
+	var slot := Node3D.new()
+	slot.set_script(load("res://scripts/world/shelter_slot.gd"))
+	slot.set("slot_id", StringName(slot_id))
+	slot.position = pos
+	return _add(groups.Refuge, slot, base_name)
+
+
+func _only(slot: Node3D, level: int) -> Node3D:
+	return _level_group(slot, "Only%d" % level)
+
+
+func _from(slot: Node3D, level: int) -> Node3D:
+	return _level_group(slot, "From%d" % level)
+
+
+func _level_group(slot: Node3D, group_name: String) -> Node3D:
+	var existing := slot.get_node_or_null(group_name)
+	if existing:
+		return existing
+	var g := Node3D.new()
+	g.name = group_name
+	slot.add_child(g)
+	g.owner = scene_root
+	return g
+
+
+## kind: 0 plano, 1 cocinar, 2 descansar, 3 radio (ShelterStation.Kind).
+func _station(pos: Vector3, parent: Node, base_name: String, kind: int, radius := 0.9) -> void:
+	var s := Area3D.new()
+	s.set_script(load("res://scripts/world/shelter_station.gd"))
+	s.set("kind", kind)
+	s.set("radius", radius)
+	s.position = pos
+	_add(parent, s, base_name)
 
 
 func _ceiling_light(x: float, z: float, level: int, mode := "on", energy := 1.0,
@@ -310,15 +360,18 @@ func _ceiling_light(x: float, z: float, level: int, mode := "on", energy := 1.0,
 	_add(groups.Lights, light, "Light")
 
 
-func _point_light(pos: Vector3, color: Color, energy: float, light_range: float, flicker := false) -> void:
+func _point_light(pos: Vector3, color: Color, energy: float, light_range: float, flicker := false,
+		parent: Node = null) -> void:
 	var light := OmniLight3D.new()
 	if flicker:
 		light.set_script(FlickerScript)
+		light.set("flicker_chance", 2.5 if parent else 0.35)
+		light.set("min_energy_factor", 0.6 if parent else 0.1)
 	light.light_color = color
 	light.light_energy = energy
 	light.omni_range = light_range
 	light.position = pos
-	_add(groups.Lights, light, "Light")
+	_add(parent if parent else groups.Lights, light, "Light")
 
 
 func _instance(path: String, parent: Node, base_name: String, pos: Vector3, props := {}) -> Node:
@@ -465,33 +518,104 @@ func _refuge() -> void:
 	var box := BoxShape3D.new()
 	box.size = Vector3(10.6, 3.2, 7.7)
 	shape.shape = box
+	zone.set("use_shelter", true)
 	_add(groups.Refuge, zone, "RefugeZone")
 	_add(zone, shape, "Shape")
-	var warm := Color(1.0, 0.72, 0.45)
-	_point_light(Vector3(30.5, 2.7, 4.0), warm, 1.1, 8.0)
-	_point_light(Vector3(33.4, 1.5, 6.6), warm, 0.8, 4.0)
-	_prop("rugRectangle", Vector3(31, 0.005, 4.8))
+
+	# Mobiliario fijo (no depende de las mejoras).
 	_prop("loungeSofa", Vector3(31, 0, 6.9), 180)
 	_prop("tableCoffee", Vector3(31, 0, 5.2))
 	_prop("cabinetTelevision", Vector3(31, 0, 0.55))
 	_prop("televisionVintage", Vector3(31, 0.55, 0.55))
 	_prop("bookcaseOpenLow", Vector3(28.6, 0, 0.45))
+	_prop("radio", Vector3(28.6, 0.8, 0.45))
 	_prop("kitchenCabinet", Vector3(35.4, 0, 1.4), -90)
 	_prop("kitchenSink", Vector3(35.4, 0, 2.3), -90)
 	_prop("kitchenFridge", Vector3(35.35, 0, 3.4), -90)
 	_prop("kitchenMicrowave", Vector3(35.4, 0.9, 1.3), -90)
 	_prop("kitchenCoffeeMachine", Vector3(35.45, 1.0, 2.6), -90)
-	_prop("table", Vector3(27.6, 0, 5.4))
-	_prop("chair", Vector3(27.2, 0, 6.3), 180)
-	_prop("chair", Vector3(28.0, 0, 4.5))
-	_prop("radio", Vector3(27.8, 0.78, 5.3), 20)
-	_prop("bedSingle", Vector3(26.4, 0, 2.2), 90, {"colors": hospital_bed_colors})
+	_prop("table", Vector3(27.8, 0, 5.4))
+	_prop("chair", Vector3(27.4, 0, 6.3), 180)
+	_prop("chair", Vector3(28.2, 0, 4.5))
 	_prop("lampRoundFloor", Vector3(33.5, 0, 6.9))
-	_prop("pottedPlant", Vector3(35.3, 0, 7.4))
-	_prop("washer", Vector3(25.8, 0, 7.3), 90, {"tint": Color(0.55, 0.6, 0.5)})
-	_inspect(Vector3(26.3, 0.6, 7.2), ["Un generador a nafta, conectado con cables pelados. Ronronea bajito. Mientras ande, acá hay luz.",
-		"Alguien anotó con marcador: \"cargar cada 2 días\". La letra es tuya... no. No puede ser."])
-	_inspect(Vector3(31, 0.8, 0.9), ["Un televisor viejo y una videocasetera. Todavía funcionan."])
+	_inspect(Vector3(31, 0.8, 0.9), ["Un televisor viejo y una videocasetera. Sin electricidad no sirven de nada."])
+	_station(Vector3(28.6, 0.9, 0.7), groups.Refuge, "RadioStation", 3)
+
+	# El plano en la pared: abre el menú de mejoras.
+	_box(groups.Refuge, "BlueprintBoard", Vector3(33.0, 1.6, 7.88), Vector3(1.0, 0.7, 0.03), "cork", false)
+	_box(groups.Refuge, "BlueprintPaper", Vector3(33.0, 1.62, 7.86), Vector3(0.8, 0.5, 0.01), "paper", false)
+	var title := Label3D.new()
+	title.text = "PLANO"
+	title.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
+	title.font_size = 16
+	title.pixel_size = 0.008
+	title.modulate = Color(0.25, 0.2, 0.3)
+	title.position = Vector3(33.0, 1.78, 7.84)
+	title.rotation_degrees.y = 180
+	_add(groups.Refuge, title, "BlueprintTitle")
+	_station(Vector3(33.0, 1.2, 7.3), groups.Refuge, "BlueprintStation", 0, 1.1)
+
+	var warm := Color(1.0, 0.7, 0.42)
+	# Fuego: fogata en un tacho -> salamandra. Habilita cocinar.
+	var fire := _slot("fire", "SlotFire", Vector3(28.4, 0, 2.6))
+	_inspect(Vector3(0, 0.5, 0), ["Un rincón despejado, lejos de las cortinas. Acá se podría hacer fuego. (Ver el plano.)"], 0.9, _only(fire, 0))
+	var l1 := _only(fire, 1)
+	_prop("trashcan", Vector3.ZERO, 0, {"parent": l1, "tint": Color(0.5, 0.35, 0.25)})
+	_box(l1, "Embers", Vector3(0, 0.62, 0), Vector3(0.36, 0.08, 0.36), "ember", false)
+	_point_light(Vector3(0, 1.0, 0), warm, 1.3, 5.5, true, l1)
+	var l2 := _only(fire, 2)
+	_box(l2, "Stove", Vector3(0, 0.4, 0), Vector3(0.7, 0.8, 0.55), "soot")
+	_box(l2, "StoveWindow", Vector3(0, 0.45, 0.28), Vector3(0.35, 0.2, 0.02), "ember", false)
+	_box(l2, "Chimney", Vector3(0, 2.0, -0.1), Vector3(0.14, 2.4, 0.14), "soot", false)
+	_point_light(Vector3(0, 0.9, 0.5), warm, 1.6, 7.0, true, l2)
+	_station(Vector3(0, 0.6, 0.3), _from(fire, 1), "CookStation", 1)
+
+	# Electricidad: generador roto -> reparado -> instalación prolija.
+	var power := _slot("power", "SlotPower", Vector3(25.8, 0, 7.3))
+	var p0 := _only(power, 0)
+	_prop("washer", Vector3.ZERO, 90, {"parent": p0, "tint": Color(0.3, 0.32, 0.3)})
+	_inspect(Vector3(0.4, 0.6, -0.1), ["El generador. Tiene nafta, pero los cables están cortados. Necesita cables y algo de metal. (Ver el plano.)"], 0.9, p0)
+	_point_light(Vector3(2.0, 1.0, -1.9), Color(1.0, 0.75, 0.45), 0.45, 3.5, true, p0)  # una vela en la mesa
+	var p1 := _from(power, 1)
+	_prop("washer", Vector3.ZERO, 90, {"parent": p1, "tint": Color(0.55, 0.6, 0.5)})
+	_inspect(Vector3(0.4, 0.6, -0.1), ["El generador ronronea bajito. Mientras ande, acá hay luz."], 0.9, p1)
+	_point_light(Vector3(4.7, 2.7, -3.3), warm, 1.1, 8.0, false, p1)
+	_point_light(Vector3(7.6, 1.5, -0.7), warm, 0.8, 4.0, false, p1)
+	var p2 := _only(power, 2)
+	_box(p2, "Conduit", Vector3(-0.68, 2.2, -3.6), Vector3(0.05, 0.05, 7.0), "soot", false)
+
+	# Cama: colchón en el piso -> cama armada -> cama con mantas. Habilita descansar.
+	var bed := _slot("bed", "SlotBed", Vector3(25.8, 0, 2.0))
+	var b0 := _only(bed, 0)
+	_box(b0, "Mattress", Vector3(0, 0.08, 0), Vector3(0.95, 0.16, 2.0), "cloth", false)
+	_inspect(Vector3(0, 0.3, 0), ["Un colchón en el piso, con olor a hospital. Así no se descansa. (Ver el plano.)"], 1.0, b0)
+	_prop("bedSingle", Vector3.ZERO, 0, {"parent": _only(bed, 1), "colors": hospital_bed_colors})
+	_prop("bedSingle", Vector3.ZERO, 0, {"parent": _only(bed, 2), "colors": {"carpetWhite": Color(0.92, 0.9, 0.84),
+		"carpet": Color(0.6, 0.26, 0.2), "wood": Color(0.5, 0.36, 0.26)}})
+	_station(Vector3(0.6, 0.5, 0), _from(bed, 1), "RestStation", 2, 1.1)
+
+	# Ventanas: rejas desnudas -> tablones -> cortinas.
+	var windows := _slot("windows", "SlotWindows", Vector3(0, 0, 0))
+	var w1 := _from(windows, 1)
+	var w2 := _only(windows, 2)
+	for x in [30.0, 33.5]:
+		for y in [1.15, 1.5, 1.85, 2.2]:
+			_box(w1, "Plank", Vector3(x + randf_range(-0.05, 0.05), y, 0.2), Vector3(2.15, 0.2, 0.04), "planks", false)
+		for dx in [-1.2, 1.2]:
+			_prop("curtain", Vector3(x + dx, 0, 0.3), 0, {"parent": w2, "h": 2.4, "tint": Color(0.7, 0.32, 0.26)})
+
+	# Decoración: nada -> cuadros y fotos -> plantas y alfombra.
+	var decor := _slot("decor", "SlotDecor", Vector3(0, 0, 0))
+	var d1 := _from(decor, 1)
+	for pic in [[Vector3(25.12, 1.7, 4.4), "photo"], [Vector3(25.12, 1.55, 5.4), "photo2"], [Vector3(25.12, 1.8, 6.2), "photo"]]:
+		_box(d1, "Frame", pic[0], Vector3(0.03, 0.5, 0.42), "planks", false)
+		_box(d1, "Photo", pic[0] + Vector3(0.02, 0, 0), Vector3(0.01, 0.38, 0.3), pic[1], false)
+	_prop("books", Vector3(28.3, 0.8, 0.45), 20, {"parent": d1})
+	var d2 := _from(decor, 2)
+	_prop("rugRectangle", Vector3(31, 0.005, 4.8), 0, {"parent": d2})
+	_prop("pottedPlant", Vector3(35.3, 0, 7.4), 0, {"parent": d2})
+	_prop("pottedPlant", Vector3(29.6, 0, 0.5), 0, {"parent": d2})
+	_prop("plantSmall1", Vector3(27.9, 0.78, 5.6), 0, {"parent": d2})
 
 
 func _ground_floor_rooms() -> void:
@@ -738,6 +862,26 @@ func _secrets() -> void:
 	_add(groups.Secrets, scrawl, "Scrawl")
 
 
+## Un lugar por ambiente: entrar por primera vez suma al bono de llegar a casa.
+func _discovery() -> void:
+	var places := [
+		["pb_stairs", 0, 0, 6, 8, 0], ["pb_pharmacy", 9, 0, 17, 8, 0], ["pb_consult1", 17, 0, 25, 8, 0],
+		["pb_corridor", 0, 8, 36, 11, 0], ["pb_security", 0, 11, 7, 20, 0], ["pb_lobby", 7, 11, 24, 20, 0],
+		["pb_consult2", 24, 11, 30, 20, 0], ["pb_baths", 30, 11, 36, 20, 0],
+		["p1_stairs", 0, 0, 6, 8, 1], ["p1_ward", 9, 0, 24, 8, 1], ["p1_surgery", 24, 0, 36, 8, 1],
+		["p1_corridor", 0, 8, 36, 11, 1], ["p1_director", 0, 11, 7, 20, 1], ["p1_nurses", 7, 11, 18, 20, 1],
+		["p1_storage", 18, 11, 26, 20, 1], ["p1_archive", 26, 11, 33, 20, 1], ["p1_hidden", 33, 11, 36, 20, 1],
+	]
+	var parent := _add(scene_root, Node3D.new(), "Places")
+	for p: Array in places:
+		var zone := Area3D.new()
+		zone.set_script(load("res://scripts/world/discovery_zone.gd"))
+		zone.set("place_id", StringName(p[0]))
+		zone.set("size", Vector3(p[3] - p[1] - 0.4, 2.8, p[4] - p[2] - 0.4))
+		zone.position = Vector3((p[1] + p[3]) / 2.0, p[5] * H + 1.4, (p[2] + p[4]) / 2.0)
+		_add(parent, zone, String(p[0]))
+
+
 func _items() -> void:
 	var pickup := "res://scenes/world/pickup.tscn"
 	var items := [
@@ -762,6 +906,21 @@ func _items() -> void:
 		["Peaches3", "food_canned_peaches", Vector3(20.5, H + 0.55, 0.45), 1],
 		# Cuarto tapiado (secreto)
 		["LetterMarta", "letter_marta_01", Vector3(34.6, H + 0.5, 18.2), 1],
+		# Materiales para el refugio (alcanzan para las primeras mejoras, no para todas).
+		["Wood1", "material_wood", Vector3(10.4, 0.0, 6.9), 2],
+		["Wood2", "material_wood", Vector3(16.8, 0.0, 18.5), 1],
+		["Wood3", "material_wood", Vector3(20.6, H, 17.9), 3],
+		["Wood4", "material_wood", Vector3(32.0, H, 12.8), 2],
+		["Metal1", "material_metal", Vector3(1.3, 0.0, 12.0), 2],
+		["Metal2", "material_metal", Vector3(25.4, H + 0.9, 0.45), 2],
+		["Metal3", "material_metal", Vector3(30.9, 0.0, 12.9), 1],
+		["Cloth1", "material_cloth", Vector3(13.0, H + 0.72, 1.6), 2],
+		["Cloth2", "material_cloth", Vector3(25.3, 0.72, 13.4), 1],
+		["Cloth3", "material_cloth", Vector3(24.9, H, 19.2), 2],
+		["Cloth4", "material_cloth", Vector3(13.8, H + 0.85, 19.1), 1],
+		["Cable1", "material_cable", Vector3(4.4, 0.76, 17.2), 1],
+		["Cable2", "material_cable", Vector3(9.8, H + 1.35, 19.5), 1],
+		["Cable3", "material_cable", Vector3(4.6, 0.0, 2.0), 1],
 	]
 	for it: Array in items:
 		_instance(pickup, groups.Items, it[0], it[2],

@@ -203,9 +203,13 @@ func use(item: ItemData, entry: Dictionary = {}) -> String:
 	var result := ""
 	match item.kind:
 		ItemData.Kind.FOOD:
-			Sanity.restore(item.sanity_restore)
+			# Cocinada en el fuego del refugio rinde más (GDD).
+			var cooked: bool = entry.get("cooked", false)
+			Sanity.restore(item.sanity_restore * (Shelter.cooked_multiplier if cooked else 1.0))
 			_consume_one(entry)
-			result = "Por un momento, todo parece normal."
+			result = "Caliente. Como en casa." if cooked else "Por un momento, todo parece normal."
+		ItemData.Kind.MATERIAL:
+			return "Esto sirve para el refugio. Se descarga solo al llegar."
 		ItemData.Kind.COMIC, ItemData.Kind.MOVIE:
 			var times: int = _use_counts.get(item.id, 0)
 			Sanity.restore(item.sanity_restore * pow(item.reuse_falloff, times))

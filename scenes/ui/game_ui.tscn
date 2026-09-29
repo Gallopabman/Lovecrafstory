@@ -3,8 +3,10 @@
 [ext_resource type="Script" path="res://scripts/ui/game_ui.gd" id="1_ui"]
 [ext_resource type="Script" path="res://scripts/ui/game_menu.gd" id="2_menu"]
 [ext_resource type="Script" path="res://scripts/ui/inventory_grid.gd" id="3_grid"]
+[ext_resource type="Script" path="res://scripts/ui/shelter_menu.gd" id="4_shelter"]
 
 [node name="GameUI" type="CanvasLayer"]
+process_mode = 3
 layer = 50
 script = ExtResource("1_ui")
 
@@ -173,6 +175,120 @@ offset_bottom = 210.0
 modulate = Color(1, 1, 1, 0.5)
 text = "E: guardar la carta"
 horizontal_alignment = 2
+
+[node name="ShelterMenu" type="Control" parent="."]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_shelter")
+
+[node name="Background" type="ColorRect" parent="ShelterMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.03, 0.02, 0.015, 0.88)
+
+[node name="Title" type="Label" parent="ShelterMenu"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 9.0
+offset_right = 150.0
+offset_bottom = 19.0
+text = "PLANO DEL REFUGIO"
+
+[node name="CozyLabel" type="Label" parent="ShelterMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 180.0
+offset_top = 9.0
+offset_right = 308.0
+offset_bottom = 19.0
+horizontal_alignment = 2
+
+[node name="CozyBar" type="ProgressBar" parent="ShelterMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 21.0
+offset_right = 308.0
+offset_bottom = 27.0
+show_percentage = false
+
+[node name="SlotList" type="ItemList" parent="ShelterMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 36.0
+offset_right = 142.0
+offset_bottom = 130.0
+focus_mode = 0
+mouse_filter = 2
+
+[node name="UpgradeName" type="Label" parent="ShelterMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 150.0
+offset_top = 36.0
+offset_right = 308.0
+offset_bottom = 58.0
+autowrap_mode = 3
+
+[node name="UpgradeDesc" type="Label" parent="ShelterMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 150.0
+offset_top = 62.0
+offset_right = 308.0
+offset_bottom = 110.0
+modulate = Color(1, 1, 1, 0.75)
+autowrap_mode = 3
+
+[node name="CostLabel" type="RichTextLabel" parent="ShelterMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 150.0
+offset_top = 114.0
+offset_right = 308.0
+offset_bottom = 160.0
+mouse_filter = 2
+bbcode_enabled = true
+scroll_active = false
+
+[node name="ShelterResult" type="Label" parent="ShelterMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 150.0
+offset_top = 160.0
+offset_right = 308.0
+offset_bottom = 184.0
+modulate = Color(1, 0.8, 0.7, 1)
+autowrap_mode = 3
+
+[node name="StockLabel" type="Label" parent="ShelterMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 190.0
+offset_right = 308.0
+offset_bottom = 214.0
+autowrap_mode = 3
+
+[node name="ShelterHint" type="Label" parent="ShelterMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 218.0
+offset_right = 308.0
+offset_bottom = 230.0
+modulate = Color(1, 1, 1, 0.5)
 
 [node name="LostScreen" type="ColorRect" parent="."]
 unique_name_in_owner = true

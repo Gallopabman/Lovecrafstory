@@ -127,6 +127,9 @@ func _draw_item(entry: Dictionary, rect: Rect2i, faded: bool, font: Font, font_s
 	var text_color := Color(1, 0.96, 0.9, 0.3 if faded else 1.0)
 	draw_string(font, pixels.position + Vector2(2, font_size + 1), item.short_name,
 		HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, text_color)
+	# Comida cocinada: una marca naranja arriba a la derecha.
+	if entry.get("cooked", false):
+		draw_rect(Rect2(pixels.end.x - 5, pixels.position.y + 2, 3, 3), Color(1.0, 0.55, 0.2))
 	# Abajo a la derecha: cantidad de la pila o balas en el cargador.
 	var corner := ""
 	if item.max_stack > 1:

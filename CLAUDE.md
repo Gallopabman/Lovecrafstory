@@ -61,6 +61,12 @@ en vez de inventarlo.
   - `Inventory` ([scripts/autoload/inventory.gd](scripts/autoload/inventory.gd)): cuadrícula
     `grid_size`, entradas `{item, cell, rotated}`, `letters` aparte; `add()` devuelve false si no
     entra; `use(item, entry)`, `move`, `drop` (emite `item_dropped`).
+  - `Shelter` ([scripts/autoload/shelter.gd](scripts/autoload/shelter.gd)): el refugio como hogar.
+    Blueprint `SLOTS` (fuego, electricidad, cama, ventanas, decoración; 2 niveles cada uno, costo en
+    materiales, +1 cozy por nivel), `stock` de materiales, `cozy()` → `drain_multiplier()` (x0.6 pelado
+    → x0.1 completo), `has_electricity()` (generador), estaciones `cook()` / `rest()` / `play_radio()`,
+    `discover(place)` y el bono de llegar a casa (lugares nuevos + objetos + cartas de la salida, tope
+    30). Los materiales se descargan solos de la mochila al entrar. Persiste entre sobrevivientes.
   - `GameState` ([scripts/autoload/game_state.gd](scripts/autoload/game_state.gd)): persiste entre
     sobrevivientes (pickups recogidos por ruta de nodo, objetos tirados, cuerpos, `lost_ones` para el
     Perdido, número de sobreviviente) y `post_message()` para avisos. Todavía no guarda a disco.
@@ -112,6 +118,12 @@ modificar la escena a mano o actualizar el script y avisar.
   la próxima zona, "la calle"), ascensor muerto. Escalera recta con rampa invisible + `NavigationLink3D`.
 - Lore: el hospital se aisló el día 9 de la niebla; Ferreyra soldó las rejas "para que nadie salga".
   Los `Inspectable` (E) cuentan la historia con textos cortos.
+- **Refugio** (sala del personal, PB NE): arranca pelado (colchón en el piso, generador roto, una
+  vela). El plano en la pared (`ShelterStation` BLUEPRINT) abre `ShelterMenu`. Cada espacio es un
+  `ShelterSlot` cuyos hijos `Only<n>` / `From<n>` se muestran según el nivel (props, luces y estaciones
+  COOK / REST / RADIO adentro). Materiales repartidos por el hospital (madera 8, chatarra 5, sábanas 6,
+  cables 3): alcanzan para las primeras mejoras, no para todas. `DiscoveryZone` por ambiente.
+  La `RefugeZone` usa `use_shelter` (goteo y electricidad salen de `Shelter`).
 - Componentes nuevos: `Prop` (@tool, modelo + escala por `fit_height`/`fit_largest` + anchor
   FLOOR/CEILING/WALL + colores por material + colisión de caja), `Inspectable`, `FlickerLight`;
   `GreyBox` ahora tiene `mesh_visible` / `collision_enabled`; el shader PS1 tiene `emission_color`.
@@ -148,6 +160,8 @@ Godot **4.7.2** (no está en el PATH):
   OK/FAIL y guarda capturas en `%APPDATA%\Godot\app_userdata\Lovacrafstory\test_shots\`. Mirar las capturas.
 - **Test del hospital**: `<godot> --path . -s res://tests/hospital_tour_test.gd` (carga, escalera,
   navmesh entre pisos, límites, una captura por ambiente en `test_shots\hospital\`).
+- **Test del refugio**: `<godot> --path . -s res://tests/shelter_test.gd` (materiales, bono, plano,
+  estaciones, persistencia; capturas en `test_shots\shelter\`).
 - Regenerar el hospital: `<godot> --headless --path . -s res://tools/build_hospital.gd`.
 - Un hook de seguridad bloquea comandos de PowerShell con ciertos patrones (`.Replace(...)` con
   comillas, `Remove-Item`): para editar archivos usar la herramienta Edit.
@@ -184,10 +198,14 @@ munición apilable, arma equipada, dos acechadores en la sala.
 
 **Zona 1** — hecho: Hospital San Judas (ver arriba), tres acechadores, alucinación en el quirófano.
 
+**Prototipo 3** — hecho: refugio con blueprint (5 espacios x 2 niveles), materiales, nivel cozy,
+estaciones (cocinar, descansar, radio, TV con electricidad) y bono de llegar a casa. A afinar con el
+usuario: costos, cantidades de materiales, valores de cozy/goteo y de las estaciones. Pendiente del GDD:
+mudarse a otro refugio (edificios con más slots), baúl para guardar cosas, mesa de trabajo / biblioteca.
+
 Pendiente / preguntas abiertas:
 - ¿Los horrores reaparecen en zonas limpias? (pregunta abierta del GDD; hoy no).
   Sonido (disparos, golpes, pasos) todavía no hay.
 - El Perdido (ya se registran posición e inventario en `GameState.lost_ones`), alucinaciones
   inofensivas "de verdad", cámaras fijas en interiores, bono de llegar a casa, guardado a disco.
 - Íconos de objetos para la cuadrícula (hoy: color + abreviatura).
-- **Prototipo 3** (GDD): refugio con un slot de mejora y el bono de llegar a casa.

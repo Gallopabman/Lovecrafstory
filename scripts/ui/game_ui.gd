@@ -16,6 +16,7 @@ const HEART_TEXT := "Su corazón no aguantó.\n\nAlguien más llegará al refugi
 @onready var lost_label: Label = %LostLabel
 @onready var debug_label: Label = %DebugLabel
 @onready var game_menu: GameMenu = $GameMenu
+@onready var shelter_menu: ShelterMenu = $ShelterMenu
 
 var _message_timer := 0.0
 
@@ -30,7 +31,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	pickup_label.visible = not game_menu.visible
+	pickup_label.visible = not game_menu.visible and not shelter_menu.visible
 	if _message_timer > 0.0:
 		_message_timer -= delta
 		pickup_label.modulate.a = clampf(_message_timer / 0.5, 0.0, 1.0)

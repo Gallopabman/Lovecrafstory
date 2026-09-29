@@ -54,7 +54,7 @@ func _initialize() -> void:
 
 	print("-- Carga")
 	check(current_scene.name == "Hospital", "escena del hospital cargada")
-	check(sanity.in_refuge() and sanity.has_electricity(), "arranca en el refugio, con electricidad")
+	check(sanity.in_refuge() and not sanity.has_electricity(), "arranca en el refugio, sin electricidad (el generador empieza roto)")
 	var props := current_scene.get_node("Props").get_child_count()
 	check(props > 150, "mobiliario: %d props" % props)
 	check(get_nodes_in_group(&"enemies").size() == 3, "3 acechadores")

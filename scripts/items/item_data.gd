@@ -3,7 +3,8 @@ extends Resource
 ## Definición de un objeto (ver "Objetos de esperanza" del GDD, más armas y munición).
 ## Crear nuevos objetos como .tres en assets/items/.
 
-enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO }
+## MATERIAL: para las mejoras del refugio (se descarga solo al llegar a casa).
+enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL }
 
 @export var id: StringName
 @export var display_name := ""
@@ -56,3 +57,7 @@ func is_letter() -> bool:
 
 func is_weapon() -> bool:
 	return kind == Kind.WEAPON
+
+
+func is_material() -> bool:
+	return kind == Kind.MATERIAL

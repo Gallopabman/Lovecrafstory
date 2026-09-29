@@ -173,6 +173,8 @@ func _show_details() -> void:
 		item = entry.item if not entry.is_empty() else null
 	name_label.text = item.display_name if item else ""
 	var description := item.description if item else ""
+	if item and entry.get("cooked", false):
+		name_label.text += "  (caliente)"
 	if item and item.is_weapon():
 		if Inventory.is_equipped(entry):
 			name_label.text += "  (en la mano)"

@@ -11,6 +11,9 @@ signal hit_taken(amount: float)
 signal horror_seen(horror_id: StringName)
 ## Cordura en 0. Ver `lost_in_refuge` para saber cómo terminó.
 signal lost
+## El jugador llegó al refugio / salió de él (para el bono de llegar a casa).
+signal refuge_entered
+signal refuge_exited
 
 ## Rangos en % de la cordura máxima (tabla "Estados de cordura" del GDD).
 enum State { LUCID, UNEASY, BROKEN, BRINK, LOST }
@@ -77,13 +80,13 @@ func in_refuge() -> bool:
 
 
 func has_electricity() -> bool:
-	return _refuges.any(func(r: RefugeZone) -> bool: return r.has_electricity)
+	return _refuges.any(func(r: RefugeZone) -> bool: return r.current_has_electricity())
 
 
 func drain_multiplier() -> float:
 	var multiplier := 1.0
 	for refuge in _refuges:
-		multiplier = minf(multiplier, refuge.drain_multiplier)
+		multiplier = minf(multiplier, refuge.current_drain_multiplier())
 	return multiplier
 
 
@@ -124,12 +127,19 @@ func register_sighting(horror_id: StringName, amount: float) -> bool:
 
 
 func enter_refuge(refuge: RefugeZone) -> void:
-	if refuge not in _refuges:
-		_refuges.append(refuge)
+	if refuge in _refuges:
+		return
+	_refuges.append(refuge)
+	if _refuges.size() == 1 and active:
+		refuge_entered.emit()
 
 
 func exit_refuge(refuge: RefugeZone) -> void:
+	if refuge not in _refuges:
+		return
 	_refuges.erase(refuge)
+	if _refuges.is_empty() and active:
+		refuge_exited.emit()
 
 
 ## Nuevo sobreviviente: la cordura máxima vuelve a la base; los horrores
