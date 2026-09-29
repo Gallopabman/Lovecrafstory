@@ -34,7 +34,15 @@ que aparecer en los créditos del juego cuando se publique.
 | Water Cooler | J-Toastie | CC-BY 3.0 | [poly.pizza/m/zWi9p5FSxD](https://poly.pizza/m/zWi9p5FSxD) | `assets/models/props/hospital/water_cooler.glb` |
 | Tall Cabinet | Bouggles | CC-BY 3.0 | [poly.pizza/m/z9U3UyVGPu](https://poly.pizza/m/z9U3UyVGPu) | `assets/models/props/hospital/tall_cabinet.glb` |
 
-## Texturas (reducidas a 64x64 para el look PS1)
+## Mobiliario realista (Poly Haven)
+
+| Assets | Autor | Licencia | Fuente | Ubicación |
+| --- | --- | --- | --- | --- |
+| 38 modelos (escritorio de metal, sillas escolar / de oficina / plástica, estanterías de acero, rack, biblioteca, mesas de luz, cómoda, cajas, cajón, bolsas, sillón, butaca, mesas, televisores, planta, generador portátil, tacho-estufa, estufa de mampostería, radio, microondas, cocina eléctrica, cama de hierro, cama plegable, silla de ruedas, botiquín, luminaria fluorescente, cartel de piso mojado, reloj, cámara de seguridad, lámpara de escritorio, escoba, etc.) | Poly Haven (varios autores) | CC0 | [polyhaven.com/models](https://polyhaven.com/models) | `assets/models/props/polyhaven/<id>/` |
+
+Descargados con [tools/fetch_polyhaven.ps1](tools/fetch_polyhaven.ps1): solo la textura de color, reducida a 256 px.
+
+## Texturas (reducidas a 128x128 para el look PS1)
 
 | Textura | Autor | Licencia | Fuente | Archivo |
 | --- | --- | --- | --- | --- |

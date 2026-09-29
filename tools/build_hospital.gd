@@ -76,6 +76,38 @@ var presets := {
 	"bed_metal": {"dir": HOSP, "L": 2.1},
 }
 
+## Reemplazos por modelos más detallados de Poly Haven (CC0, escala real en metros).
+## La clave es el nombre usado en las llamadas a _prop; el valor, el id de Poly Haven y su preset.
+var upgrades := {
+	"desk": ["metal_office_desk", {}], "deskCorner": ["metal_office_desk", {}],
+	"chair": ["SchoolChair_01", {}], "chairDesk": ["modern_arm_chair_01", {}],
+	"chairModernCushion": ["plastic_monobloc_chair_01", {}],
+	"bookcaseOpen": ["steel_frame_shelves_01", {"h": 1.9}], "bookcaseOpenLow": ["worn_metal_rack", {"h": 0.9}],
+	"bookcaseClosed": ["wooden_bookshelf_worn", {}], "bookcaseClosedDoors": ["wooden_bookshelf_worn", {}],
+	"bookcaseClosedWide": ["wooden_bookshelf_worn", {}],
+	"cabinetBedDrawerTable": ["ClassicNightstand_01", {}], "cabinetTelevision": ["vintage_wooden_drawer_01", {}],
+	"cardboardBoxClosed": ["cardboard_box_01", {}], "cardboardBoxOpen": ["wooden_crate_01", {}],
+	"loungeSofa": ["Sofa_01", {}], "loungeChair": ["ArmChair_01", {}],
+	"tableCoffee": ["CoffeeTable_01", {}], "table": ["WoodenTable_03", {}], "sideTable": ["side_table_01", {}],
+	"televisionVintage": ["Television_01", {"col": false}], "televisionModern": ["television_02", {"anchor": 2, "col": false}],
+	"plantSmall1": ["potted_plant_04", {"col": false}], "washer": ["portable_generator", {}],
+	"radio": ["boombox", {"col": false}], "kitchenMicrowave": ["vintage_microwave", {"h": 0.32, "col": false}],
+	"bedSingle": ["vintage_day_bed", {}], "bed_metal": ["old_bed_frame", {}], "wheelchair": ["wheelchair_01", {}],
+	"first_aid_kit": ["medical_box", {"anchor": 2, "col": false}], "lampRoundTable": ["desk_lamp_arm_01", {"col": false}],
+	# Usados directamente por su nombre de Poly Haven.
+	"barrel_stove": ["barrel_stove", {}], "scandinavian_masonry_heater": ["scandinavian_masonry_heater", {"h": 1.5}],
+	"electric_stove": ["electric_stove", {}], "security_camera_01": ["security_camera_01", {"anchor": 2, "col": false}],
+	"wall_clock": ["wall_clock", {"anchor": 2, "col": false}], "WetFloorSign_01": ["WetFloorSign_01", {"col": false}],
+	"wooden_broom": ["wooden_broom", {"col": false}], "trashbag": ["trashbag", {}],
+	"mounted_fluorescent_lights": ["mounted_fluorescent_lights", {"anchor": 1, "col": false}],
+}
+const POLYHAVEN := "res://assets/models/props/polyhaven/"
+## Correcciones por modelo de Poly Haven (rotación para que el frente mire a +Z, etc.).
+## Se completan mirando los renders de tools/preview_props.
+var ph_fixes := {
+	"SchoolChair_01": {"rot": Vector3(0, 90, 0)},
+}
+
 ## Colores "de hospital" para la cama de Kenney y la de Quaternius.
 var hospital_bed_colors := {"carpetWhite": Color(0.86, 0.88, 0.86), "carpet": Color(0.5, 0.62, 0.58),
 	"wood": Color(0.72, 0.74, 0.74), "Red": Color(0.55, 0.64, 0.6), "DarkRed": Color(0.42, 0.5, 0.47),
@@ -105,6 +137,7 @@ func _initialize() -> void:
 	_refuge()
 	_ground_floor_rooms()
 	_first_floor_rooms()
+	_details()
 	_secrets()
 	_discovery()
 	_items()
@@ -145,8 +178,17 @@ func _make_materials() -> void:
 		"cloth": ["", Color(0.78, 0.76, 0.7), 1.0],
 		"cork": ["wood_floor", Color(0.62, 0.45, 0.3), 1.2],
 		"paper": ["", Color(0.88, 0.86, 0.78), 1.0],
+		"blanket": ["", Color(0.55, 0.22, 0.17), 1.0],
+		"mattress": ["", Color(0.7, 0.76, 0.72), 1.0],
+		"or_pad": ["", Color(0.24, 0.42, 0.36), 1.0],
 		"planks": ["wood_floor", Color(0.6, 0.48, 0.36), 0.8],
 		"soot": ["metal_green", Color(0.22, 0.2, 0.19), 0.9],
+		# Arquitectura
+		"trim": ["wall_plaster", Color(0.8, 0.8, 0.74), 1.5],
+		"rail": ["wood_floor", Color(0.55, 0.42, 0.3), 1.0],
+		"sign": ["", Color(0.12, 0.26, 0.2), 1.0],
+		"counter": ["wood_floor", Color(0.62, 0.55, 0.46), 0.7],
+		"counter_top": ["ceiling_office", Color(0.7, 0.72, 0.7), 1.0],
 	}
 	for key: String in defs:
 		var d: Array = defs[key]
@@ -189,6 +231,9 @@ func _box(parent: Node, base_name: String, center: Vector3, size: Vector3, mat: 
 	var b: StaticBody3D = GreyBoxScript.new()
 	b.set("size", size)
 	b.set("material", mats[mat])
+	# Más vértices en superficies grandes: la luz por vértice queda más suave.
+	if maxf(size.x, maxf(size.y, size.z)) > 1.5:
+		b.set("subdivisions_per_meter", 2.0)
 	if not collision:
 		b.set("collision_enabled", false)
 	if not visible:
@@ -226,9 +271,69 @@ func _wall(axis: String, c: float, a0: float, a1: float, y0: float, height: floa
 			_wall_segment(axis, c, left, right, y0, op[3], height, thickness, mat)
 		if bars and op[2] > 0.0:
 			_window_bars(axis, c, left, right, y0 + op[2], y0 + op[3])
+		_opening_trim(axis, c, left, right, y0 + op[2], y0 + op[3], thickness, op[2] <= 0.0)
 		cursor = right
 	if cursor < a1:
 		_wall_segment(axis, c, cursor, a1, y0, 0.0, height, thickness, mat)
+
+
+## Marco de puerta (dos jambas + dintel) o alféizar de ventana. Solo visual.
+func _opening_trim(axis: String, c: float, a: float, b: float, y_lo: float, y_hi: float, thickness: float,
+		is_door: bool) -> void:
+	var depth := thickness + 0.06
+	var pieces := []
+	if is_door:
+		var h := y_hi - y_lo
+		pieces.append([a - 0.04, y_lo + h / 2, 0.08, h + 0.08])
+		pieces.append([b + 0.04, y_lo + h / 2, 0.08, h + 0.08])
+		pieces.append([(a + b) / 2, y_hi + 0.04, b - a + 0.16, 0.08])
+	else:
+		pieces.append([(a + b) / 2, y_lo - 0.03, b - a + 0.1, 0.06])
+	for p: Array in pieces:
+		var center := Vector3(p[0], p[1], c) if axis == "x" else Vector3(c, p[1], p[0])
+		var size := Vector3(p[2], p[3], depth) if axis == "x" else Vector3(depth, p[3], p[2])
+		_box(groups.Structure, "Trim", center, size, "trim", false)
+
+
+## Pasamanos de hospital a lo largo de un pasillo (se corta en las aberturas).
+## `face` es la z de la cara de la pared; `side` +1/-1 hacia dónde sobresale.
+func _handrail(face: float, side: float, x0: float, x1: float, y0: float, openings: Array) -> void:
+	var cuts := []
+	for op: Array in openings:
+		cuts.append([op[0] - op[1] / 2.0 - 0.15, op[0] + op[1] / 2.0 + 0.15])
+	cuts.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	var cursor := x0
+	for cut: Array in cuts + [[x1, x1]]:
+		if cut[0] - cursor > 0.5:
+			var z := face + side * 0.06
+			_box(groups.Structure, "Handrail", Vector3((cursor + cut[0]) / 2, y0 + 0.9, z),
+				Vector3(cut[0] - cursor, 0.06, 0.05), "rail", false)
+			_box(groups.Structure, "HandrailGuard", Vector3((cursor + cut[0]) / 2, y0 + 0.9, face + side * 0.015),
+				Vector3(cut[0] - cursor, 0.14, 0.02), "trim", false)
+		cursor = maxf(cursor, cut[1])
+
+
+## Mostrador (recepción, enfermería, farmacia): frente de madera y tapa laminada, a lo largo de X.
+func _counter(x0: float, x1: float, z: float, y0: float) -> void:
+	var mid := (x0 + x1) / 2.0
+	_box(groups.Props, "Counter", Vector3(mid, y0 + 0.5, z), Vector3(x1 - x0, 1.0, 0.6), "counter")
+	_box(groups.Props, "CounterTop", Vector3(mid, y0 + 1.02, z - 0.03), Vector3(x1 - x0 + 0.06, 0.04, 0.7), "counter_top", false)
+	_box(groups.Props, "CounterKick", Vector3(mid, y0 + 0.05, z - 0.31), Vector3(x1 - x0, 0.1, 0.02), "soot", false)
+
+
+## Cartel con el nombre del ambiente sobre una puerta (del lado del pasillo).
+func _room_sign(text: String, x: float, z_face: float, y0: float, facing_south: bool, height := 2.62) -> void:
+	var dz := 0.03 if facing_south else -0.03
+	_box(groups.Structure, "SignPlate", Vector3(x, y0 + height, z_face + dz), Vector3(1.3, 0.2, 0.02), "sign", false)
+	var label := Label3D.new()
+	label.text = text
+	label.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
+	label.font_size = 16
+	label.pixel_size = 0.0075
+	label.modulate = Color(0.88, 0.9, 0.86)
+	label.position = Vector3(x, y0 + height, z_face + dz * 1.8)
+	label.rotation_degrees.y = 0.0 if facing_south else 180.0
+	_add(groups.Structure, label, "SignText")
 
 
 func _wall_segment(axis: String, c: float, a: float, b: float, y0: float, lo: float, hi: float,
@@ -270,14 +375,22 @@ func _closed_door(pos: Vector3, facing_deg: float, width := 1.3, height := 2.3) 
 
 func _prop(model_name: String, pos: Vector3, rot_y := 0.0, extra := {}) -> Node3D:
 	var preset: Dictionary = presets.get(model_name, {})
+	var path: String = preset.get("dir", KENNEY) + model_name + ".glb"
+	var from_polyhaven := upgrades.has(model_name)
+	if from_polyhaven:
+		var up: Array = upgrades[model_name]
+		model_name = up[0]
+		path = POLYHAVEN + model_name + "/" + model_name + ".gltf"
+		preset = up[1].duplicate()
+		preset.merge(ph_fixes.get(model_name, {}))
 	var p: Node3D = PropScript.new()
-	p.set("model", load(preset.get("dir", KENNEY) + model_name + ".glb"))
-	if preset.has("h"):
-		p.set("fit_height", extra.get("h", preset.h))
+	p.set("model", load(path))
+	if preset.has("h") or extra.has("h"):
+		p.set("fit_height", extra.get("h", preset.get("h", 1.0)))
 	elif preset.has("L"):
 		p.set("fit_largest", preset.L)
 	else:
-		p.set("model_scale", extra.get("s", preset.get("s", 2.0)))
+		p.set("model_scale", extra.get("s", preset.get("s", 1.0 if from_polyhaven else 2.0)))
 	if preset.has("rot"):
 		p.set("model_rotation", preset.rot)
 	if preset.has("anchor"):
@@ -285,8 +398,9 @@ func _prop(model_name: String, pos: Vector3, rot_y := 0.0, extra := {}) -> Node3
 	if extra.has("anchor"):
 		p.set("anchor", extra.anchor)
 	p.set("collision", extra.get("col", preset.get("col", true)))
-	# Los muebles de Kenney son muy limpios y saturados: se apagan un poco.
-	var default_tint := Color(0.78, 0.76, 0.74) if preset.get("dir", KENNEY) == KENNEY else Color.WHITE
+	# Los muebles de Kenney son muy limpios y saturados: se apagan un poco. Los de Poly Haven, apenas.
+	var default_tint := Color(0.85, 0.84, 0.82) if from_polyhaven \
+		else (Color(0.78, 0.76, 0.74) if preset.get("dir", KENNEY) == KENNEY else Color.WHITE)
 	p.set("tint", extra.get("tint", default_tint))
 	if extra.has("colors"):
 		p.set("material_colors", extra.colors)
@@ -345,8 +459,11 @@ func _station(pos: Vector3, parent: Node, base_name: String, kind: int, radius :
 func _ceiling_light(x: float, z: float, level: int, mode := "on", energy := 1.0,
 		color := Color(0.82, 0.95, 0.88)) -> void:
 	var y := level * H + CEIL
-	_box(groups.Lights, "Tube", Vector3(x, y - 0.03, z), Vector3(1.2, 0.05, 0.28),
-		"lamp" if mode != "off" else "lamp_off", false)
+	# Luminaria de Poly Haven con dos tubos (emisivos si la luz anda).
+	_prop("mounted_fluorescent_lights", Vector3(x, y, z), 90, {"parent": groups.Lights})
+	for dz in [-0.14, 0.14]:
+		_box(groups.Lights, "Tube", Vector3(x + dz, y - 0.055, z), Vector3(0.06, 0.03, 0.82),
+			"lamp" if mode != "off" else "lamp_off", false)
 	if mode == "off":
 		return
 	var light := OmniLight3D.new()
@@ -449,6 +566,19 @@ func _structure() -> void:
 			else [_door(3.5), [12.5, 5.0, 0.0, 2.8], _door(22), _door(29.5)]
 		_wall("x", 8.0, TE / 2, W - TE / 2, y0, CEIL, T, north_doors)
 		_wall("x", 11.0, TE / 2, W - TE / 2, y0, CEIL, T, south_doors)
+		# Pasamanos a los dos lados del pasillo (el ascensor también corta el de la pared norte).
+		_handrail(8.0 + T / 2, 1.0, 0.3, W - 0.3, y0, north_doors + [[7.5, 1.5]])
+		_handrail(11.0 - T / 2, -1.0, 0.3, W - 0.3, y0, south_doors)
+		var signs := [["ESCALERA", 1.5, true], ["FARMACIA", 12.5, true], ["CONSULTORIO 1", 20.5, true],
+			["PERSONAL", 28.0, true], ["SEGURIDAD", 3.5, false], ["HALL", 15.5, false],
+			["CONSULTORIO 2", 27.0, false], ["BAÑOS", 33.0, false]] if level == 0 else \
+			[["ESCALERA", 4.3, true], ["INTERNACIÓN", 12.0, true], ["INTERNACIÓN", 21.0, true],
+			["QUIRÓFANO", 29.5, true], ["DIRECCIÓN", 3.5, false], ["ENFERMERÍA", 12.5, false],
+			["DEPÓSITO", 22.0, false], ["ARCHIVO", 29.5, false]]
+		for s: Array in signs:
+			# Sobre las aberturas anchas (2.8 m) el cartel va más alto.
+			var wide: bool = s[0] == "HALL" or s[0] == "ENFERMERÍA"
+			_room_sign(s[0], s[1], 8.0 + T / 2 if s[2] else 11.0 - T / 2, y0, s[2], 3.0 if wide else 2.62)
 		var north_parts := [6.0, 9.0, 17.0, 25.0] if level == 0 else [6.0, 9.0, 24.0]
 		for x in north_parts:
 			_wall("z", x, TE / 2, 8.0 - T / 2, y0, CEIL, T)
@@ -560,14 +690,13 @@ func _refuge() -> void:
 	var fire := _slot("fire", "SlotFire", Vector3(28.4, 0, 2.6))
 	_inspect(Vector3(0, 0.5, 0), ["Un rincón despejado, lejos de las cortinas. Acá se podría hacer fuego. (Ver el plano.)"], 0.9, _only(fire, 0))
 	var l1 := _only(fire, 1)
-	_prop("trashcan", Vector3.ZERO, 0, {"parent": l1, "tint": Color(0.5, 0.35, 0.25)})
-	_box(l1, "Embers", Vector3(0, 0.62, 0), Vector3(0.36, 0.08, 0.36), "ember", false)
-	_point_light(Vector3(0, 1.0, 0), warm, 1.3, 5.5, true, l1)
+	_prop("barrel_stove", Vector3.ZERO, 0, {"parent": l1})
+	_box(l1, "Embers", Vector3(0, 0.88, 0), Vector3(0.3, 0.03, 0.3), "ember", false)
+	_point_light(Vector3(0, 1.15, 0), warm, 1.3, 5.5, true, l1)
 	var l2 := _only(fire, 2)
-	_box(l2, "Stove", Vector3(0, 0.4, 0), Vector3(0.7, 0.8, 0.55), "soot")
-	_box(l2, "StoveWindow", Vector3(0, 0.45, 0.28), Vector3(0.35, 0.2, 0.02), "ember", false)
-	_box(l2, "Chimney", Vector3(0, 2.0, -0.1), Vector3(0.14, 2.4, 0.14), "soot", false)
-	_point_light(Vector3(0, 0.9, 0.5), warm, 1.6, 7.0, true, l2)
+	_prop("scandinavian_masonry_heater", Vector3.ZERO, 0, {"parent": l2})
+	_box(l2, "StoveWindow", Vector3(0, 0.45, 0.44), Vector3(0.3, 0.2, 0.02), "ember", false)
+	_point_light(Vector3(0, 0.9, 0.8), warm, 1.6, 7.0, true, l2)
 	_station(Vector3(0, 0.6, 0.3), _from(fire, 1), "CookStation", 1)
 
 	# Electricidad: generador roto -> reparado -> instalación prolija.
@@ -589,9 +718,12 @@ func _refuge() -> void:
 	var b0 := _only(bed, 0)
 	_box(b0, "Mattress", Vector3(0, 0.08, 0), Vector3(0.95, 0.16, 2.0), "cloth", false)
 	_inspect(Vector3(0, 0.3, 0), ["Un colchón en el piso, con olor a hospital. Así no se descansa. (Ver el plano.)"], 1.0, b0)
-	_prop("bedSingle", Vector3.ZERO, 0, {"parent": _only(bed, 1), "colors": hospital_bed_colors})
-	_prop("bedSingle", Vector3.ZERO, 0, {"parent": _only(bed, 2), "colors": {"carpetWhite": Color(0.92, 0.9, 0.84),
-		"carpet": Color(0.6, 0.26, 0.2), "wood": Color(0.5, 0.36, 0.26)}})
+	# Nivel 1: la cama plegable armada. Nivel 2: la misma con mantas y almohada.
+	_prop("bedSingle", Vector3(0.1, 0, 0), 90, {"parent": _only(bed, 1)})
+	var b2 := _only(bed, 2)
+	_prop("bedSingle", Vector3(0.1, 0, 0), 90, {"parent": b2})
+	_box(b2, "Blanket", Vector3(0.12, 0.47, 0.25), Vector3(0.72, 0.06, 1.3), "blanket", false)
+	_box(b2, "Pillow", Vector3(0.12, 0.5, -0.72), Vector3(0.55, 0.1, 0.35), "cloth", false)
 	_station(Vector3(0.6, 0.5, 0), _from(bed, 1), "RestStation", 2, 1.1)
 
 	# Ventanas: rejas desnudas -> tablones -> cortinas.
@@ -625,11 +757,10 @@ func _ground_floor_rooms() -> void:
 		_prop("bookcaseOpen", Vector3(x, y, 0.35))
 	for x in [10.8, 12.0, 13.2]:
 		_prop("bookcaseOpen", Vector3(x, y, 4.0))
-	for x in [13.9, 14.75, 15.6]:
-		_prop("kitchenBar", Vector3(x, y, 6.9), 180)
+	_counter(13.5, 16.1, 6.9, y)
 	_prop("cardboardBoxOpen", Vector3(10.0, y, 6.3), 25)
 	_prop("cardboardBoxClosed", Vector3(9.7, y, 7.4))
-	_prop("cardboardBoxClosed", Vector3(9.7, y + 0.5, 7.4), 15)
+	_prop("cardboardBoxClosed", Vector3(9.7, y + 0.34, 7.4), 15)
 	_prop("trashcan", Vector3(16.5, y, 7.4))
 	_prop("blood", Vector3(12.5, y + 0.01, 6.0), 40)
 	_inspect(Vector3(13.0, 1.0, 1.0), ["Estantes saqueados. Quedan frascos de un antipsicótico vencido y, escondidas atrás, golosinas de la máquina."])
@@ -643,7 +774,7 @@ func _ground_floor_rooms() -> void:
 	_prop("iv_stand", Vector3(19.6, y, 4.3))
 	_prop("bathroomSink", Vector3(17.35, y, 1.6), 90)
 	_prop("bookcaseClosed", Vector3(24.6, y, 5.0), -90)
-	_prop("coatRackStanding", Vector3(24.4, y, 7.4))
+	_prop("trashbag", Vector3(24.4, y, 7.3), 40)
 	_inspect(Vector3(21, 1.0, 2.0), ["Una receta a medio escribir: \"Reposo. Evitar la niebla. No mirar a los...\". La tinta se corrió."])
 
 	# Seguridad (x 0-7, z 11-20).
@@ -655,13 +786,10 @@ func _ground_floor_rooms() -> void:
 	for z in [12.6, 13.4, 14.2]:
 		_prop("locker", Vector3(0.45, y, z), 90)
 	_prop("bookcaseClosedDoors", Vector3(6.55, y, 18.6), -90)
-	_prop("coatRackStanding", Vector3(6.3, y, 11.8))
 	_inspect(Vector3(3.5, 1.0, 16.4), ["Los monitores de las cámaras. Pasillos vacíos. En uno, alguien parado en el quirófano de arriba. Parpadeás y ya no está."])
 
 	# Hall de entrada y sala de espera (x 7-24, z 11-20).
-	for x in [8.6, 9.45, 10.3, 11.15]:
-		_prop("kitchenBar", Vector3(x, y, 13.4), 180)
-	_prop("kitchenBarEnd", Vector3(11.65, y, 13.4), 180)
+	_counter(8.2, 11.8, 13.4, y)
 	_prop("computerScreen", Vector3(9.5, y + 1.05, 13.5), 0)
 	_prop("chairDesk", Vector3(9.8, y, 14.4), 180)
 	_prop("sign_hospital", Vector3(7.12, 1.9, 12.8), 90)
@@ -730,7 +858,10 @@ func _first_floor_rooms() -> void:
 	var beds := [10.5, 13.0, 15.5, 18.0, 20.5, 23.0]
 	for i in beds.size():
 		var x: float = beds[i]
-		_prop("bed_metal", Vector3(x, y, 1.5), 0, {"colors": hospital_bed_colors})
+		_prop("bed_metal", Vector3(x, y, 1.5), 0)
+		# Colchón en todas menos la cama 4 (la del paciente que salió a la niebla).
+		if i != 3:
+			_box(groups.Props, "Mattress", Vector3(x, y + 0.52, 1.55), Vector3(0.82, 0.14, 1.85), "mattress", false)
 		_prop("cabinetBedDrawerTable", Vector3(x + 0.95, y, 0.45))
 		_prop("iv_stand", Vector3(x - 0.85, y, 0.9))
 		if i < beds.size() - 1:
@@ -744,7 +875,11 @@ func _first_floor_rooms() -> void:
 	_inspect(Vector3(11.5, y + 1.6, 0.4), ["Rejas soldadas. Abajo, el estacionamiento se pierde en la niebla. Hay una ambulancia con las puertas abiertas."])
 
 	# Quirófano (x 24-36, z 0-8). Casi a oscuras.
-	_prop("table", Vector3(30.0, y, 4.0), 90, {"tint": Color(0.7, 0.78, 0.76), "h": 0.95})
+	# Mesa de operaciones: pedestal de metal, base y colchoneta verde.
+	_box(groups.Props, "OrBase", Vector3(30.0, y + 0.05, 4.0), Vector3(0.7, 0.1, 0.9), "soot")
+	_box(groups.Props, "OrPedestal", Vector3(30.0, y + 0.45, 4.0), Vector3(0.28, 0.8, 0.4), "bars")
+	_box(groups.Props, "OrFrame", Vector3(30.0, y + 0.88, 4.0), Vector3(0.62, 0.06, 2.0), "counter_top")
+	_box(groups.Props, "OrPad", Vector3(30.0, y + 0.95, 4.0), Vector3(0.56, 0.08, 1.92), "or_pad", false)
 	_prop("lampRoundFloor", Vector3(31.2, y, 3.0), 0, {"h": 2.0, "tint": Color(0.8, 0.85, 0.85)})
 	for x in [25.4, 26.3]:
 		_prop("kitchenCabinet", Vector3(x, y, 0.45))
@@ -771,8 +906,7 @@ func _first_floor_rooms() -> void:
 	_inspect(Vector3(3.5, y + 1.0, 17.3), ["El teléfono no tiene tono. Aun así, del otro lado alguien respira."])
 
 	# Enfermería (x 7-18, z 11-20).
-	for x in [9.0, 9.85, 10.7, 11.55, 12.4, 13.25]:
-		_prop("kitchenBar", Vector3(x, y, 13.3), 180)
+	_counter(8.6, 13.7, 13.3, y)
 	_prop("computerScreen", Vector3(10.2, y + 1.05, 13.4))
 	_prop("chairDesk", Vector3(10.0, y, 14.3), 180)
 	_prop("chairDesk", Vector3(12.6, y, 14.4), 160)
@@ -790,7 +924,7 @@ func _first_floor_rooms() -> void:
 	for x in [19.2, 20.4, 21.6]:
 		_prop("bookcaseOpen", Vector3(x, y, 19.55), 180)
 		_prop("bookcaseOpen", Vector3(x + 2.6, y, 15.6))
-	for p in [Vector3(19.0, y, 12.2), Vector3(19.6, y, 12.4), Vector3(19.3, y + 0.5, 12.3), Vector3(24.8, y, 18.8),
+	for p in [Vector3(19.0, y, 12.2), Vector3(19.6, y, 12.4), Vector3(19.3, y + 0.34, 12.3), Vector3(24.8, y, 18.8),
 			Vector3(25.2, y, 18.2), Vector3(23.3, y, 17.4)]:
 		_prop("cardboardBoxClosed", p, randf_range(-30, 30))
 	_prop("cardboardBoxOpen", Vector3(20.6, y, 16.8), 70)
@@ -815,6 +949,23 @@ func _first_floor_rooms() -> void:
 	_prop("exit_sign", Vector3(4.3, y + 2.65, 8.12), 0)
 	_prop("trashcan", Vector3(34.8, y, 10.6))
 	_inspect(Vector3(7.5, y + 1.2, 8.4), ["El ascensor. Adentro de la cabina, detenida entre pisos, algo golpea despacio. Siempre tres veces."])
+
+
+## Detalles que hacen que el lugar se sienta real (Poly Haven, CC0).
+func _details() -> void:
+	# Cámaras de seguridad en los extremos de los pasillos, mirando hacia adentro.
+	for level: int in [0, 1]:
+		var y0 := level * H
+		_prop("security_camera_01", Vector3(0.18, y0 + 2.9, 9.5), 90)
+		_prop("security_camera_01", Vector3(35.82, y0 + 2.9, 8.6), -90)
+	_prop("wall_clock", Vector3(16.5, 2.4, 11.12), 180)            # hall, sobre la abertura
+	_prop("wall_clock", Vector3(12.5, H + 2.3, 19.84), 180)        # enfermería
+	_prop("WetFloorSign_01", Vector3(24.0, 0, 9.3), 30)
+	_prop("WetFloorSign_01", Vector3(31.5, 0, 12.4), -20)
+	_prop("wooden_broom", Vector3(25.5, H, 12.8), 10)
+	for p in [Vector3(8.8, 0, 7.4), Vector3(34.9, 0, 10.5), Vector3(19.2, H, 13.4), Vector3(35.2, H, 7.2)]:
+		_prop("trashbag", p, randf_range(0, 360))
+	_prop("electric_stove", Vector3(35.4, 0, 4.4), -90)
 
 
 ## Secretos por cordura (GDD: cada zona tiene al menos uno).

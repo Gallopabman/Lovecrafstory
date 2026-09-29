@@ -70,6 +70,9 @@ func message() -> String:
 
 func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(OUT)
+	# Aislar de los dispositivos reales (ver hospital_tour_test).
+	for action in InputMap.get_actions():
+		InputMap.action_erase_events(action)
 	sanity = root.get_node("Sanity")
 	inventory = root.get_node("Inventory")
 	shelter = root.get_node("Shelter")

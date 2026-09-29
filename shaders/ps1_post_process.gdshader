@@ -9,9 +9,9 @@ global uniform float ps1_insanity;
 global uniform float ps1_shock;
 
 uniform sampler2D screen_texture : hint_screen_texture, filter_nearest;
-uniform float color_levels : hint_range(2.0, 256.0) = 32.0;
+uniform float color_levels : hint_range(2.0, 256.0) = 64.0;
 // Niveles de color al borde de la locura.
-uniform float insane_color_levels : hint_range(2.0, 256.0) = 10.0;
+uniform float insane_color_levels : hint_range(2.0, 256.0) = 12.0;
 uniform bool dithering = true;
 uniform float dither_strength : hint_range(0.0, 2.0) = 1.0;
 

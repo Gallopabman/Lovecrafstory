@@ -4,7 +4,8 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_post"]
 shader = ExtResource("1_shader")
-shader_parameter/color_levels = 32.0
+shader_parameter/color_levels = 64.0
+shader_parameter/insane_color_levels = 12.0
 shader_parameter/dithering = true
 shader_parameter/dither_strength = 1.0
 

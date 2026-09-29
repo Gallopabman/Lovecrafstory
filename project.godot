@@ -27,8 +27,8 @@ Shelter="*res://scripts/autoload/shelter.gd"
 
 [display]
 
-window/size/viewport_width=320
-window/size/viewport_height=240
+window/size/viewport_width=640
+window/size/viewport_height=480
 window/size/window_width_override=1280
 window/size/window_height_override=960
 window/stretch/mode="viewport"
@@ -171,7 +171,7 @@ ps1_fog_end={
 }
 ps1_snap_resolution={
 "type": "vec2",
-"value": Vector2(320, 240)
+"value": Vector2(640, 480)
 }
 ps1_insanity={
 "type": "float",

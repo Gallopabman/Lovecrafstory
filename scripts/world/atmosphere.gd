@@ -22,7 +22,7 @@ extends WorldEnvironment
 		fog_end = value
 		_apply_preview()
 ## Grilla a la que se ajustan los vértices. Más baja = más temblor.
-@export var snap_resolution := Vector2(320, 240):
+@export var snap_resolution := Vector2(640, 480):
 	set(value):
 		snap_resolution = value
 		_apply_preview()
@@ -40,7 +40,7 @@ extends WorldEnvironment
 	set(value):
 		insane_fog_end = value
 		_apply_preview()
-@export var insane_snap_resolution := Vector2(110, 82):
+@export var insane_snap_resolution := Vector2(160, 120):
 	set(value):
 		insane_snap_resolution = value
 		_apply_preview()

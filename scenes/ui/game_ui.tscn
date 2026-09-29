@@ -8,6 +8,7 @@
 [node name="GameUI" type="CanvasLayer"]
 process_mode = 3
 layer = 50
+scale = Vector2(2, 2)
 script = ExtResource("1_ui")
 
 [node name="PickupLabel" type="Label" parent="."]
@@ -30,11 +31,9 @@ offset_bottom = 26.0
 [node name="GameMenu" type="Control" parent="."]
 process_mode = 3
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
+offset_right = 320.0
+offset_bottom = 240.0
 script = ExtResource("2_menu")
 
 [node name="Background" type="ColorRect" parent="GameMenu"]
@@ -179,11 +178,9 @@ horizontal_alignment = 2
 [node name="ShelterMenu" type="Control" parent="."]
 process_mode = 3
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
+offset_right = 320.0
+offset_bottom = 240.0
 script = ExtResource("4_shelter")
 
 [node name="Background" type="ColorRect" parent="ShelterMenu"]
@@ -292,11 +289,8 @@ modulate = Color(1, 1, 1, 0.5)
 
 [node name="LostScreen" type="ColorRect" parent="."]
 unique_name_in_owner = true
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_right = 320.0
+offset_bottom = 240.0
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
 

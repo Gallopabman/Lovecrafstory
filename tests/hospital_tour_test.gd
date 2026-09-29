@@ -43,6 +43,10 @@ func shot(name: String) -> void:
 
 func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(OUT)
+	# Aislar de los dispositivos reales (gamepad conectado, teclado, mouse): el test solo
+	# usa Input.action_press / InputEventAction, que no dependen de los bindings.
+	for action in InputMap.get_actions():
+		InputMap.action_erase_events(action)
 	var sanity := root.get_node("Sanity")
 	change_scene_to_file("res://scenes/levels/hospital.tscn")
 	await frames(90)
