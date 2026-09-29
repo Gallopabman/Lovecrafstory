@@ -127,6 +127,41 @@ func _initialize() -> void:
 	check(anim.current_animation == &"CharacterArmature|HitRecieve", "anim de golpe")
 	await frames(60)
 
+	print("-- Correr y saltar")
+	place(Vector3(0, 0.05, 8), 0.0)
+	await seconds(0.5)
+	Input.action_press("move_forward")
+	Input.action_press("run")
+	for i in 40:
+		await physics_frame
+	var run_speed := Vector2(player().velocity.x, player().velocity.z).length()
+	check(run_speed > 4.0 and anim.current_animation == &"CharacterArmature|Run", "correr: %.1f m/s, anim %s" % [run_speed, anim.current_animation])
+	Input.action_release("run")
+	Input.action_release("move_forward")
+	await seconds(0.8)
+	check(anim.has_animation(&"CharacterArmature|Jump_Idle"), "animaciones de salto importadas del rig del alien")
+	var ground_y: float = player().global_position.y
+	var max_y := ground_y
+	var air_anims := {}
+	var ev := InputEventAction.new()
+	ev.action = "jump"
+	ev.pressed = true
+	Input.parse_input_event(ev)
+	for i in 70:
+		await physics_frame
+		max_y = maxf(max_y, player().global_position.y)
+		if not player().is_on_floor():
+			air_anims[anim.current_animation] = true
+		if i == 18:
+			await shot("00_salto")
+	var ev_up := InputEventAction.new()
+	ev_up.action = "jump"
+	ev_up.pressed = false
+	Input.parse_input_event(ev_up)
+	check(max_y - ground_y > 0.6, "salta %.2f m" % (max_y - ground_y))
+	check(player().is_on_floor(), "vuelve al piso")
+	check(air_anims.has(&"CharacterArmature|Jump") or air_anims.has(&"CharacterArmature|Jump_Idle"), "anim de salto en el aire: %s" % [air_anims.keys()])
+
 	print("-- Recoger")
 	place(Vector3(2, 0.05, -0.9), 0.0)
 	await frames(10)
@@ -216,7 +251,7 @@ func _initialize() -> void:
 	await send_action("ui_down")
 	await send_action("ui_down")
 	check(menu._section == 1, "bajando se llega a las cartas")
-	await send_action("interact")
+	await send_action("ui_accept")
 	check(menu.letter_panel.visible and sanity.maximum == 110.0, "leer la carta: +10 máximo")
 	await shot("04_carta")
 	await send_action("interact")
@@ -296,6 +331,10 @@ func _initialize() -> void:
 	check(combat.aiming and combat.target == st, "apuntar engancha al acechador")
 	check(player().anim_player.current_animation == &"CharacterArmature|Idle_Gun_Pointing", "pose de apuntar")
 	await shot("10_apuntando")
+	# Cordura por debajo del máximo (pero lúcido) para ver la recompensa al matar.
+	sanity.restore(1000.0)
+	sanity._set_current(sanity.maximum * 0.8)
+	var pre_kill: float = sanity.current
 	var shots_fired := 0
 	for i in 8:
 		if st.is_dead():
@@ -309,6 +348,7 @@ func _initialize() -> void:
 	Input.action_release("aim")
 	check(st.is_dead() and shots_fired == 4, "4 tiros matan al acechador (%d)" % shots_fired)
 	check(e_pistol.loaded == 4, "quedan 4 en el cargador: %d" % e_pistol.loaded)
+	check(sanity.current - pre_kill > 3.5, "matar un horror devuelve cordura: +%.1f" % (sanity.current - pre_kill))
 	check(game_state.is_killed("/root/TestRoom/Stalker"), "muerte registrada en GameState")
 	await seconds(1.5)
 	await shot("12_acechador_muerto")

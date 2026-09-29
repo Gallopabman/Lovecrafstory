@@ -30,6 +30,7 @@ en vez de inventarlo.
   cuerpo. Fuego: apuntar deja quieto, auto-apuntado al enemigo más cercano (estilo SH1), cargador +
   munición en la mochila, los disparos atraen enemigos, **la locura abre la dispersión**. Cuerpo a
   cuerpo: golpe en arco; sin arma, trompadas. Los enemigos muertos no reaparecen.
+  **Las armas no se gastan** (por ahora) y **matar un horror devuelve un poco de cordura** (+5).
 - **Refugio**: blueprints de slots fijos (fuego, electricidad, cama, decoración, ventanas,
   estaciones). Un solo refugio activo; mudarse es una decisión. Bono de llegada según logros de la salida.
 - **Mundo interconectado** ("lineal abierto", atajos estilo RE2/Dark Souls). Primer tramo:
@@ -85,9 +86,14 @@ en vez de inventarlo.
 - **UI** ([scenes/ui/game_ui.tscn](scenes/ui/game_ui.tscn), CanvasLayer 50): menú (pausa el juego;
   entrada propia en `_input`), cuadrícula `InventoryGrid`, lector de cartas, avisos breves, pantalla de
   muerte. Tema global [assets/ui/ps1_theme.tres](assets/ui/ps1_theme.tres), Pixel Operator 8px.
-- **Input**: `move_*`, `look_*` (stick der.), `run`, `interact` (E), `flashlight` (F), `menu`
-  (Tab / I / Back), `pause` (Esc), `inventory_move` (R), `inventory_rotate` (Q), `inventory_drop` (X),
-  `aim` (clic der. / L2), `attack` (clic izq. / R2), `reload` (R / X del gamepad).
+- **Input** (teclado / gamepad): `move_*`, `look_*` (stick der.), `run` (Shift / B), `jump`
+  (Espacio / A), `interact` (E / X), `flashlight` (F / cruceta arriba), `reload` (R / Y),
+  `aim` (clic der. / L2), `attack` (clic izq. / R2), `menu` (Tab o I / Back), `pause` (Esc / Start).
+  En el menú: usar (E, Enter / A), `inventory_move` (R / X), `inventory_rotate` (Q / RB),
+  `inventory_drop` (X / Y). En el menú "usar" solo acepta la E del teclado, no `interact` del gamepad.
+- **Salto**: el superviviente no trae animación de salto; `AnimationRetarget`
+  ([scripts/world/animation_retarget.gd](scripts/world/animation_retarget.gd)) copia en runtime
+  Jump / Jump_Idle / Jump_Land del rig del alien (mismos nombres de huesos Quaternius, solo rotaciones).
   Debug: F3 overlay, F9 golpe, F10 −25 %, F11 +25 %.
 - Assets de terceros: registrar siempre en [CREDITS.md](CREDITS.md) (preferir CC0).
 
@@ -150,8 +156,8 @@ alucinación desde Inquieto.
 munición apilable, arma equipada, dos acechadores en la sala.
 
 Pendiente / preguntas abiertas:
-- Combate: ¿durabilidad de armas cuerpo a cuerpo? ¿matar horrores afecta la cordura? ¿los horrores
-  reaparecen en zonas limpias? (pregunta abierta del GDD). Sonido (disparos, golpes) todavía no hay.
+- ¿Los horrores reaparecen en zonas limpias? (pregunta abierta del GDD; hoy no).
+  Sonido (disparos, golpes, pasos) todavía no hay.
 - El Perdido (ya se registran posición e inventario en `GameState.lost_ones`), alucinaciones
   inofensivas "de verdad", cámaras fijas en interiores, bono de llegar a casa, guardado a disco.
 - Íconos de objetos para la cuadrícula (hoy: color + abreviatura).

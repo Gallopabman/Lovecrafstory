@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cj0s5yv84qdli"
-path="res://.godot/imported/crowbar_Diffuse_palette_2.jpg-a74362d4e0c07b49014e74bded0b8eee.ctex"
+path.s3tc="res://.godot/imported/crowbar_Diffuse_palette_2.jpg-a74362d4e0c07b49014e74bded0b8eee.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "d3c5453fdd496fbbcc5afaf739b91fdf"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/crowbar_Diffuse_palette_2.jpg"
-dest_files=["res://.godot/imported/crowbar_Diffuse_palette_2.jpg-a74362d4e0c07b49014e74bded0b8eee.ctex"]
+dest_files=["res://.godot/imported/crowbar_Diffuse_palette_2.jpg-a74362d4e0c07b49014e74bded0b8eee.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

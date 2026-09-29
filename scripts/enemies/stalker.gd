@@ -3,7 +3,7 @@ extends CharacterBody3D
 ## Enemigo acechador: deambula cerca de donde aparece, persigue al jugador
 ## cuando lo ve, lo oye correr u oye un disparo, y lo golpea (el daño es a la
 ## cordura). Tiene vida: se tambalea con cada golpe y muere para siempre
-## (el mundo sigue como quedó).
+## (el mundo sigue como quedó). Matarlo devuelve un poco de cordura.
 
 signal died
 
@@ -20,6 +20,8 @@ const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN]
 ## Multiplica los colores del modelo (apagarlo lo vuelve más inquietante en la niebla).
 @export var tint := Color(0.55, 0.5, 0.55)
 @export var max_health := 100.0
+## Cordura que recupera el jugador al matarlo (alivio de sobrevivir al horror).
+@export var kill_sanity_reward := 5.0
 
 @export_group("Movimiento")
 @export var wander_speed := 1.0
@@ -164,6 +166,7 @@ func _die() -> void:
 	collision_layer = 0
 	remove_from_group(&"enemies")
 	anim_player.play(ANIM_DEATH, 0.1)
+	Sanity.restore(kill_sanity_reward)
 	died.emit()
 
 

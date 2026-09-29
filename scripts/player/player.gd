@@ -10,7 +10,12 @@ const ANIM_RUN := &"CharacterArmature|Run"
 const ANIM_HIT := &"CharacterArmature|HitRecieve"
 const ANIM_INTERACT := &"CharacterArmature|Interact"
 const ANIM_DEATH := &"CharacterArmature|Death"
-const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN]
+## El modelo del superviviente no trae salto: se toman del rig (compatible) del alien.
+const ANIM_JUMP := &"CharacterArmature|Jump"
+const ANIM_AIRBORNE := &"CharacterArmature|Jump_Idle"
+const ANIM_LAND := &"CharacterArmature|Jump_Land"
+const JUMP_ANIM_SOURCE := preload("res://assets/models/enemies/tentacled/tentacled.glb")
+const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN, ANIM_AIRBORNE]
 
 @export_group("Movimiento")
 @export var walk_speed := 2.2
@@ -19,6 +24,12 @@ const LOOPING_ANIMS: Array[StringName] = [ANIM_IDLE, ANIM_WALK, ANIM_RUN]
 @export var acceleration := 10.0
 ## Qué tan rápido el modelo gira hacia la dirección de movimiento.
 @export var turn_speed := 10.0
+## Velocidad vertical al saltar (4.2 m/s ≈ 0.9 m de altura).
+@export var jump_velocity := 4.2
+## Control del movimiento en el aire (0 = ninguno, 1 = igual que en el piso).
+@export_range(0.0, 1.0) var air_control := 0.35
+## Caídas más largas que esto (segundos en el aire) hacen la animación de aterrizaje.
+@export var hard_landing_time := 0.6
 
 @export_group("Cámara")
 @export var camera_height := 1.5
@@ -40,6 +51,9 @@ var _yaw := 0.0
 var _pitch := deg_to_rad(-15.0)
 ## Mientras sea > 0 una animación de acción (golpe, interactuar) tiene prioridad.
 var _action_lock := 0.0
+var _air_time := 0.0
+## Tiempo desde que despegó, para dejar terminar la animación de impulso.
+var _jump_timer := 0.0
 
 @onready var visual: Node3D = $Visual
 @onready var model: Node3D = $Visual/Model
@@ -61,6 +75,8 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 	PS1Materials.apply(model)
+	var skeleton := model.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
+	AnimationRetarget.import_animations(JUMP_ANIM_SOURCE, [ANIM_JUMP, ANIM_AIRBORNE, ANIM_LAND], anim_player, skeleton)
 	for anim_name in LOOPING_ANIMS:
 		anim_player.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
 	anim_player.play(ANIM_IDLE)
@@ -90,10 +106,23 @@ func _physics_process(delta: float) -> void:
 	_update_camera_rotation(delta)
 	_action_lock = maxf(_action_lock - delta, 0.0)
 
-	if not is_on_floor():
+	var on_floor := is_on_floor()
+	_jump_timer += delta
+	if not on_floor:
 		velocity.y -= gravity * delta
+		_air_time += delta
+	else:
+		if _air_time > hard_landing_time and can_control:
+			play_action(ANIM_LAND)
+		_air_time = 0.0
 
 	combat.physics_update(delta)
+	if Input.is_action_just_pressed("jump") and on_floor and can_control \
+			and not combat.aiming and not is_busy():
+		velocity.y = jump_velocity
+		_jump_timer = 0.0
+		anim_player.speed_scale = 1.0
+		anim_player.play(ANIM_JUMP, 0.05)
 	var input := Vector2.ZERO
 	# Apuntar deja al personaje quieto (survival horror clásico).
 	if can_control and _action_lock <= 0.0 and not combat.aiming:
@@ -103,7 +132,9 @@ func _physics_process(delta: float) -> void:
 	var target_velocity := direction * (run_speed if is_running else walk_speed)
 
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
-	horizontal = horizontal.lerp(target_velocity, 1.0 - exp(-acceleration * delta))
+	# En el aire se conserva el impulso y se controla poco.
+	var control := 1.0 if on_floor else air_control
+	horizontal = horizontal.lerp(target_velocity, 1.0 - exp(-acceleration * control * delta))
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
 
@@ -133,6 +164,14 @@ func _update_animation(speed: float) -> void:
 		anim_player.speed_scale = 1.0
 		if anim_player.current_animation != PlayerCombat.ANIM_AIM:
 			anim_player.play(PlayerCombat.ANIM_AIM, 0.12)
+		return
+	# En el aire: se deja terminar el impulso y después la pose de vuelo.
+	# (_air_time > 0.1 evita que un escalón chico cuente como caída.)
+	if not is_on_floor() and (_air_time > 0.1 or _jump_timer < 0.1):
+		anim_player.speed_scale = 1.0
+		var jump_playing := anim_player.current_animation == ANIM_JUMP and anim_player.is_playing()
+		if not jump_playing and anim_player.current_animation != ANIM_AIRBORNE:
+			anim_player.play(ANIM_AIRBORNE, 0.15)
 		return
 	var anim := ANIM_IDLE
 	var reference_speed := 1.0

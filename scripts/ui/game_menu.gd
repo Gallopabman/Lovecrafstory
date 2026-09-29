@@ -87,7 +87,7 @@ func _grid_input(event: InputEvent, direction: Vector2i) -> void:
 			_set_section(Section.LETTERS)
 		_show_details()
 	elif grid.is_holding():
-		if _pressed(event, ["inventory_move", "interact", "ui_accept"]):
+		if event.is_action_pressed("inventory_move") or _is_use(event):
 			if not grid.try_place():
 				result_label.text = "No entra ahí."
 		elif event.is_action_pressed("inventory_rotate"):
@@ -95,7 +95,7 @@ func _grid_input(event: InputEvent, direction: Vector2i) -> void:
 		elif _pressed(event, ["ui_cancel", "pause"]):
 			grid.cancel_move()
 		_show_details()
-	elif _pressed(event, ["interact", "ui_accept"]):
+	elif _is_use(event):
 		var entry := grid.hovered_entry()
 		if not entry.is_empty():
 			result_label.text = Inventory.use(entry.item, entry)
@@ -125,7 +125,7 @@ func _letters_input(event: InputEvent, direction: Vector2i) -> void:
 	elif direction.y > 0:
 		letter_list.select(mini(index + 1, Inventory.letters.size() - 1))
 		_show_details()
-	elif _pressed(event, ["interact", "ui_accept"]) and index >= 0:
+	elif _is_use(event) and index >= 0:
 		result_label.text = Inventory.use(Inventory.letters[index])
 	elif _pressed(event, ["ui_cancel", "pause"]):
 		close()
@@ -198,6 +198,12 @@ func _letter_index() -> int:
 func _open_letter(item: ItemData) -> void:
 	letter_label.text = item.letter_text
 	letter_panel.show()
+
+
+## Usar: A / Enter / Espacio, o la E del teclado. En el gamepad "interact" es X,
+## que en el menú sirve para mover objetos.
+static func _is_use(event: InputEvent) -> bool:
+	return event.is_action_pressed("ui_accept") or (event is InputEventKey and event.is_action_pressed("interact"))
 
 
 static func _pressed(event: InputEvent, actions: Array[String]) -> bool:
