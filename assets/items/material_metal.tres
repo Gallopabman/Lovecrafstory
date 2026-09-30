@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/material_metal.glb" id="2_ivkjv"]
 
 [resource]
 script = ExtResource("1_item")
@@ -11,3 +12,5 @@ description = "Caños, bisagras, una bandeja de metal. Pesado, pero útil."
 kind = 6
 max_stack = 10
 world_color = Color(0.45, 0.47, 0.5, 1)
+world_scene = ExtResource("2_ivkjv")
+world_size = 0.7

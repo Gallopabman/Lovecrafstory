@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_notebook.glb" id="2_rspol"]
 
 [resource]
 script = ExtResource("1_item")
@@ -9,6 +10,20 @@ display_name = "Parte del Cabo Ríos"
 short_name = "PARTE"
 description = "Un parte policial a medio llenar, en el asiento del patrullero."
 kind = 3
-max_sanity_bonus = 10.0
-letter_text = "Parte n.º 0417. Cabo 1.º H. Ríos, móvil 12.\n\nSe instala barricada sobre la avenida a la altura del teatro, por orden de la comisaría. Motivo: \"contener\".\n\nNadie supo decirme contener qué.\n\n02:10. Se acerca una mujer desde la niebla. Pide que la dejemos pasar al teatro, que su hijo está adentro. No se le ven los pies.\n\n02:40. El agente Sosa dice que la conoce. Que es su mamá. La mamá de Sosa murió en el '79.\n\n03:15. Sosa pasó la barricada. No lo detuve. No sé por qué no lo detuve.\n\n03:50. La marquesina se prendió sola. Me quedo en el móvil. Si alguien encuentra esto, la radio de la patrulla todavía agarra algo: no la escuchen."
+letter_text = "Parte n.º 0417. Cabo 1.º H. Ríos, móvil 12.
+
+Se instala barricada sobre la avenida a la altura del teatro, por orden de la comisaría. Motivo: \"contener\".
+
+Nadie supo decirme contener qué.
+
+02:10. Se acerca una mujer desde la niebla. Pide que la dejemos pasar al teatro, que su hijo está adentro. No se le ven los pies.
+
+02:40. El agente Sosa dice que la conoce. Que es su mamá. La mamá de Sosa murió en el '79.
+
+03:15. Sosa pasó la barricada. No lo detuve. No sé por qué no lo detuve.
+
+03:50. La marquesina se prendió sola. Me quedo en el móvil. Si alguien encuentra esto, la radio de la patrulla todavía agarra algo: no la escuchen."
 world_color = Color(0.75, 0.8, 0.9, 1)
+world_scene = ExtResource("2_rspol")
+world_size = 0.3
+world_tint = Color(0.85, 0.9, 1, 1)

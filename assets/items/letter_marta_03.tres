@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_envelope.glb" id="2_2qlsu"]
 
 [resource]
 script = ExtResource("1_item")
@@ -10,5 +11,21 @@ short_name = "CARTA"
 description = "Doblada adentro de una polvera, en el tocador del camarín principal."
 kind = 3
 max_sanity_bonus = 15.0
-letter_text = "Entré.\n\nElla estaba en el escenario, cantando \"La Paloma\" para una sala llena de gente que no tenía cara. Cuando terminó, aplaudieron sin manos.\n\nNo era mi mamá. Era lo que quedó de todas las mamás que alguien extrañó en esta niebla. Se viste con lo que recordamos. Por eso cada uno la ve distinta.\n\nMe escondí acá, en su camarín. Es raro: es el lugar más tranquilo que encontré desde el día uno. Como si ella también necesitara un lugar donde no cantar.\n\nSi la callaste, este cuarto es tuyo. Prendé las luces del espejo. Poné flores, aunque sean de papel.\n\nY si alguna vez escuchás la melodía otra vez, no cantes.\n\n- Marta"
+letter_text = "Entré.
+
+Ella estaba en el escenario, cantando \"La Paloma\" para una sala llena de gente que no tenía cara. Cuando terminó, aplaudieron sin manos.
+
+No era mi mamá. Era lo que quedó de todas las mamás que alguien extrañó en esta niebla. Se viste con lo que recordamos. Por eso cada uno la ve distinta.
+
+Me escondí acá, en su camarín. Es raro: es el lugar más tranquilo que encontré desde el día uno. Como si ella también necesitara un lugar donde no cantar.
+
+Si la callaste, este cuarto es tuyo. Prendé las luces del espejo. Poné flores, aunque sean de papel.
+
+Y si alguna vez escuchás la melodía otra vez, no cantes.
+
+- Marta"
 world_color = Color(0.9, 0.88, 0.8, 1)
+world_scene = ExtResource("2_2qlsu")
+world_size = 0.26
+world_rotation = Vector3(-90, 0, 0)
+world_tint = Color(1, 0.85, 0.85, 1)

@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/material_cable.glb" id="2_xxl2c"]
 
 [resource]
 script = ExtResource("1_item")
@@ -11,3 +12,6 @@ description = "Cable eléctrico enrollado. Para reparar lo que da luz."
 kind = 6
 max_stack = 10
 world_color = Color(0.2, 0.2, 0.2, 1)
+world_scene = ExtResource("2_xxl2c")
+world_size = 0.4
+world_tint = Color(0.9, 0.75, 0.6, 1)

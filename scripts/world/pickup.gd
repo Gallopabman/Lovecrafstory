@@ -19,7 +19,18 @@ func _ready() -> void:
 		queue_free()
 		return
 	add_to_group(&"interactable")
-	if item and item.held_scene:
+	if item and item.world_scene:
+		# El modelo del objeto, a su tamaño real, girando despacio.
+		var prop := Prop.new()
+		prop.collision = false
+		prop.model_rotation = item.world_rotation
+		prop.fit_largest = item.world_size
+		prop.tint = item.world_tint
+		prop.model = item.world_scene
+		_mesh.mesh = null
+		_mesh.position.y = 0.05
+		_mesh.add_child(prop)
+	elif item and item.held_scene:
 		# Armas: se muestra su modelo real, acostado y girando.
 		var model := item.held_scene.instantiate() as Node3D
 		model.rotation_degrees = item.pickup_rotation

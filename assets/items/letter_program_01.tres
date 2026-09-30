@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_notebook.glb" id="2_57i3r"]
 
 [resource]
 script = ExtResource("1_item")
@@ -9,6 +10,18 @@ display_name = "Programa de mano (1979)"
 short_name = "PROG"
 description = "Un programa de papel ilustración, amarillento, en una sala de ensayo que no figura en los planos."
 kind = 3
-max_sanity_bonus = 10.0
-letter_text = "TEATRO IMPERIO - Temporada 1979\n\nGALA LÍRICA\n\"La Paloma\" (S. Iradier)\nSoprano: Elena M. de Sosa\nAl piano: Maestro A. Kaufmann\n\nFunción única. Tres y cuarto de la tarde.\n\n(Escrito a mano, en el margen:)\n\"Elena no salió a saludar. El telón bajó y ella siguió cantando detrás, horas, hasta que se le fue la voz. Después, el silencio. Nadie la volvió a ver. El maestro dice que todavía la escucha afinar.\""
+letter_text = "TEATRO IMPERIO - Temporada 1979
+
+GALA LÍRICA
+\"La Paloma\" (S. Iradier)
+Soprano: Elena M. de Sosa
+Al piano: Maestro A. Kaufmann
+
+Función única. Tres y cuarto de la tarde.
+
+(Escrito a mano, en el margen:)
+\"Elena no salió a saludar. El telón bajó y ella siguió cantando detrás, horas, hasta que se le fue la voz. Después, el silencio. Nadie la volvió a ver. El maestro dice que todavía la escucha afinar.\""
 world_color = Color(0.85, 0.78, 0.6, 1)
+world_scene = ExtResource("2_57i3r")
+world_size = 0.28
+world_tint = Color(0.95, 0.8, 0.6, 1)

@@ -110,3 +110,21 @@ suelto como asset. Si el repositorio se vuelve público como paquete de assets, 
 | `boss_attack`, `boss_hurt` | 80 CC0 creature SFX (1 y 2, tono más grave) | rubberduck | CC0 | [opengameart.org/content/80-cc0-creature-sfx](https://opengameart.org/content/80-cc0-creature-sfx) |
 | `boss_music` | "Final Boss Lair" | hitctrl | **CC-BY 3.0** | [opengameart.org/content/finalbosslair](https://opengameart.org/content/finalbosslair) |
 | `theater` (ambiente) | "Vampire's Piano" | tad | CC0 | [opengameart.org/content/vampires-piano](https://opengameart.org/content/vampires-piano) |
+
+## Objetos en el piso (`assets/models/items/`)
+
+| Objeto | Modelo | Autor | Licencia | Fuente |
+| --- | --- | --- | --- | --- |
+| Lata de duraznos, chocolate | Food Kit (`can`, `chocolate-wrapper`) | Kenney | CC0 | [kenney.nl/assets/food-kit](https://kenney.nl/assets/food-kit) |
+| Maderas | Survival Kit (`resource-planks`) | Kenney | CC0 | [kenney.nl/assets/survival-kit](https://kenney.nl/assets/survival-kit) |
+| Botella de agua | Water Bottle | Quaternius | CC0 | [poly.pizza/m/KpxDpidn1Z](https://poly.pizza/m/KpxDpidn1Z) |
+| Chatarra (caños) | Pipes | Quaternius | CC0 | [poly.pizza/m/GB6AFkoiZb](https://poly.pizza/m/GB6AFkoiZb) |
+| Llave | Key | Quaternius | CC0 | [poly.pizza/m/bg6e1lfNsO](https://poly.pizza/m/bg6e1lfNsO) |
+| Balas 9 mm | Pistol Ammo | CreativeTrio | CC0 | [poly.pizza/m/Kh2hNjWMXA](https://poly.pizza/m/Kh2hNjWMXA) |
+| Cartuchos | Ammo Shotgun | CreativeTrio | CC0 | [poly.pizza/m/btpe2U9ODn](https://poly.pizza/m/btpe2U9ODn) |
+| Cartas de Marta (sobre) | Letter | Isa Lousberg | CC0 | [poly.pizza/m/BJS8VvgPkQ](https://poly.pizza/m/BJS8VvgPkQ) |
+| Sábanas (tela doblada) | Towel Blue | Isa Lousberg | CC0 | [poly.pizza/m/HE7whBjUwQ](https://poly.pizza/m/HE7whBjUwQ) |
+| Cómic y revista | Magazine | J-Toastie | **CC-BY 3.0** | [poly.pizza/m/OMzty7kxKo](https://poly.pizza/m/OMzty7kxKo) |
+| Cables (rollo) | Rope | J-Toastie | **CC-BY 3.0** | [poly.pizza/m/dkNzi6oDQj](https://poly.pizza/m/dkNzi6oDQj) |
+| VHS | VHS | Guillaume Brette | **CC-BY 3.0** | [poly.pizza/m/8vBswoRHx8o](https://poly.pizza/m/8vBswoRHx8o) |
+| Informes, parte, cuaderno, programa | Notebook | jeremy | **CC-BY 3.0** | [poly.pizza/m/9Ptsg_xZt6B](https://poly.pizza/m/9Ptsg_xZt6B) |

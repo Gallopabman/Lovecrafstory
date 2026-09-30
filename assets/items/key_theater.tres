@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/key_theater.glb" id="2_k6hks"]
 
 [resource]
 script = ExtResource("1_item")
@@ -10,3 +11,5 @@ short_name = "LLA"
 description = "Una llave de bronce con una etiqueta de la comisaría: \"Imperio - candado entrada\". Sosa la tenía guardada."
 kind = 7
 world_color = Color(0.8, 0.65, 0.3, 1)
+world_scene = ExtResource("2_k6hks")
+world_size = 0.18

@@ -54,6 +54,14 @@ enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL, KEY }
 @export_group("Mundo")
 ## Color del placeholder en el mundo y en la mochila hasta tener modelos e íconos.
 @export var world_color := Color(0.6, 0.6, 0.6)
+## Modelo del objeto tirado en el piso (si no hay, se usa `held_scene` o una caja de color).
+@export var world_scene: PackedScene
+## Tamaño en metros de su dimensión más grande en el piso.
+@export var world_size := 0.25
+## Rotación del modelo en el piso (para acostarlo o ponerlo de frente).
+@export var world_rotation := Vector3.ZERO
+## Colores por material del modelo del piso (p. ej. el cómic en otro color que la revista).
+@export var world_tint := Color.WHITE
 ## Rotación del modelo "held" cuando está tirado en el piso como pickup.
 @export var pickup_rotation := Vector3.ZERO
 

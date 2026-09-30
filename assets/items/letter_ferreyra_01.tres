@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_notebook.glb" id="2_0bfdd"]
 
 [resource]
 script = ExtResource("1_item")
@@ -9,7 +10,6 @@ display_name = "Informe del Dr. Ferreyra"
 short_name = "INF"
 description = "Tres hojas con membrete del Hospital San Judas, dobladas en cuatro. Nunca se enviaron."
 kind = 3
-max_sanity_bonus = 10.0
 letter_text = "Dr. A. Ferreyra, Director. Informe que nadie va a leer.
 
 Día 3 de la niebla. Evacuamos a los que pudimos. Los que quedaron en internación dicen que la niebla les habla con la voz de sus familias.
@@ -22,3 +22,6 @@ Si leés esto: no confíes en tu cabeza cuando se nubla. Lo que ves cuando está
 
 Dejé la pistola en el cajón de mi escritorio. Yo no pude."
 world_color = Color(0.92, 0.9, 0.82, 1)
+world_scene = ExtResource("2_0bfdd")
+world_size = 0.3
+world_tint = Color(1, 1, 0.95, 1)

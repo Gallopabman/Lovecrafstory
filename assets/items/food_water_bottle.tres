@@ -1,14 +1,16 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/food_water_bottle.glb" id="2_cjdsc"]
 
 [resource]
 script = ExtResource("1_item")
 id = &"food_water_bottle"
 display_name = "Botella de agua"
 short_name = "H2O"
-grid_size = Vector2i(1, 2)
 description = "Agua mineral, sin abrir. Fría, como si alguien la hubiera guardado recién."
-kind = 0
+grid_size = Vector2i(1, 2)
 sanity_restore = 4.0
 world_color = Color(0.45, 0.65, 0.8, 1)
+world_scene = ExtResource("2_cjdsc")
+world_rotation = Vector3(0, 0, 90)

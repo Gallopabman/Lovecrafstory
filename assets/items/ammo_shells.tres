@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/ammo_shells.glb" id="2_qegsm"]
 
 [resource]
 script = ExtResource("1_item")
@@ -11,3 +12,5 @@ description = "Cartuchos de calibre 12, rojos, con el latón manchado. Huelen a 
 kind = 5
 max_stack = 12
 world_color = Color(0.7, 0.18, 0.12, 1)
+world_scene = ExtResource("2_qegsm")
+world_size = 0.24

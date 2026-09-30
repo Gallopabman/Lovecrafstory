@@ -93,7 +93,8 @@ offset_bottom = 222.0
 mouse_filter = 2
 color = Color(0.5, 0.13, 0.1, 1)
 
-[node name="Title" type="Label" parent="GameMenu"]
+[node name="MenuTitle" type="Label" parent="GameMenu"]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 10.0
 offset_top = 7.0
@@ -105,7 +106,7 @@ text = "INVENTARIO"
 [node name="SurvivorLabel" type="Label" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
+offset_left = 150.0
 offset_top = 7.0
 offset_right = 310.0
 offset_bottom = 17.0
@@ -114,7 +115,7 @@ horizontal_alignment = 2
 
 [node name="BackpackPanel" type="Panel" parent="GameMenu"]
 layout_mode = 0
-offset_left = 70.0
+offset_left = 8.0
 offset_top = 30.0
 offset_right = 172.0
 offset_bottom = 150.0
@@ -122,7 +123,7 @@ mouse_filter = 2
 
 [node name="BackpackTitle" type="Label" parent="GameMenu"]
 layout_mode = 0
-offset_left = 70.0
+offset_left = 14.0
 offset_top = 33.0
 offset_right = 100.0
 offset_bottom = 43.0
@@ -132,7 +133,7 @@ text = "MOCHILA"
 [node name="SpaceLabel" type="Label" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
+offset_left = 90.0
 offset_top = 33.0
 offset_right = 166.0
 offset_bottom = 43.0
@@ -142,7 +143,7 @@ horizontal_alignment = 2
 [node name="InventoryGrid" type="Control" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
+offset_left = 18.0
 offset_top = 47.0
 offset_right = 162.0
 offset_bottom = 143.0
@@ -151,7 +152,7 @@ script = ExtResource("3_grid")
 
 [node name="LettersPanel" type="Panel" parent="GameMenu"]
 layout_mode = 0
-offset_left = 70.0
+offset_left = 8.0
 offset_top = 154.0
 offset_right = 172.0
 offset_bottom = 216.0
@@ -159,7 +160,7 @@ mouse_filter = 2
 
 [node name="LettersTitle" type="Label" parent="GameMenu"]
 layout_mode = 0
-offset_left = 70.0
+offset_left = 14.0
 offset_top = 157.0
 offset_right = 166.0
 offset_bottom = 167.0
@@ -169,7 +170,7 @@ text = "CARTAS"
 [node name="LetterList" type="ItemList" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
+offset_left = 12.0
 offset_top = 168.0
 offset_right = 168.0
 offset_bottom = 212.0
@@ -179,15 +180,15 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
 [node name="SanityPanel" type="Panel" parent="GameMenu"]
 layout_mode = 0
-offset_left = 70.0
+offset_left = 178.0
 offset_top = 30.0
 offset_right = 312.0
-offset_bottom = 72.0
+offset_bottom = 66.0
 mouse_filter = 2
 
 [node name="SanityTitle" type="Label" parent="GameMenu"]
 layout_mode = 0
-offset_left = 70.0
+offset_left = 184.0
 offset_top = 33.0
 offset_right = 240.0
 offset_bottom = 43.0
@@ -197,7 +198,7 @@ text = "CORDURA"
 [node name="StateLabel" type="Label" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
+offset_left = 230.0
 offset_top = 33.0
 offset_right = 306.0
 offset_bottom = 43.0
@@ -206,83 +207,85 @@ horizontal_alignment = 2
 [node name="SanityBar" type="ProgressBar" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
+offset_left = 184.0
 offset_top = 46.0
 offset_right = 274.0
-offset_bottom = 53.0
+offset_bottom = 52.0
 show_percentage = false
 
 [node name="SanityHint" type="Label" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
-offset_top = 56.0
+offset_left = 184.0
+offset_top = 54.0
 offset_right = 306.0
-offset_bottom = 68.0
+offset_bottom = 64.0
 modulate = Color(1, 1, 1, 0.55)
 clip_text = true
 
 [node name="DetailPanel" type="Panel" parent="GameMenu"]
 layout_mode = 0
-offset_left = 70.0
-offset_top = 76.0
+offset_left = 178.0
+offset_top = 70.0
 offset_right = 312.0
 offset_bottom = 216.0
 mouse_filter = 2
 
 [node name="PreviewFrame" type="Panel" parent="GameMenu"]
 layout_mode = 0
-offset_left = 70.0
-offset_top = 81.0
+offset_left = 183.0
+offset_top = 75.0
 offset_right = 219.0
-offset_bottom = 117.0
+offset_bottom = 111.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
 [node name="ItemPreview" type="Control" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
-offset_top = 83.0
+offset_left = 185.0
+offset_top = 77.0
 offset_right = 217.0
-offset_bottom = 115.0
+offset_bottom = 109.0
 mouse_filter = 2
 script = ExtResource("5_icon")
 
 [node name="NameLabel" type="Label" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
-offset_top = 82.0
+offset_left = 224.0
+offset_top = 76.0
 offset_right = 308.0
-offset_bottom = 116.0
+offset_bottom = 110.0
 theme_override_colors/font_color = Color(1, 0.94, 0.82, 1)
 autowrap_mode = 3
 
 [node name="DescriptionLabel" type="Label" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
-offset_top = 121.0
+offset_left = 184.0
+offset_top = 114.0
 offset_right = 308.0
-offset_bottom = 188.0
+offset_bottom = 212.0
 modulate = Color(1, 1, 1, 0.75)
 autowrap_mode = 3
+clip_text = false
+clip_contents = true
 
 [node name="ResultLabel" type="Label" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
-offset_top = 190.0
-offset_right = 308.0
-offset_bottom = 213.0
+offset_left = 10.0
+offset_top = 227.0
+offset_right = 314.0
+offset_bottom = 239.0
 modulate = Color(1, 0.8, 0.7, 1)
-autowrap_mode = 3
+text_overrun_behavior = 3
 
 [node name="HintLabel" type="RichTextLabel" parent="GameMenu"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
+offset_left = 10.0
 offset_top = 227.0
 offset_right = 314.0
 offset_bottom = 239.0

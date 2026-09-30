@@ -36,8 +36,12 @@ const DIRECTIONS := {
 
 @export var bar_pixels_per_point := 0.9
 @export var bar_max_width := 122.0
+## Segundos que el resultado de una acción reemplaza a la ayuda del pie.
+@export var result_seconds := 3.0
 
 var _section := Section.GRID
+var _last_result := ""
+var _result_timer := 0.0
 
 @onready var sanity_bar: ProgressBar = %SanityBar
 @onready var state_label: Label = %StateLabel
@@ -50,6 +54,7 @@ var _section := Section.GRID
 @onready var letter_panel: Panel = %LetterPanel
 @onready var letter_label: Label = %LetterLabel
 @onready var survivor_label: Label = %SurvivorLabel
+@onready var menu_title: Label = %MenuTitle
 @onready var space_label: Label = %SpaceLabel
 @onready var sanity_hint: Label = %SanityHint
 @onready var item_preview: ItemIcon = %ItemPreview
@@ -192,7 +197,8 @@ func _refresh() -> void:
 	sanity_hint.text = STATE_HINTS[Sanity.state]
 	var scene := get_tree().current_scene
 	var zone: String = ZONE_NAMES.get(scene.name, "") if scene else ""
-	survivor_label.text = "Sobreviviente #%d%s" % [GameState.survivor_number, "  ·  " + zone if zone else ""]
+	menu_title.text = "SOBREVIVIENTE #%d" % GameState.survivor_number
+	survivor_label.text = zone
 	var used := 0
 	for entry in Inventory.entries:
 		var fp := Inventory.footprint(entry.item, entry.rotated)
@@ -226,11 +232,13 @@ func _show_details() -> void:
 	if item and entry.get("cooked", false):
 		name_label.text += "  (caliente)"
 	if item and item.is_weapon():
-		if Inventory.is_equipped(entry):
-			name_label.text += "  (en la mano)"
+		# Datos del arma al lado del nombre (la descripción queda para el texto).
+		# "En la mano" ya se ve en la cuadrícula (borde dorado).
 		if item.is_ranged:
-			description += "\n\nCargador: %d/%d   Balas: %d" % [
-				entry.loaded, item.magazine_size, Inventory.ammo_count(item.ammo_item)]
+			name_label.text += "\nCargador %d/%d\n%s: %d" % [entry.loaded, item.magazine_size,
+				item.ammo_item.display_name, Inventory.ammo_count(item.ammo_item)]
+		elif Inventory.is_equipped(entry):
+			name_label.text += "\nEn la mano"
 	description_label.text = description
 	_refresh_hint()
 
@@ -277,3 +285,18 @@ static func _direction(event: InputEvent) -> Vector2i:
 			continue
 		return DIRECTIONS[action]
 	return Vector2i.ZERO
+
+
+## El resultado de la última acción se muestra un rato en el pie, en lugar de la ayuda.
+func _process(delta: float) -> void:
+	if not visible:
+		return
+	if result_label.text != _last_result:
+		_last_result = result_label.text
+		_result_timer = result_seconds
+	elif _result_timer > 0.0:
+		_result_timer -= delta
+		if _result_timer <= 0.0:
+			result_label.text = ""
+			_last_result = ""
+	hint_label.visible = result_label.text == ""

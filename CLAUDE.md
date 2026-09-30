@@ -94,7 +94,10 @@ en vez de inventarlo.
     reinicia todo. **Los tests usan `path = "user://test_save.dat"`** para no pisar la partida del usuario.
 - **Objetos**: `ItemData` ([scripts/items/item_data.gd](scripts/items/item_data.gd)), un `.tres` por
   objeto en `assets/items/` (`grid_size`, `short_name` de 3 letras para la cuadrícula).
-  En el mundo: [scenes/world/pickup.tscn](scenes/world/pickup.tscn).
+  En el mundo: [scenes/world/pickup.tscn](scenes/world/pickup.tscn), con su modelo `world_scene`
+  ([assets/models/items/](assets/models/items/)) a `world_size` metros (lo más largo), `world_rotation` y
+  `world_tint` (el cómic y la revista comparten modelo). Los objetos chicos van un poco agrandados para que
+  se lean. Sin `world_scene`: armas con `held_scene`; si no, una caja del color `world_color`.
 - **Componentes de mundo** (`scripts/world/`): `GreyBox` (blockout con malla subdividida),
   `RefugeZone` (Area3D: goteo reducido + electricidad), `SanityGated` (muestra/oculta hijos
   y su colisión según el estado), `HorrorSighting` (baja cordura la primera vez que se ve),
@@ -131,6 +134,10 @@ en vez de inventarlo.
   La cuadrícula `InventoryGrid` dibuja celdas con bisel, cursor que late e **íconos** hechos con
   primitivas (`ItemIcon.draw_icon`, [scripts/ui/item_icon.gd](scripts/ui/item_icon.gd): lata, botella,
   cómic, VHS, carta, pistola, barreta, balas, materiales). Lector de cartas en papel, avisos, muerte.
+  Layout (320x240): título "SOBREVIVIENTE #N" y zona arriba; mochila y cartas a la izquierda; cordura y
+  detalle a la derecha (los datos del arma van debajo del nombre para dejarle lugar a la descripción); el
+  resultado de usar algo reemplaza unos segundos a la ayuda del pie. Las posiciones están fijas en el .tscn:
+  al tocarlas con scripts, cuidar de no pisar las de otros nodos (ya pasó una vez).
   Tema global [assets/ui/ps1_theme.tres](assets/ui/ps1_theme.tres), Pixel Operator 8px (botones y sliders
   incluidos).
 - **Menú de inicio** ([scenes/ui/main_menu.tscn](scenes/ui/main_menu.tscn), **escena principal**): niebla
