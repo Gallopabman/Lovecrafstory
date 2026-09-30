@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_police_01"
+display_name = "Parte del Cabo Ríos"
+short_name = "PARTE"
+description = "Un parte policial a medio llenar, en el asiento del patrullero."
+kind = 3
+max_sanity_bonus = 10.0
+letter_text = "Parte n.º 0417. Cabo 1.º H. Ríos, móvil 12.\n\nSe instala barricada sobre la avenida a la altura del teatro, por orden de la comisaría. Motivo: \"contener\".\n\nNadie supo decirme contener qué.\n\n02:10. Se acerca una mujer desde la niebla. Pide que la dejemos pasar al teatro, que su hijo está adentro. No se le ven los pies.\n\n02:40. El agente Sosa dice que la conoce. Que es su mamá. La mamá de Sosa murió en el '79.\n\n03:15. Sosa pasó la barricada. No lo detuve. No sé por qué no lo detuve.\n\n03:50. La marquesina se prendió sola. Me quedo en el móvil. Si alguien encuentra esto, la radio de la patrulla todavía agarra algo: no la escuchen."
+world_color = Color(0.75, 0.8, 0.9, 1)

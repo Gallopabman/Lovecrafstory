@@ -56,8 +56,8 @@ func _show_message(text: String) -> void:
 
 
 ## Cordura 0. En el refugio el sobreviviente muere y su cuerpo queda con sus
-## cosas; afuera se pierde (a futuro, el Perdido). En ambos casos alguien nuevo
-## llega al refugio. El mundo persiste en GameState; la escena se recarga.
+## cosas; afuera se pierde y vaga por esa zona como el Perdido. En ambos casos
+## alguien nuevo llega al refugio. El mundo persiste en GameState.
 func _on_lost() -> void:
 	game_menu.close()
 	lost_label.text = HEART_TEXT if Sanity.lost_in_refuge else LOST_TEXT
@@ -78,7 +78,6 @@ func _restart() -> void:
 			GameState.add_corpse(player.global_position, player.visual.global_rotation.y, items)
 		else:
 			GameState.add_lost_one(player.global_position, items)
-	GameState.survivor_number += 1
 	Inventory.clear()
 	Sanity.reset()
-	get_tree().reload_current_scene()
+	GameState.new_survivor()

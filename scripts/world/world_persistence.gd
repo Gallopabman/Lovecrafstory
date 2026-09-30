@@ -1,23 +1,40 @@
 class_name WorldPersistence
 extends Node3D
 ## Reconstruye en el nivel lo que dejaron los sobrevivientes anteriores
-## (objetos tirados y cuerpos) y hace aparecer en el piso lo que se tira.
+## (objetos tirados, cuerpos y Perdidos) y hace aparecer en el piso lo que se tira.
 
 const PICKUP_SCENE := preload("res://scenes/world/pickup.tscn")
 const CORPSE_SCENE := preload("res://scenes/world/corpse.tscn")
+const LOST_ONE_SCENE := preload("res://scenes/enemies/lost_one.tscn")
 
 ## Distancia delante del jugador a la que caen los objetos tirados.
 @export var drop_distance := 0.7
 
 
 func _ready() -> void:
+	var here := GameState.current_scene_path()
 	for data in GameState.dropped_items:
-		_spawn_pickup(data)
+		if data.scene == here:
+			_spawn_pickup(data)
 	for data in GameState.corpses:
+		if data.scene != here:
+			continue
 		var corpse := CORPSE_SCENE.instantiate() as Corpse
 		corpse.setup(data)
 		add_child(corpse)
+	for data in GameState.lost_ones_here():
+		var lost := LOST_ONE_SCENE.instantiate() as LostOne
+		lost.setup(data)
+		lost.died.connect(_on_lost_one_died.bind(lost))
+		add_child(lost)
 	Inventory.item_dropped.connect(_on_item_dropped)
+
+
+## El Perdido suelta en el piso todo lo que llevaba.
+func _on_lost_one_died(lost: LostOne) -> void:
+	var positions := lost.loot_positions()
+	for i in lost.items.size():
+		_spawn_pickup(GameState.add_dropped(lost.items[i], positions[i]))
 
 
 func _on_item_dropped(item: ItemData) -> void:

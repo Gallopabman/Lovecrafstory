@@ -30,6 +30,8 @@ const ANIM_CROUCH_WALK := SurvivorRig.CROUCH_WALK
 @export_range(0.0, 1.0) var air_control := 0.35
 ## Caídas más largas que esto (segundos en el aire) hacen la animación de aterrizaje.
 @export var hard_landing_time := 1.1
+## Metros entre pasos al caminar (corriendo, un poco más).
+@export var step_length := 0.8
 
 @export_group("Agacharse")
 @export var crouch_speed := 1.2
@@ -69,6 +71,7 @@ var _air_time := 0.0
 var _jump_timer := 0.0
 var _stand_height := 1.8
 var _current_camera_height := 0.0
+var _step_distance := 0.0
 
 @onready var visual: Node3D = $Visual
 @onready var model: Node3D = $Visual/Model
@@ -83,6 +86,7 @@ var anim_player: AnimationPlayer
 
 func _ready() -> void:
 	add_to_group(&"player")
+	_place_at_spawn()
 	# La cápsula cambia de alto al agacharse: copia propia para no tocar el recurso de la escena.
 	body_shape.shape = body_shape.shape.duplicate()
 	_stand_height = (body_shape.shape as CapsuleShape3D).height
@@ -115,6 +119,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	elif event.is_action_pressed("flashlight"):
 		flashlight.visible = not flashlight.visible
+		Audio.play_sfx(&"flashlight", global_position, -8.0)
 	elif event.is_action_pressed("interact"):
 		_try_interact()
 	elif event.is_action_pressed("crouch"):
@@ -168,6 +173,11 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	_update_animation(horizontal.length())
+	if is_running:
+		GameState.track(&"run_time", delta)
+	elif is_crouching:
+		GameState.track(&"crouch_time", delta)
+	_update_footsteps(horizontal.length() * delta, on_floor)
 
 	var target_height := crouch_camera_height if is_crouching else camera_height
 	_current_camera_height = lerpf(_current_camera_height, target_height, 1.0 - exp(-8.0 * delta))
@@ -288,14 +298,40 @@ func _try_interact() -> void:
 
 
 func _on_hit_taken(_amount: float) -> void:
+	Audio.play_sfx(&"player_hurt", global_position)
 	if can_control:
 		play_action(ANIM_HIT)
 
 
 func _on_lost() -> void:
 	can_control = false
+	Audio.play_sfx(&"player_death", global_position)
 	anim_player.speed_scale = 1.0
 	anim_player.play(ANIM_DEATH, 0.2)
+
+
+## Un paso cada `step_length` metros recorridos; agachado casi no suenan.
+func _update_footsteps(distance: float, on_floor: bool) -> void:
+	if not on_floor:
+		return
+	_step_distance += distance
+	var length := step_length * (1.4 if is_running else 1.0)
+	if _step_distance >= length:
+		_step_distance = 0.0
+		var volume := -14.0 if is_crouching else (-2.0 if is_running else -7.0)
+		Audio.play_sfx(Audio.footstep, global_position, volume)
+
+
+## Al llegar desde otra zona aparece en el SpawnPoint pedido, mirando hacia su -Z.
+func _place_at_spawn() -> void:
+	if GameState.next_spawn == &"":
+		return
+	for node in get_parent().find_children("*", "Marker3D", true, false):
+		if node is SpawnPoint and node.spawn_id == GameState.next_spawn:
+			global_position = node.global_position
+			visual.global_rotation.y = node.global_rotation.y
+			break
+	GameState.next_spawn = &""
 
 
 func _camera_target() -> Vector3:

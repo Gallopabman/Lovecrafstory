@@ -71,8 +71,16 @@ en vez de inventarlo.
     `discover(place)` y el bono de llegar a casa (lugares nuevos + objetos + cartas de la salida, tope
     30). Los materiales se descargan solos de la mochila al entrar. Persiste entre sobrevivientes.
   - `GameState` ([scripts/autoload/game_state.gd](scripts/autoload/game_state.gd)): persiste entre
-    sobrevivientes (pickups recogidos por ruta de nodo, objetos tirados, cuerpos, `lost_ones` para el
-    Perdido, número de sobreviviente) y `post_message()` para avisos. Todavía no guarda a disco.
+    sobrevivientes (pickups recogidos por ruta de nodo, objetos tirados, cuerpos y `lost_ones`, los tres
+    **por escena**; enemigos muertos, `flags` del mundo, número de sobreviviente) y `post_message()`.
+    `playstyle` junta estadísticas del sobreviviente actual (`track(&"shots")`, `melee`, `run_time`,
+    `crouch_time`) para el Perdido. Viajes: `travel(escena, spawn)` + `next_spawn`; `new_survivor()`
+    carga `refuge_scene` (el hospital; los tests la cambian); `new_game()` reinicia todo. No guarda a disco.
+  - `Audio` ([scripts/autoload/audio.gd](scripts/autoload/audio.gd)): busca sonidos **por nombre** en
+    `assets/audio/{sfx,ambience,music}/` (`step` = `step.ogg` o variantes `step_1`, `step_2`... al azar;
+    si no existe, no suena y no falla). `play_sfx(nombre, posición 3D opcional)`, `play_ui`,
+    `set_ambience`, `play_music`, latido automático desde Quebrado, susto al ver un horror nuevo.
+    Buses Master / Music / SFX / Ambience (se crean en runtime). Volumen general en `user://settings.cfg`.
 - **Objetos**: `ItemData` ([scripts/items/item_data.gd](scripts/items/item_data.gd)), un `.tres` por
   objeto en `assets/items/` (`grid_size`, `short_name` de 3 letras para la cuadrícula).
   En el mundo: [scenes/world/pickup.tscn](scenes/world/pickup.tscn).
@@ -84,6 +92,14 @@ en vez de inventarlo.
 - **Enemigos** (`scripts/enemies/`): `Stalker` — deambula, persigue si ve, oye correr u oye un
   disparo (`hear_noise`), golpea la cordura; tiene vida (`take_damage`), se tambalea, destella en rojo
   y muere (queda el cuerpo, `GameState.mark_killed`). Grupo `enemies`. Usa NavigationAgent3D.
+  Sonidos por export (`sound_idle`, `sound_alert`...). Hooks para subclases: `_start_attack(anim)`,
+  `_attack_connects()`, `_chase`, `_attack`, `_die`, `_key`.
+- **El Perdido** ([scripts/enemies/lost_one.gd](scripts/enemies/lost_one.gd), `LostOne extends Stalker`,
+  [scenes/enemies/lost_one.tscn](scenes/enemies/lost_one.tscn)): el Adventurer oscurecido con ojos rojos,
+  220 de vida, +20 de cordura al matarlo. Lo crea `WorldPersistence` donde cayó el sobreviviente; lleva el
+  arma que tenía en la mano. Estilo según `playstyle` (`dominant_style`): **tirador** (dispara de lejos si
+  tenía arma de fuego), **bruto** (pega fuerte y seguido), **corredor** (persigue a 4.2 m/s), **sigiloso**
+  (sin ruido, solo se ve de cerca), **errante** (nada especial). Al morir suelta todo lo que llevaba.
 - **Combate** ([scripts/player/player_combat.gd](scripts/player/player_combat.gd), nodo `Combat` hijo
   del jugador; su `setup()` lo llama Player): apuntar/disparar/recargar, cuerpo a cuerpo, arma en la
   mano vía BoneAttachment3D en `hand_r`. Las escenas `scenes/weapons/*_held.tscn` están en metros en
@@ -92,9 +108,21 @@ en vez de inventarlo.
   `noise_radius`, `held_scene`); munición = kind AMMO con `max_stack`.
 - **Capas de colisión**: 1 escenario + jugador, 2 enemigos, 3 interactuables.
 - **Interacción**: el jugador busca Areas del grupo `interactable` (capa 3) y llama `interact(player)`.
-- **UI** ([scenes/ui/game_ui.tscn](scenes/ui/game_ui.tscn), CanvasLayer 50): menú (pausa el juego;
-  entrada propia en `_input`), cuadrícula `InventoryGrid`, lector de cartas, avisos breves, pantalla de
-  muerte. Tema global [assets/ui/ps1_theme.tres](assets/ui/ps1_theme.tres), Pixel Operator 8px.
+- **UI** ([scenes/ui/game_ui.tscn](scenes/ui/game_ui.tscn), CanvasLayer 50): menú de inventario (pausa
+  el juego; entrada propia en `_input`): barras de encabezado y pie, paneles Mochila / Cartas / Cordura
+  (estado con color y una frase) / Detalle (vista previa grande del objeto), ayudas de teclas con color.
+  La cuadrícula `InventoryGrid` dibuja celdas con bisel, cursor que late e **íconos** hechos con
+  primitivas (`ItemIcon.draw_icon`, [scripts/ui/item_icon.gd](scripts/ui/item_icon.gd): lata, botella,
+  cómic, VHS, carta, pistola, barreta, balas, materiales). Lector de cartas en papel, avisos, muerte.
+  Tema global [assets/ui/ps1_theme.tres](assets/ui/ps1_theme.tres), Pixel Operator 8px (botones y sliders
+  incluidos).
+- **Menú de inicio** ([scenes/ui/main_menu.tscn](scenes/ui/main_menu.tscn), **escena principal**): niebla
+  animada ([shaders/menu_fog.gdshader](shaders/menu_fog.gdshader)), Jugar (partida nueva → hospital),
+  Opciones (solo volumen general, pedido del usuario) y Salir. Música `menu_music`.
+- **Zonas y puertas**: `ZoneDoor` (Area3D interactuable: `target_scene`, `target_spawn`, opcionalmente
+  `required_item` + `unlock_flag` para forzarla una vez) y `SpawnPoint` (Marker3D con `spawn_id`; el
+  jugador aparece mirando a su -Z). `LevelAudio` fija el ambiente, los pasos y un zumbido que crece con la
+  locura; `LoopSound` es un sonido en loop en un punto (fuego, generador).
 - **Input** (teclado / gamepad): `move_*`, `look_*` (stick der.), `run` (Shift / B), `jump`
   (Espacio / A), `crouch` (C o Ctrl / L3, alterna), `interact` (E / X), `flashlight` (F / cruceta arriba), `reload` (R / Y),
   `aim` (clic der. / L2), `attack` (clic izq. / R2), `menu` (Tab o I / Back), `pause` (Esc / Start).
@@ -120,7 +148,7 @@ en vez de inventarlo.
 
 ## Zona 1: Hospital San Judas
 
-[scenes/levels/hospital.tscn](scenes/levels/hospital.tscn) es la **escena principal** (la sala de
+[scenes/levels/hospital.tscn](scenes/levels/hospital.tscn) es la primera zona y el refugio (la sala de
 prueba queda para los tests). La generó [tools/build_hospital.gd](tools/build_hospital.gd), un andamio
 de **una sola pasada**: si ya se editó la escena en el editor, no volver a correrlo (pisa los cambios);
 modificar la escena a mano o actualizar el script y avisar.
@@ -128,8 +156,10 @@ modificar la escena a mano o actualizar el script y avisar.
   consultorios, seguridad (barreta), hall/recepción/sala de espera, baños. P1: internación (6 camas),
   quirófano, dirección (pistola + carta del Dr. Ferreyra), enfermería, depósito a oscuras, archivo y
   cuarto tapiado (secreto: aparece en Quebrado; carta de Marta).
-- Límites reales: ventanas con rejas soldadas, entrada encadenada, salida de emergencia trabada (lleva a
-  la próxima zona, "la calle"), ascensor muerto. Escalera recta con rampa invisible + `NavigationLink3D`.
+- Límites reales: ventanas con rejas soldadas, entrada encadenada, ascensor muerto. La **salida de
+  emergencia** (PB este, x 36) es un `ZoneDoor` a la calle: se fuerza una vez con la barreta
+  (flag `hospital_exit_forced`); volviendo se aparece en `from_street`. Escalera recta con rampa
+  invisible + `NavigationLink3D`. Ambiente `hospital`; el fuego y el generador del refugio suenan.
 - Lore: el hospital se aisló el día 9 de la niebla; Ferreyra soldó las rejas "para que nadie salga".
   Los `Inspectable` (E) cuentan la historia con textos cortos.
 - **Refugio** (sala del personal, PB NE): arranca pelado (colchón en el piso, generador roto, una
@@ -143,6 +173,25 @@ modificar la escena a mano o actualizar el script y avisar.
   `GreyBox` ahora tiene `mesh_visible` / `collision_enabled`; el shader PS1 tiene `emission_color`.
 - Muebles de Kenney: el frente mira a +Z; escalar por altura real (sus transformaciones internas
   varían). Modelos de Poly Pizza: medirlos dentro de un `Prop`, no a mano (la escala engaña).
+
+## Zona 2: la avenida
+
+[scenes/levels/street.tscn](scenes/levels/street.tscn), generada por [tools/build_street.gd](tools/build_street.gd)
+(mismas reglas: una sola pasada). Exterior con niebla clara y espesa (fin a 20 m) y luz de cielo tapado.
+- Avenida de dos manos de x 0 (fachada trasera del hospital, ladrillo, puerta de emergencia) a x 65
+  (Teatro Imperio: marquesina con lamparitas prendidas, puertas encadenadas: **la próxima zona**).
+  Edificios del Downtown City MegaKit (Quaternius) a los dos lados, cada uno con su caja de colisión sin
+  el porche. Autos abandonados (Car Kit de Kenney, x1.5), la ambulancia del San Judas chocada,
+  faroles casi todos muertos.
+- Barricada policial en x ~50 (patrulleros, van, conos, vallas): se pasa solo por la vereda norte.
+- Callejón al norte (x 33–38) que lleva a un patio de servicio cerrado con un auto quemado.
+- Secreto: en el patio, "ELLA TE ESPERA EN EL IMPERIO" (Inquieto) y un ladrillo flojo que desaparece en
+  Quebrado → nicho con la **segunda carta de Marta**. En el patrullero, el **parte del Cabo Ríos**.
+  Una revista (Inspector Aguirre), comida, balas y materiales. Cuatro acechadores; alucinación bajo la
+  marquesina.
+- Piezas modulares con `Prop.anchor = ORIGIN` (respeta el origen del modelo). Paredes de ladrillo con
+  piezas de una cara: `_brick_wall` pone otra de espaldas. Los `Label3D` no usan el shader PS1: se
+  desvanecen con `visibility_range_end` para no atravesar la niebla.
 
 ## Estructura
 
@@ -176,7 +225,13 @@ Godot **4.7.2** (no está en el PATH):
   navmesh entre pisos, límites, una captura por ambiente en `test_shots\hospital\`).
 - **Test del refugio**: `<godot> --path . -s res://tests/shelter_test.gd` (materiales, bono, plano,
   estaciones, persistencia; capturas en `test_shots\shelter\`).
-- Regenerar el hospital: `<godot> --headless --path . -s res://tools/build_hospital.gd`.
+- **Test de la calle**: `<godot> --path . -s res://tests/street_tour_test.gd` (forzar la salida con la
+  barreta, spawn, navmesh, barricada, límites, secreto, vuelta al hospital; `test_shots\street\`).
+- **Test del menú de inicio**: `<godot> --path . -s res://tests/main_menu_test.gd` (foco, volumen
+  guardado, Jugar → hospital).
+- Regenerar el hospital / la calle: `<godot> --headless --path . -s res://tools/build_hospital.gd`
+  (o `build_street.gd`).
+- Una `class_name` nueva no existe para los tests hasta correr `--import` (refresca la caché de clases).
 - Muebles de Poly Haven: `powershell -File tools/fetch_polyhaven.ps1 -Ids <id>,...` y revisar escala y
   frente con `<godot> --path . -s res://tools/preview_props.gd -- res://assets/models/props/polyhaven/ salida.png 4 id1,id2`.
   Correcciones por modelo en `upgrades` / `ph_fixes` del generador.
@@ -221,10 +276,12 @@ munición apilable, arma equipada, dos acechadores en la sala.
 **Zona 1** — hecho: Hospital San Judas (ver arriba), tres acechadores, alucinación en el quirófano.
 
 **Mejora gráfica** — hecha: 640x480, texturas 128, 38 muebles de Poly Haven, arquitectura (marcos,
-pasamanos, carteles, mostradores, luminarias), superviviente realista con la Universal Animation Library
-y Thin Zombie. Quedan low-poly: inodoros, lavatorios, heladera y lámpara de pie de Kenney; lockers,
-archiveros, expendedora (Poly Pizza). La ropa del superviviente es medieval ("Peasant"): se podría
-recolorear o buscar un outfit moderno. Pendiente: variante femenina del superviviente (UBC trae pelo).
+pasamanos, carteles, mostradores, luminarias) y Thin Zombie. El superviviente volvió a ser el Adventurer
+(el realista era "muy medieval"). Quedan low-poly: inodoros, lavatorios, heladera y lámpara de pie de
+Kenney; lockers, archiveros, expendedora (Poly Pizza).
+
+**Sonido, Perdido, zona 2, inventario, menú de inicio** — hecho: 66 sonidos (ver CREDITS), el Perdido
+con estilos, la avenida, inventario rediseñado con íconos, menú de inicio con volumen.
 
 **Prototipo 3** — hecho: refugio con blueprint (5 espacios x 2 niveles), materiales, nivel cozy,
 estaciones (cocinar, descansar, radio, TV con electricidad) y bono de llegar a casa. A afinar con el
@@ -233,7 +290,7 @@ mudarse a otro refugio (edificios con más slots), baúl para guardar cosas, mes
 
 Pendiente / preguntas abiertas:
 - ¿Los horrores reaparecen en zonas limpias? (pregunta abierta del GDD; hoy no).
-  Sonido (disparos, golpes, pasos) todavía no hay.
-- El Perdido (ya se registran posición e inventario en `GameState.lost_ones`), alucinaciones
-  inofensivas "de verdad", cámaras fijas en interiores, bono de llegar a casa, guardado a disco.
-- Íconos de objetos para la cuadrícula (hoy: color + abreviatura).
+- Nadie escuchó los sonidos todavía (se eligieron por descripción): revisar cuáles quedan bien,
+  sobre todo los del zombie (gruñido / ataque se asignaron a ojo) y que los loops no corten.
+- Teatro Imperio (zona 3), alucinaciones inofensivas "de verdad", cámaras fijas en interiores,
+  guardado a disco, volver al menú de inicio desde el juego (hoy Esc solo suelta el mouse).

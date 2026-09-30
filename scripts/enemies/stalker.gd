@@ -56,6 +56,15 @@ enum State { WANDER, CHASE, ATTACK, STAGGER, DEAD }
 ## Momento de la animación en que el golpe conecta.
 @export var attack_hit_time := 0.45
 
+@export_group("Sonidos")
+@export var sound_idle: StringName = &"zombie_growl"
+@export var sound_alert: StringName = &"zombie_growl"
+@export var sound_attack: StringName = &"zombie_attack"
+@export var sound_hurt: StringName = &"zombie_hurt"
+@export var sound_death: StringName = &"zombie_death"
+## Segundos entre gruñidos mientras deambula.
+@export var idle_sound_interval := Vector2(5.0, 12.0)
+
 @export_group("Daño recibido")
 ## Segundos que queda aturdido al recibir un golpe.
 @export var stagger_time := 0.45
@@ -74,6 +83,9 @@ var _attack_hit_pending := false
 var _cooldown := 0.0
 var _stagger_timer := 0.0
 var _flash_timer := 0.0
+var _idle_sound_timer := 0.0
+## Animación del ataque en curso (las subclases pueden tener más de uno).
+var _attack_anim: StringName
 var _materials: Array[ShaderMaterial] = []
 var _base_colors: Array[Color] = []
 
@@ -97,6 +109,7 @@ func _ready() -> void:
 		anim_player.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
 	anim_player.play(anim_idle)
 	_wander_wait = randf_range(wander_pause.x, wander_pause.y)
+	_idle_sound_timer = randf_range(idle_sound_interval.x, idle_sound_interval.y)
 	nav_agent.target_position = global_position
 
 
@@ -115,9 +128,13 @@ func _physics_process(delta: float) -> void:
 	if player_valid and _perceives(player):
 		_since_seen = 0.0
 		if state == State.WANDER:
-			state = State.CHASE
+			_alert()
 	else:
 		_since_seen += delta
+	_idle_sound_timer -= delta
+	if _idle_sound_timer <= 0.0:
+		_idle_sound_timer = randf_range(idle_sound_interval.x, idle_sound_interval.y)
+		Audio.play_sfx(sound_idle, global_position, -6.0)
 
 	match state:
 		State.WANDER:
@@ -153,6 +170,7 @@ func take_damage(amount: float) -> void:
 	if health <= 0.0:
 		_die()
 		return
+	Audio.play_sfx(sound_hurt, global_position)
 	state = State.STAGGER
 	_stagger_timer = stagger_time
 	_attack_hit_pending = false
@@ -163,11 +181,17 @@ func take_damage(amount: float) -> void:
 func hear_noise(origin: Vector3, radius: float) -> void:
 	if state == State.WANDER and global_position.distance_to(origin) <= radius:
 		_since_seen = 0.0
-		state = State.CHASE
+		_alert()
+
+
+func _alert() -> void:
+	state = State.CHASE
+	Audio.play_sfx(sound_alert, global_position)
 
 
 func _die() -> void:
 	state = State.DEAD
+	Audio.play_sfx(sound_death, global_position)
 	GameState.mark_killed(_key())
 	# El cuerpo queda en el piso pero ya no bloquea ni se puede golpear.
 	collision_layer = 0
@@ -221,11 +245,13 @@ func _chase(delta: float, player: Player, player_valid: bool) -> void:
 	_play(anim_run)
 
 
-func _start_attack() -> void:
+func _start_attack(anim: StringName = anim_attack) -> void:
 	state = State.ATTACK
 	_attack_timer = 0.0
 	_attack_hit_pending = true
-	anim_player.play(anim_attack, 0.1)
+	_attack_anim = anim
+	anim_player.play(anim, 0.1)
+	Audio.play_sfx(sound_attack, global_position)
 
 
 func _attack(delta: float, player: Player, player_valid: bool) -> void:
@@ -235,11 +261,16 @@ func _attack(delta: float, player: Player, player_valid: bool) -> void:
 	_attack_timer += delta
 	if _attack_hit_pending and _attack_timer >= attack_hit_time:
 		_attack_hit_pending = false
-		if player_valid and global_position.distance_to(player.global_position) <= attack_range * 1.3:
+		if player_valid and _attack_connects(player):
 			Sanity.take_hit(attack_damage)
-	if _attack_timer >= anim_player.get_animation(anim_attack).length:
+	if _attack_timer >= anim_player.get_animation(_attack_anim).length:
 		_cooldown = attack_cooldown
 		state = State.CHASE
+
+
+## El golpe llega si el jugador sigue cerca cuando conecta.
+func _attack_connects(player: Player) -> bool:
+	return global_position.distance_to(player.global_position) <= attack_range * 1.3
 
 
 func _perceives(player: Player) -> bool:

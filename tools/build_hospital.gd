@@ -491,6 +491,16 @@ func _point_light(pos: Vector3, color: Color, energy: float, light_range: float,
 	_add(parent if parent else groups.Lights, light, "Light")
 
 
+func _loop_sound(parent: Node, sound: String, pos: Vector3, volume_db: float, unit := 2.0) -> void:
+	var s := AudioStreamPlayer3D.new()
+	s.set_script(load("res://scripts/world/loop_sound.gd"))
+	s.set("sound", StringName(sound))
+	s.volume_db = volume_db
+	s.unit_size = unit
+	s.position = pos
+	_add(parent, s, "Sound")
+
+
 func _instance(path: String, parent: Node, base_name: String, pos: Vector3, props := {}) -> Node:
 	var inst: Node = load(path).instantiate()
 	for k: String in props:
@@ -693,6 +703,7 @@ func _refuge() -> void:
 	_prop("barrel_stove", Vector3.ZERO, 0, {"parent": l1})
 	_box(l1, "Embers", Vector3(0, 0.88, 0), Vector3(0.3, 0.03, 0.3), "ember", false)
 	_point_light(Vector3(0, 1.15, 0), warm, 1.3, 5.5, true, l1)
+	_loop_sound(_from(fire, 1), "fire", Vector3(0, 0.8, 0), -8.0)
 	var l2 := _only(fire, 2)
 	_prop("scandinavian_masonry_heater", Vector3.ZERO, 0, {"parent": l2})
 	_box(l2, "StoveWindow", Vector3(0, 0.45, 0.44), Vector3(0.3, 0.2, 0.02), "ember", false)
@@ -709,6 +720,7 @@ func _refuge() -> void:
 	_prop("washer", Vector3.ZERO, 90, {"parent": p1, "tint": Color(0.55, 0.6, 0.5)})
 	_inspect(Vector3(0.4, 0.6, -0.1), ["El generador ronronea bajito. Mientras ande, acá hay luz."], 0.9, p1)
 	_point_light(Vector3(4.7, 2.7, -3.3), warm, 1.1, 8.0, false, p1)
+	_loop_sound(p1, "generator", Vector3(0, 0.5, 0), -16.0)
 	_point_light(Vector3(7.6, 1.5, -0.7), warm, 0.8, 4.0, false, p1)
 	var p2 := _only(power, 2)
 	_box(p2, "Conduit", Vector3(-0.68, 2.2, -3.6), Vector3(0.05, 0.05, 7.0), "soot", false)
@@ -847,8 +859,17 @@ func _ground_floor_rooms() -> void:
 	_prop("trashcan", Vector3(8.6, y, 10.7))
 	_prop("blood", Vector3(2.0, y + 0.01, 9.4), 10)
 	_inspect(Vector3(7.5, 1.2, 8.4), ["El ascensor está muerto. Las puertas no ceden ni un centímetro."])
-	_inspect(Vector3(35.6, 1.2, 9.5), ["Salida de emergencia. Trabada con algo pesado del otro lado.",
-		"Del otro lado se oye la calle. Motores que no arrancan. Pasos que no son de nadie."])
+	# Salida de emergencia a la calle (zona 2): se fuerza con la barreta.
+	var exit := Area3D.new()
+	exit.set_script(load("res://scripts/world/zone_door.gd"))
+	exit.set("target_scene", "res://scenes/levels/street.tscn")
+	exit.set("target_spawn", &"from_hospital")
+	exit.set("required_item", load("res://assets/items/weapon_crowbar.tres"))
+	exit.set("unlock_flag", &"hospital_exit_forced")
+	exit.set("locked_text", "Salida de emergencia. La traba está oxidada; con algo para hacer palanca se podría forzar.")
+	exit.set("unlock_text", "Metí la barreta en la traba y empujé. Cedió con un chillido.")
+	exit.position = Vector3(35.6, 1.2, 9.5)
+	_add(groups.Inspectables, exit, "EmergencyExit")
 	_inspect(Vector3(0.4, 1.6, 9.5), ["Rejas soldadas. La niebla se pega al vidrio como si quisiera entrar."])
 
 
@@ -1117,6 +1138,17 @@ func _systems() -> void:
 	var persistence := Node3D.new()
 	persistence.set_script(load("res://scripts/world/world_persistence.gd"))
 	_add(scene_root, persistence, "WorldPersistence")
+	var level_audio := Node.new()
+	level_audio.set_script(load("res://scripts/world/level_audio.gd"))
+	level_audio.set("ambience", &"hospital")
+	_add(scene_root, level_audio, "LevelAudio")
+	# Volviendo de la calle se entra por la salida de emergencia, mirando al oeste.
+	var spawn := Marker3D.new()
+	spawn.set_script(load("res://scripts/world/spawn_point.gd"))
+	spawn.set("spawn_id", &"from_street")
+	spawn.position = Vector3(34.6, 0.05, 9.5)
+	spawn.rotation_degrees.y = 90.0
+	_add(scene_root, spawn, "SpawnFromStreet")
 	# El sobreviviente arranca en el refugio, mirando al televisor.
 	_instance("res://scenes/player/player.tscn", scene_root, "Player", Vector3(30.0, 0.05, 3.6))
 	_instance("res://scenes/effects/ps1_post_process.tscn", scene_root, "PS1PostProcess", Vector3.ZERO)

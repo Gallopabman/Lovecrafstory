@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/ps1_spatial.gdshader" id="1_uwpry"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_uwpry")
+shader_parameter/albedo_color = Color(0.12, 0.26, 0.2, 1)
+shader_parameter/emission_color = null
+shader_parameter/texture_resolution = null
+shader_parameter/uv_scale = null
+shader_parameter/world_uv = null
+shader_parameter/world_uv_scale = null
+shader_parameter/vertex_snap = null
+shader_parameter/affine_mapping = null
+shader_parameter/fog_enabled = null

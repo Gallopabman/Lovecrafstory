@@ -115,6 +115,8 @@ func _initialize() -> void:
 	sanity = root.get_node("Sanity")
 	inventory = root.get_node("Inventory")
 	game_state = root.get_node("GameState")
+	# En la sala de prueba el refugio es la misma sala.
+	game_state.refuge_scene = "res://scenes/levels/test_room.tscn"
 	change_scene_to_file("res://scenes/levels/test_room.tscn")
 	await frames(60)
 	isolate_input()
@@ -524,6 +526,26 @@ func _initialize() -> void:
 	await frames(30)
 	check(game_state.corpses.size() == 1 and game_state.lost_ones.size() == 1, "afuera no deja cuerpo: queda registrado para el Perdido")
 	check(game_state.survivor_number == 3 and sanity.in_refuge(), "sobreviviente #3 en el refugio")
+
+	print("-- El Perdido")
+	var lost_nodes: Array[Node] = current_scene.get_node("WorldPersistence").find_children("*", "LostOne", false, false)
+	check(lost_nodes.size() == 1, "el Perdido vaga donde cayó el #2")
+	if lost_nodes.size() == 1:
+		var lost: Node3D = lost_nodes[0]
+		check(lost.global_position.distance_to(Vector3(0, 0, 8)) < 3.0, "aparece cerca de donde se perdió: %s" % lost.global_position)
+		check(lost.items.size() == 2 and lost.style_name() == "errante", "lleva sus 2 objetos, estilo %s" % lost.style_name())
+		check(lost.dominant_style({&"shots": 12.0}) == 1 and lost.dominant_style({&"crouch_time": 60.0}) == 4, "estilo según cómo se jugó")
+		lost.set_physics_process(false)
+		place(lost.global_position + Vector3(0, 0.05, 2.5), 0.0)
+		await frames(10)
+		await shot("10_perdido")
+		var sanity_before: float = sanity.current
+		var pickups_before: int = current_scene.get_node("WorldPersistence").find_children("*", "Pickup", false, false).size()
+		lost.take_damage(10000.0)
+		await frames(5)
+		check(game_state.lost_ones[0].defeated and sanity.current > sanity_before, "matarlo lo hace descansar y da cordura")
+		var loot: int = current_scene.get_node("WorldPersistence").find_children("*", "Pickup", false, false).size() - pickups_before
+		check(loot == 2, "suelta lo que llevaba (%d)" % loot)
 
 	print("RESULT: %d fallas" % fails)
 	quit()

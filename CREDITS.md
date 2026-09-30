@@ -50,3 +50,43 @@ Descargados con [tools/fetch_polyhaven.ps1](tools/fetch_polyhaven.ps1): solo la 
 | Tiles 107, Tiles 141, Painted Plaster 017, Office Ceiling 001, Painted Metal 006, Concrete 034, Wood Floor 051 | ambientCG | CC0 | [ambientcg.com](https://ambientcg.com) | `assets/textures/hospital/` |
 
 `wall_hospital.png` es `wall_plaster.png` (Painted Plaster 017) con el zócalo verde pintado encima.
+
+## La avenida (zona 2)
+
+| Asset | Autor | Licencia | Fuente | Ubicación |
+| --- | --- | --- | --- | --- |
+| Downtown City MegaKit (versión gratuita: edificios, calles, veredas, ladrillo, puertas, props) | Quaternius | CC0 | [quaternius.com](https://quaternius.com) / [itch.io](https://quaternius.itch.io/downtown-city-megakit) | `assets/models/city/` |
+| Car Kit (autos, patrulleros, ambulancia, conos, restos) | Kenney | CC0 | [kenney.nl/assets/car-kit](https://kenney.nl/assets/car-kit) | `assets/models/props/cars/` |
+| Faroles, tablero eléctrico, aire acondicionado, barriles, cajones, reflector, tacho de metal | Poly Haven | CC0 | [polyhaven.com/models](https://polyhaven.com/models) | `assets/models/props/polyhaven/<id>/` |
+
+## Sonido
+
+Los archivos se renombraron al nombre que usa el juego (`assets/audio/{sfx,ambience,music}/`).
+Variantes numeradas (`step_1`, `step_2`...) se eligen al azar.
+
+| Sonidos del juego | Original | Autor | Licencia | Fuente |
+| --- | --- | --- | --- | --- |
+| `step`, `punch_hit` | Impact Sounds | Kenney | CC0 | [kenney.nl/assets/impact-sounds](https://kenney.nl/assets/impact-sounds) |
+| `pickup`, `inventory_open/close`, `menu_move/confirm/back`, `dry_fire_2`, `door_open` | Interface Sounds, RPG Audio | Kenney | CC0 | [kenney.nl/assets/interface-sounds](https://kenney.nl/assets/interface-sounds), [rpg-audio](https://kenney.nl/assets/rpg-audio) |
+| `gunshot_1`, `dry_fire_1` | Chaingun, pistol, rifle, shotgun shots / 2 metal weapon clicks | Michel Baradari (publicado por qubodup) | **CC-BY 3.0** | [opengameart.org/content/chaingun-pistol-rifle-shotgun-shots](https://opengameart.org/content/chaingun-pistol-rifle-shotgun-shots) |
+| `gunshot_2` | Gunshots (22 Magnum, recortado) | kurt | CC0 | [opengameart.org/content/gunshots](https://opengameart.org/content/gunshots) |
+| `reload` | Handgun Reload Sound Effect | zer0_sol | CC0 | [opengameart.org/content/handgun-reload-sound-effect](https://opengameart.org/content/handgun-reload-sound-effect) |
+| `swing_1..4` | Swishes Sound Pack | artisticdude | CC0 | [opengameart.org/content/swishes-sound-pack](https://opengameart.org/content/swishes-sound-pack) |
+| `swing_5` | 3 Melee sounds | remaxim | CC0 | [opengameart.org/content/3-melee-sounds](https://opengameart.org/content/3-melee-sounds) |
+| `melee_hit` | Fleshy Fight Sounds | will_leamon | **OGA-BY 3.0** | [opengameart.org/content/fleshy-fight-sounds](https://opengameart.org/content/fleshy-fight-sounds) |
+| `zombie_growl_1/2`, `zombie_attack_1..3`, `zombie_hurt_3/4` | Zombies Sound Pack | artisticdude | CC0 | [opengameart.org/content/zombies-sound-pack](https://opengameart.org/content/zombies-sound-pack) |
+| `zombie_growl_3/4` | Undead Moans | AntumDeluge | CC0 | [opengameart.org/content/undead-moans](https://opengameart.org/content/undead-moans) |
+| `zombie_attack_4` | 80 CC0 creature SFX | rubberduck | CC0 | [opengameart.org/content/80-cc0-creature-sfx](https://opengameart.org/content/80-cc0-creature-sfx) |
+| `zombie_hurt_1/2`, `zombie_death` | 15 monster grunt/pain/death sounds | Michel Baradari (qubodup) | **CC-BY 3.0** | [opengameart.org/content/15-monster-gruntpaindeath-sounds](https://opengameart.org/content/15-monster-gruntpaindeath-sounds) |
+| `player_hurt`, `player_death` | 11 male human pain/death sounds | Michel Baradari (qubodup) | **CC-BY 3.0** | [opengameart.org/content/11-male-human-paindeath-sounds](https://opengameart.org/content/11-male-human-paindeath-sounds) |
+| `door_locked` | Door Lock Sounds | Cough-E | CC0 | [opengameart.org/content/door-lock-sounds](https://opengameart.org/content/door-lock-sounds) |
+| `heartbeat` | Heartbeat sounds | bart | CC0 | [opengameart.org/content/heartbeat-sounds](https://opengameart.org/content/heartbeat-sounds) |
+| `scare` | Horror Hit Soundpack 1 | psychhead_ | CC0 | [opengameart.org/content/horror-hit-soundpack-1](https://opengameart.org/content/horror-hit-soundpack-1) |
+| `radio_static` | Static | xhunterko | CC0 | [opengameart.org/content/static](https://opengameart.org/content/static) |
+| `radio_music` | "El Choclo" (A. Villoldo), The Peerless Orchestra, 1914, 78 rpm | Great 78 Project | Dominio público (grabación y obra anteriores a 1925) | [archive.org](https://archive.org/details/78_el-choclo_the-peerless-orchestra-villoldo_gbia3038440b) |
+| `fire` (ambiente) | Fireplace Sound loop (mono 22 kHz) | PagDev | CC0 | [opengameart.org/content/fireplace-sound-loop](https://opengameart.org/content/fireplace-sound-loop) |
+| `generator` (ambiente) | Generator (loop) | YCbCr | CC0 | [opengameart.org/content/generator-loop](https://opengameart.org/content/generator-loop) |
+| `hospital` (ambiente) | Abandoned Building Ambience | tcarisland | **CC-BY 4.0** | [opengameart.org/content/abandoned-building-ambience](https://opengameart.org/content/abandoned-building-ambience) |
+| `drone` (zumbido de la locura) | Dark Ambient | Vinrax | **CC-BY 3.0** | [opengameart.org/content/dark-ambient-1](https://opengameart.org/content/dark-ambient-1) |
+| `street` (ambiente) | Wind Loop | AntumDeluge | **CC-BY 3.0** | [opengameart.org/content/wind-loop](https://opengameart.org/content/wind-loop) |
+| `menu_music` | PS2 horror / mystery ambient theme | Tarush Singhal | CC0 | [opengameart.org/content/ps2-horror-mystery-ambient-theme](https://opengameart.org/content/ps2-horror-mystery-ambient-theme) |

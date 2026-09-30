@@ -1,0 +1,150 @@
+extends SceneTree
+## Recorrido de la calle (zona 2): se sale del hospital forzando la salida de
+## emergencia con la barreta, se recorre la avenida, se prueban los límites
+## (barricada, edificios), el secreto del patio y la vuelta al hospital.
+## Capturas en user://test_shots/street/.
+## Uso: <godot> --path . -s res://tests/street_tour_test.gd
+## No usar class_name del juego acá (compila antes que los autoloads).
+
+const OUT := "user://test_shots/street/"
+
+var fails := 0
+var sanity: Node
+var inventory: Node
+var game_state: Node
+
+
+func check(cond: bool, msg: String) -> void:
+	print(("OK   " if cond else "FAIL ") + msg)
+	if not cond:
+		fails += 1
+
+
+func frames(n: int) -> void:
+	for i in n:
+		await process_frame
+
+
+func player() -> Node3D:
+	return current_scene.get_node("Player")
+
+
+## yaw 0 = mirando al norte (-Z), -90 = al este (+X), 90 = al oeste, 180 = al sur.
+func place(pos: Vector3, yaw_deg: float, pitch_deg := -10.0) -> void:
+	var p := player()
+	var yaw := deg_to_rad(yaw_deg)
+	p.global_position = pos
+	p.velocity = Vector3.ZERO
+	p.set("_yaw", yaw)
+	p.set("_pitch", deg_to_rad(pitch_deg))
+	p.camera_pivot.global_position = pos + Vector3.UP * p.camera_height
+	p.visual.global_rotation.y = yaw
+
+
+func walk(action: String, steps: int) -> void:
+	Input.action_press(action)
+	for i in steps:
+		await physics_frame
+	Input.action_release(action)
+
+
+func shot(name: String) -> void:
+	await frames(12)
+	root.get_texture().get_image().save_png(OUT + "%s.png" % name)
+
+
+func settle() -> void:
+	await frames(90)
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	player().set_process_unhandled_input(false)
+	player().get_node("Combat").set_process_unhandled_input(false)
+	for enemy in get_nodes_in_group(&"enemies"):
+		enemy.set_physics_process(false)
+
+
+func _initialize() -> void:
+	DirAccess.make_dir_recursive_absolute(OUT)
+	for action in InputMap.get_actions():
+		InputMap.action_erase_events(action)
+	sanity = root.get_node("Sanity")
+	inventory = root.get_node("Inventory")
+	game_state = root.get_node("GameState")
+	change_scene_to_file("res://scenes/levels/hospital.tscn")
+	await settle()
+
+	print("-- Salida de emergencia")
+	var exit: Node = current_scene.get_node("Inspectables/EmergencyExit")
+	exit.interact(player())
+	await frames(3)
+	check(current_scene.name == "Hospital" and not game_state.has_flag(&"hospital_exit_forced"), "sin barreta no se abre")
+	inventory.add(load("res://assets/items/weapon_crowbar.tres"))
+	exit.interact(player())
+	await settle()
+	check(current_scene.name == "Street", "con la barreta se sale a la calle")
+	check(game_state.has_flag(&"hospital_exit_forced"), "la puerta queda forzada")
+	check(player().global_position.distance_to(Vector3(1.6, 0, 0)) < 0.5, "aparece en la puerta del hospital: %s" % player().global_position)
+	check(get_nodes_in_group(&"enemies").size() == 4, "4 acechadores en la calle")
+	await shot("01_salida")
+
+	print("-- Navegación")
+	await physics_frame
+	var map: RID = player().get_world_3d().navigation_map
+	var path := NavigationServer3D.map_get_path(map, Vector3(5, 0, 0), Vector3(40, 0, -29), true)
+	check(path.size() > 2 and path[path.size() - 1].distance_to(Vector3(40, 0, -29)) < 1.0,
+		"hay camino de la avenida al patio: %d puntos" % path.size())
+	path = NavigationServer3D.map_get_path(map, Vector3(45, 0, 0), Vector3(58, 0, 0), true)
+	check(path.size() > 2 and path[path.size() - 1].distance_to(Vector3(58, 0, 0)) < 1.0,
+		"los enemigos pasan la barricada por la vereda")
+
+	print("-- Límites")
+	place(Vector3(46.0, 0.05, 1.0), -90.0)
+	await walk("move_forward", 150)
+	check(player().global_position.x < 49.5, "la barricada frena: x=%.2f" % player().global_position.x)
+	place(Vector3(46.0, 0.05, -5.0), -90.0)
+	await walk("move_forward", 200)
+	check(player().global_position.x > 53.0, "se pasa por la vereda norte: x=%.2f" % player().global_position.x)
+	place(Vector3(20.0, 0.05, -4.5), 0.0)
+	await walk("move_forward", 120)
+	check(player().global_position.z > -6.4, "los edificios frenan: z=%.2f" % player().global_position.z)
+	place(Vector3(60.0, 0.05, 0.0), -90.0)
+	await walk("move_forward", 200)
+	check(player().global_position.x < 66.0, "el teatro está cerrado: x=%.2f" % player().global_position.x)
+	place(Vector3(35.5, 0.05, -20.0), 0.0)
+	await walk("move_forward", 250)
+	check(player().global_position.z > -33.9, "el patio está cerrado: z=%.2f" % player().global_position.z)
+
+	print("-- Capturas")
+	var shots := [
+		["02_avenida_este", Vector3(3.0, 0.05, 1.5), -80.0],
+		["03_hospital", Vector3(8.0, 0.05, -1.0), 100.0],
+		["04_ambulancia", Vector3(25.0, 0.05, 2.5), -70.0],
+		["05_callejon", Vector3(35.5, 0.05, -4.0), 0.0],
+		["06_patio", Vector3(35.0, 0.05, -25.5), -30.0],
+		["07_barricada", Vector3(42.0, 0.05, 1.0), -85.0],
+		["08_teatro", Vector3(56.0, 0.05, -1.0), -90.0],
+		["09_vereda_sur", Vector3(30.0, 0.05, 4.8), 100.0],
+	]
+	for s: Array in shots:
+		place(s[1], s[2])
+		await shot(s[0])
+
+	print("-- Secreto del patio")
+	sanity._set_current(sanity.maximum * 0.3)
+	await frames(10)
+	check(not current_scene.get_node("Secrets/LyingWall").visible, "Quebrado: el ladrillo flojo desaparece")
+	place(Vector3(38.0, 0.05, -31.0), 0.0)
+	await create_timer(2.0).timeout
+	await shot("10_nicho")
+	sanity._set_current(sanity.maximum)
+
+	print("-- Vuelta al hospital")
+	place(Vector3(1.4, 0.05, 0), 90.0)
+	await frames(5)
+	current_scene.get_node("Inspectables/HospitalDoor").interact(player())
+	await settle()
+	check(current_scene.name == "Hospital", "vuelve al hospital")
+	check(player().global_position.distance_to(Vector3(34.6, 0, 9.5)) < 0.5, "entra por la salida de emergencia: %s" % player().global_position)
+	await shot("11_vuelta")
+
+	print("RESULT: %d fallas" % fails)
+	quit()

@@ -114,6 +114,7 @@ func reload() -> void:
 		GameState.post_message("No me quedan balas.")
 		return
 	player.play_action(ANIM_RELOAD)
+	Audio.play_sfx(&"reload", player.global_position)
 	Inventory.reload_equipped()
 
 
@@ -123,6 +124,7 @@ func _shoot(weapon: ItemData) -> void:
 			reload()
 		else:
 			GameState.post_message("Está vacía.")
+			Audio.play_sfx(&"dry_fire", player.global_position)
 			_cooldown = weapon.attack_cooldown
 		return
 	Inventory.equipped.loaded -= 1
@@ -130,6 +132,8 @@ func _shoot(weapon: ItemData) -> void:
 	_cooldown = weapon.attack_cooldown
 	player.play_action(ANIM_SHOOT)
 	_flash_muzzle()
+	Audio.play_sfx(&"gunshot", player.global_position)
+	GameState.track(&"shots")
 	get_tree().call_group(&"enemies", &"hear_noise", player.global_position, weapon.noise_radius)
 
 	var from := player.global_position + Vector3.UP * 1.4
@@ -154,10 +158,15 @@ func _melee(damage: float, reach: float, cooldown: float, anim: StringName, anim
 	if closest:
 		_face(closest.global_position, 0.0, 0.0)
 	player.play_action(anim, anim_speed)
+	GameState.track(&"melee")
+	Audio.play_sfx(&"swing", player.global_position)
 	await get_tree().create_timer(melee_hit_time, false).timeout
 	if not is_instance_valid(player) or not player.can_control:
 		return
-	for enemy in _enemies_in_arc(reach + 0.5, melee_half_angle):
+	var enemies := _enemies_in_arc(reach + 0.5, melee_half_angle)
+	if not enemies.is_empty():
+		Audio.play_sfx(&"melee_hit", player.global_position)
+	for enemy in enemies:
 		enemy.take_damage(damage)
 
 

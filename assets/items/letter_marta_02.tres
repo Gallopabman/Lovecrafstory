@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_marta_02"
+display_name = "Segunda carta de Marta"
+short_name = "CARTA"
+description = "Metida en un ladrillo flojo del patio. El papel huele a humo."
+kind = 3
+max_sanity_bonus = 10.0
+letter_text = "Salí del San Judas por la puerta de atrás. Tuve que forzarla; el doctor la había trabado desde adentro.\n\nLa calle está peor. Los autos quedaron donde los dejaron, con las puertas abiertas, como si todos hubieran bajado a mirar algo al mismo tiempo.\n\nAl fondo está el Imperio. Las luces de la marquesina siguen prendidas y no hay electricidad en ninguna otra parte. Anoche alguien tocaba el piano adentro. La misma melodía, una y otra vez, como si esperara que alguien la reconozca.\n\nYo la reconocí. Me la cantaba mi mamá.\n\nNo voy a entrar. Todavía no.\n\n- M."
+world_color = Color(0.9, 0.88, 0.8, 1)

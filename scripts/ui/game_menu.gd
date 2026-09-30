@@ -6,9 +6,22 @@ extends Control
 
 enum Section { GRID, LETTERS }
 
-const HINT_GRID := "E: usar   R: mover   X: tirar   Tab: cerrar"
-const HINT_HOLD := "Q: girar   R: soltar   Esc: cancelar"
-const HINT_LETTERS := "E: leer   Tab: cerrar"
+const HINT_GRID := [["E", "usar"], ["R", "mover"], ["X", "tirar"], ["Tab", "cerrar"]]
+const HINT_HOLD := [["Q", "girar"], ["R", "soltar"], ["Esc", "cancelar"]]
+const HINT_LETTERS := [["E", "leer"], ["Tab", "cerrar"]]
+const KEY_COLOR := "#f0c890"
+## Una línea por estado de cordura (Sanity.State).
+const STATE_HINTS := [
+	"Cabeza en su lugar.",
+	"Algo no cierra.",
+	"Todo respira.",
+	"Ya casi no soy yo.",
+	"",
+]
+const STATE_COLORS := [
+	Color(0.75, 0.85, 0.7), Color(0.9, 0.8, 0.5), Color(0.95, 0.55, 0.35), Color(0.95, 0.25, 0.2), Color(0.6, 0.1, 0.1),
+]
+const ZONE_NAMES := {&"Hospital": "Hospital San Judas", &"Street": "La avenida", &"TestRoom": "Sala de prueba"}
 const DIRECTIONS := {
 	"ui_left": Vector2i.LEFT, "move_left": Vector2i.LEFT,
 	"ui_right": Vector2i.RIGHT, "move_right": Vector2i.RIGHT,
@@ -16,8 +29,8 @@ const DIRECTIONS := {
 	"ui_down": Vector2i.DOWN, "move_back": Vector2i.DOWN,
 }
 
-@export var bar_pixels_per_point := 1.6
-@export var bar_max_width := 296.0
+@export var bar_pixels_per_point := 0.9
+@export var bar_max_width := 122.0
 
 var _section := Section.GRID
 
@@ -28,9 +41,13 @@ var _section := Section.GRID
 @onready var name_label: Label = %NameLabel
 @onready var description_label: Label = %DescriptionLabel
 @onready var result_label: Label = %ResultLabel
-@onready var hint_label: Label = %HintLabel
+@onready var hint_label: RichTextLabel = %HintLabel
 @onready var letter_panel: Panel = %LetterPanel
 @onready var letter_label: Label = %LetterLabel
+@onready var survivor_label: Label = %SurvivorLabel
+@onready var space_label: Label = %SpaceLabel
+@onready var sanity_hint: Label = %SanityHint
+@onready var item_preview: ItemIcon = %ItemPreview
 
 
 func _ready() -> void:
@@ -55,8 +72,11 @@ func _input(event: InputEvent) -> void:
 	if letter_panel.visible:
 		if _pressed(event, ["ui_cancel", "pause", "interact", "ui_accept"]):
 			letter_panel.hide()
+			Audio.play_ui(&"menu_back")
 		return
 	var direction := _direction(event)
+	if direction != Vector2i.ZERO:
+		Audio.play_ui(&"menu_move")
 	if _section == Section.GRID:
 		_grid_input(event, direction)
 	else:
@@ -69,11 +89,15 @@ func open() -> void:
 	result_label.text = ""
 	letter_panel.hide()
 	_section = Section.GRID
+	grid.focused = true
 	show()
 	_refresh()
+	Audio.play_ui(&"inventory_open")
 
 
 func close() -> void:
+	if visible:
+		Audio.play_ui(&"inventory_close")
 	grid.cancel_move()
 	letter_panel.hide()
 	hide()
@@ -88,28 +112,36 @@ func _grid_input(event: InputEvent, direction: Vector2i) -> void:
 		_show_details()
 	elif grid.is_holding():
 		if event.is_action_pressed("inventory_move") or _is_use(event):
-			if not grid.try_place():
+			if grid.try_place():
+				Audio.play_ui(&"menu_confirm")
+			else:
 				result_label.text = "No entra ahí."
+				Audio.play_ui(&"menu_back")
 		elif event.is_action_pressed("inventory_rotate"):
 			grid.rotate_held()
+			Audio.play_ui(&"menu_move")
 		elif _pressed(event, ["ui_cancel", "pause"]):
 			grid.cancel_move()
+			Audio.play_ui(&"menu_back")
 		_show_details()
 	elif _is_use(event):
 		var entry := grid.hovered_entry()
 		if not entry.is_empty():
 			result_label.text = Inventory.use(entry.item, entry)
+			Audio.play_ui(&"menu_confirm")
 	elif event.is_action_pressed("inventory_move"):
 		var entry := grid.hovered_entry()
 		if not entry.is_empty():
 			grid.begin_move(entry)
 			result_label.text = ""
+			Audio.play_ui(&"menu_confirm")
 			_show_details()
 	elif event.is_action_pressed("inventory_drop"):
 		var entry := grid.hovered_entry()
 		if not entry.is_empty():
 			Inventory.drop(entry)
 			result_label.text = "Lo dejé en el piso."
+			Audio.play_ui(&"menu_back")
 	elif _pressed(event, ["ui_cancel", "pause"]):
 		close()
 
@@ -127,6 +159,7 @@ func _letters_input(event: InputEvent, direction: Vector2i) -> void:
 		_show_details()
 	elif _is_use(event) and index >= 0:
 		result_label.text = Inventory.use(Inventory.letters[index])
+		Audio.play_ui(&"menu_confirm")
 	elif _pressed(event, ["ui_cancel", "pause"]):
 		close()
 
@@ -137,6 +170,7 @@ func _set_section(section: Section) -> void:
 		letter_list.select(0)
 	else:
 		letter_list.deselect_all()
+	grid.focused = section == Section.GRID
 	grid.queue_redraw()
 	_refresh_hint()
 
@@ -149,6 +183,16 @@ func _refresh() -> void:
 	# La barra crece con las cartas: su ancho es proporcional a la cordura máxima.
 	sanity_bar.size.x = minf(bar_pixels_per_point * Sanity.maximum, bar_max_width)
 	state_label.text = Sanity.state_name()
+	state_label.add_theme_color_override(&"font_color", STATE_COLORS[Sanity.state])
+	sanity_hint.text = STATE_HINTS[Sanity.state]
+	var scene := get_tree().current_scene
+	var zone: String = ZONE_NAMES.get(scene.name, "") if scene else ""
+	survivor_label.text = "Sobreviviente #%d%s" % [GameState.survivor_number, "  ·  " + zone if zone else ""]
+	var used := 0
+	for entry in Inventory.entries:
+		var fp := Inventory.footprint(entry.item, entry.rotated)
+		used += fp.x * fp.y
+	space_label.text = "%d/%d" % [used, Inventory.grid_size.x * Inventory.grid_size.y]
 	var selected := _letter_index()
 	letter_list.clear()
 	for letter in Inventory.letters:
@@ -171,8 +215,9 @@ func _show_details() -> void:
 	else:
 		entry = grid.held if grid.is_holding() else grid.hovered_entry()
 		item = entry.item if not entry.is_empty() else null
+	item_preview.item = item
 	name_label.text = item.display_name if item else ""
-	var description := item.description if item else ""
+	var description := item.description if item else ("Vacío." if _section == Section.GRID else "")
 	if item and entry.get("cooked", false):
 		name_label.text += "  (caliente)"
 	if item and item.is_weapon():
@@ -186,10 +231,13 @@ func _show_details() -> void:
 
 
 func _refresh_hint() -> void:
-	if _section == Section.LETTERS:
-		hint_label.text = HINT_LETTERS
-	else:
-		hint_label.text = HINT_HOLD if grid.is_holding() else HINT_GRID
+	var hints: Array = HINT_LETTERS
+	if _section == Section.GRID:
+		hints = HINT_HOLD if grid.is_holding() else HINT_GRID
+	var parts: PackedStringArray = []
+	for hint: Array in hints:
+		parts.append("[color=%s][lb]%s[rb][/color] %s" % [KEY_COLOR, hint[0], hint[1]])
+	hint_label.text = "   ".join(parts)
 
 
 func _letter_index() -> int:

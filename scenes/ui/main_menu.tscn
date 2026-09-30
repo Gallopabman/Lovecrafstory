@@ -1,0 +1,151 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="Shader" path="res://shaders/menu_fog.gdshader" id="2_fog"]
+[ext_resource type="FontFile" path="res://assets/fonts/pixel_operator/PixelOperator.ttf" id="3_font"]
+[ext_resource type="PackedScene" path="res://scenes/effects/ps1_post_process.tscn" id="4_post"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fog"]
+shader = ExtResource("2_fog")
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 320.0
+offset_bottom = 240.0
+scale = Vector2(2, 2)
+script = ExtResource("1_menu")
+
+[node name="Fog" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_fog")
+layout_mode = 0
+offset_right = 320.0
+offset_bottom = 240.0
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 0.0
+offset_top = 44.0
+offset_right = 320.0
+offset_bottom = 80.0
+theme_override_colors/font_color = Color(0.86, 0.8, 0.7, 1)
+theme_override_colors/font_shadow_color = Color(0.35, 0.05, 0.04, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 32
+text = "LOVACRAFSTORY"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="."]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 82.0
+offset_right = 320.0
+offset_bottom = 92.0
+modulate = Color(1, 1, 1, 0.55)
+text = "la niebla no se levanta nunca"
+horizontal_alignment = 1
+
+[node name="MainPanel" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 110.0
+offset_top = 128.0
+offset_right = 210.0
+offset_bottom = 196.0
+theme_override_constants/separation = 4
+
+[node name="PlayButton" type="Button" parent="MainPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Jugar"
+alignment = 0
+
+[node name="OptionsButton" type="Button" parent="MainPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Opciones"
+alignment = 0
+
+[node name="QuitButton" type="Button" parent="MainPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Salir"
+alignment = 0
+
+[node name="OptionsPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 70.0
+offset_top = 120.0
+offset_right = 250.0
+offset_bottom = 200.0
+
+[node name="OptionsTitle" type="Label" parent="OptionsPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 6.0
+offset_right = 170.0
+offset_bottom = 16.0
+theme_override_colors/font_color = Color(0.85, 0.62, 0.45, 1)
+text = "OPCIONES"
+
+[node name="VolumeLabel" type="Label" parent="OptionsPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 26.0
+offset_right = 70.0
+offset_bottom = 36.0
+text = "Volumen"
+
+[node name="VolumeSlider" type="HSlider" parent="OptionsPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 66.0
+offset_top = 26.0
+offset_right = 142.0
+offset_bottom = 36.0
+step = 5.0
+value = 80.0
+
+[node name="VolumeValue" type="Label" parent="OptionsPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 144.0
+offset_top = 26.0
+offset_right = 172.0
+offset_bottom = 36.0
+horizontal_alignment = 2
+
+[node name="BackButton" type="Button" parent="OptionsPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 52.0
+offset_right = 70.0
+offset_bottom = 66.0
+text = "Volver"
+alignment = 0
+
+[node name="Footer" type="Label" parent="."]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 226.0
+offset_right = 312.0
+offset_bottom = 236.0
+modulate = Color(1, 1, 1, 0.35)
+text = "prototipo  ·  Godot 4.7"
+horizontal_alignment = 2
+
+[node name="Fade" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 320.0
+offset_bottom = 240.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="PS1PostProcess" parent="." instance=ExtResource("4_post")]

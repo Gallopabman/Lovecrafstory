@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"comic_detective"
+display_name = "Revista: Inspector Aguirre"
+short_name = "REV"
+grid_size = Vector2i(1, 2)
+description = "Historieta policial de kiosco, número 40. Aguirre siempre resuelve el caso antes de la última página. Rinde menos cada vez que se relee."
+kind = 1
+sanity_restore = 12.0
+world_color = Color(0.3, 0.45, 0.7, 1)

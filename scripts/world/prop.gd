@@ -13,6 +13,8 @@ enum Anchor {
 	CEILING,
 	## Contra la pared: el origen queda en el centro de la cara de atrás (el frente mira a +Z).
 	WALL,
+	## Respeta el origen del modelo (piezas modulares que encastran entre sí: calles, edificios).
+	ORIGIN,
 }
 
 @export var model: PackedScene:

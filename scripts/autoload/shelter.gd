@@ -210,6 +210,10 @@ func play_radio() -> String:
 	return "Un tango viejo entre la estática. Por un momento, el mundo es normal."
 
 
+func radio_ready() -> bool:
+	return _cooldown_ready(&"radio")
+
+
 func _cooldown_ready(key: StringName) -> bool:
 	return Time.get_ticks_msec() >= _cooldowns.get(key, 0)
 
