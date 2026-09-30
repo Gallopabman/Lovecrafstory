@@ -1,0 +1,180 @@
+extends SceneTree
+## Teatro Imperio (zona 3): la llave de Sosa abre el candado, la escopeta dispara
+## perdigones, el jefe despierta al acercarse al escenario, aguanta, se enfurece y
+## muere; la puerta del camarín se abre y ahí uno se puede mudar (segundo refugio):
+## el siguiente sobreviviente llega al teatro. Capturas en user://test_shots/theater/.
+## Uso: <godot> --path . -s res://tests/theater_test.gd
+
+const OUT := "user://test_shots/theater/"
+const S := 1.1
+
+var fails := 0
+var sanity: Node
+var inventory: Node
+var game_state: Node
+var shelter: Node
+
+
+func check(cond: bool, msg: String) -> void:
+	print(("OK   " if cond else "FAIL ") + msg)
+	if not cond:
+		fails += 1
+
+
+func frames(n: int) -> void:
+	for i in n:
+		await process_frame
+
+
+func shot(name: String) -> void:
+	await frames(12)
+	root.get_texture().get_image().save_png(OUT + "%s.png" % name)
+
+
+func player() -> Node3D:
+	return current_scene.get_node("Player")
+
+
+## yaw 0 = mirando al norte (-Z), -90 = al este (+X), 90 = al oeste, 180 = al sur.
+func place(pos: Vector3, yaw_deg: float, pitch_deg := -10.0) -> void:
+	var p := player()
+	var yaw := deg_to_rad(yaw_deg)
+	p.global_position = pos
+	p.velocity = Vector3.ZERO
+	p.set("_yaw", yaw)
+	p.set("_pitch", deg_to_rad(pitch_deg))
+	p.camera_pivot.global_position = pos + Vector3.UP * p.camera_height
+	p.visual.global_rotation.y = yaw
+
+
+func settle() -> void:
+	await frames(90)
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	player().set_process_unhandled_input(false)
+	player().get_node("Combat").set_process_unhandled_input(false)
+	for enemy in get_nodes_in_group(&"enemies"):
+		enemy.set_physics_process(false)
+
+
+func _initialize() -> void:
+	DirAccess.make_dir_recursive_absolute(OUT)
+	for action in InputMap.get_actions():
+		InputMap.action_erase_events(action)
+	root.get_node("SaveGame").path = "user://test_save.dat"
+	sanity = root.get_node("Sanity")
+	inventory = root.get_node("Inventory")
+	game_state = root.get_node("GameState")
+	shelter = root.get_node("Shelter")
+	root.get_node("SaveGame").new_game()
+	change_scene_to_file("res://scenes/levels/street.tscn")
+	await settle()
+
+	print("-- Entrada")
+	var door: Node = current_scene.get_node("Inspectables/TheaterDoor")
+	door.interact(player())
+	await frames(3)
+	check(current_scene.name == "Street", "sin la llave el candado no abre")
+	inventory.add(load("res://assets/items/key_theater.tres"))
+	door.interact(player())
+	await settle()
+	check(current_scene.name == "Theater", "con la llave de Sosa se entra al teatro")
+	check(player().global_position.distance_to(Vector3(1.6, 0, 7.0)) < 0.5, "aparece en la entrada del vestíbulo")
+	var boss: Node3D = current_scene.get_node("Enemies/Singer")
+	check(boss.dormant and not boss.visual.visible, "la cantante duerme, invisible")
+	await shot("01_vestibulo")
+
+	print("-- Escopeta")
+	var shotgun_pickup: Node = current_scene.get_node("Items/Shotgun")
+	shotgun_pickup.interact(player())
+	current_scene.get_node("Items/Shells2").interact(player())
+	var shotgun: Resource = load("res://assets/items/weapon_shotgun.tres")
+	var entry: Dictionary = {}
+	for e: Dictionary in inventory.entries:
+		if e.item == shotgun:
+			entry = e
+	check(not entry.is_empty() and entry.loaded == 2, "la escopeta entra en la mochila, cargada con 2")
+	inventory.use(shotgun, entry)
+	var combat: Node = player().get_node("Combat")
+	check(inventory.equipped_item() == shotgun, "escopeta en la mano")
+	var stalker: Node3D = current_scene.get_node("Enemies/StalkerCoats")
+	stalker.global_position = Vector3(7.0, 0.05, 4.5)
+	place(Vector3(7.0, 0.05, 7.5), 0.0)
+	await frames(5)
+	Input.action_press("aim")
+	await frames(10)
+	var health_before: float = stalker.health
+	combat.attack()
+	await frames(3)
+	Input.action_release("aim")
+	var dealt: float = health_before - stalker.health
+	check(dealt > shotgun.damage * 1.5 or stalker.is_dead(), "un disparo, varios perdigones: %.0f de daño" % dealt)
+	check(entry.loaded == 1, "gasta un cartucho")
+	await shot("02_escopeta")
+
+	print("-- Recorrido")
+	for s: Array in [["03_sala", Vector3(16.0, 0.05, 7.0), -90.0], ["04_butacas", Vector3(24.0, 0.05, -1.0), -60.0],
+			["05_escenario", Vector3(36.0, S + 0.05, 13.0), -30.0], ["06_bambalinas", Vector3(43.5, S + 0.05, 1.0), 180.0],
+			["07_camarin_2", Vector3(46.5, S + 0.05, 2.0), -90.0]]:
+		place(s[1], s[2])
+		await shot(s[0])
+
+	print("-- Jefe")
+	var gate: Node3D = current_scene.get_node("Structure/CamarinGate")
+	check(not gate.is_open(), "el camarín principal está trabado")
+	place(Vector3(28.0, 0.05, 7.0), -90.0, -5.0)
+	await frames(10)
+	check(not boss.dormant and boss.visual.visible, "al acercarse al escenario, la cantante despierta")
+	boss.set_physics_process(false)
+	await shot("08_la_cantante")
+	var max_health: float = boss.max_health
+	boss.take_damage(40.0)
+	check(boss.state != 3 and boss.health == max_health - 40.0, "40 de daño: no se tambalea")
+	boss.take_damage(40.0)
+	check(boss.state == 3, "al acumular daño, se tambalea")
+	boss.take_damage(max_health * 0.5)
+	check(boss.enraged, "por debajo de la mitad, se enfurece")
+	var pre_kill: float = sanity.current
+	sanity._set_current(sanity.maximum * 0.5)
+	pre_kill = sanity.current
+	boss.take_damage(max_health)
+	await frames(3)
+	check(boss.is_dead() and game_state.has_flag(&"theater_boss_dead"), "muere y deja la marca")
+	check(sanity.current > pre_kill + 20.0, "matarla devuelve mucha cordura")
+	check(gate.is_open(), "la puerta del camarín se destraba")
+	await shot("09_derrotada")
+
+	print("-- El camarín: mudarse")
+	place(Vector3(49.0, S + 0.05, 12.5), 90.0)
+	await frames(10)
+	check(not sanity.in_refuge(), "el camarín todavía no es refugio (vivo en el hospital)")
+	await shot("10_camarin")
+	var menu: Control = current_scene.get_node("GameUI/ShelterMenu")
+	current_scene.get_node("Refuge/BlueprintStation").interact(player())
+	await frames(3)
+	check(menu.visible and menu.upgrade_name.text.begins_with("Todavía no"), "el plano ofrece mudarse")
+	await shot("11_plano_mudarse")
+	menu._build()
+	await frames(3)
+	check(shelter.active == &"theater", "me mudé al teatro")
+	menu.close()
+	await frames(5)
+	check(sanity.in_refuge(), "ahora el camarín es refugio")
+	shelter.stock[&"material_cable"] = 5
+	shelter.stock[&"material_metal"] = 5
+	check(shelter.upgrade(&"power", &"theater") and shelter.level(&"power", &"hospital") == 0, "las mejoras son de cada refugio")
+	await frames(5)
+	await shot("12_camarin_con_luz")
+
+	print("-- El que viene después llega al teatro")
+	game_state.new_survivor()
+	await settle()
+	check(current_scene.name == "Theater", "el sobreviviente nuevo aparece en el teatro")
+	check(player().global_position.distance_to(Vector3(49.0, S, 12.0)) < 0.6, "en el camarín: %s" % player().global_position)
+	check(not current_scene.get_node("Enemies").has_node("Singer") or current_scene.get_node("Enemies/Singer").is_queued_for_deletion(),
+		"la cantante no vuelve")
+	var data: Dictionary = root.get_node("SaveGame").read()
+	check(data.get("shelter", {}).get("active", &"") == &"theater", "el guardado recuerda el refugio nuevo")
+
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_save.dat"))
+	print("RESULT: %d fallas" % fails)
+	quit()

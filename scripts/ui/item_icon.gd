@@ -41,12 +41,19 @@ static func draw_icon(canvas: CanvasItem, item: ItemData, rect: Rect2, alpha := 
 		ItemData.Kind.LETTER:
 			_envelope(canvas, box, base, dark, outline)
 		ItemData.Kind.WEAPON:
-			if item.is_ranged:
+			if item.is_ranged and item.pellets > 1:
+				_shotgun(canvas, rect, Color(0.36, 0.37, 0.4, alpha), Color(0.45, 0.3, 0.2, alpha), outline)
+			elif item.is_ranged:
 				_pistol(canvas, box, Color(0.42, 0.43, 0.46, alpha), outline)
 			else:
 				_crowbar(canvas, box, Color(0.62, 0.16, 0.12, alpha), outline, rect)
 		ItemData.Kind.AMMO:
-			_bullets(canvas, box, Color(0.85, 0.66, 0.3, alpha), outline)
+			if id.contains("shell"):
+				_shells(canvas, box, Color(0.7, 0.16, 0.1, alpha), Color(0.85, 0.66, 0.3, alpha), outline)
+			else:
+				_bullets(canvas, box, Color(0.85, 0.66, 0.3, alpha), outline)
+		ItemData.Kind.KEY:
+			_key(canvas, box, base, outline)
 		ItemData.Kind.MATERIAL:
 			if id.contains("wood"):
 				_planks(canvas, box, base, dark, outline)
@@ -176,3 +183,35 @@ static func _cloth(c: CanvasItem, b: Rect2, base: Color, dark: Color, o: Color) 
 	shape.append(shape[0])
 	c.draw_polyline(shape, o, 1.0)
 	c.draw_line(_p(b, 0.2, 0.52), _p(b, 0.8, 0.46), dark, 1.0)
+
+
+## Ocupa todo el lugar del objeto (3x1): caño largo y culata de madera.
+static func _shotgun(c: CanvasItem, rect: Rect2, metal: Color, wood: Color, o: Color) -> void:
+	var r := rect.grow(-2)
+	var mid := r.get_center().y
+	var barrel := Rect2(r.position.x + r.size.x * 0.35, mid - 3, r.size.x * 0.63, 3)
+	_framed(c, barrel, metal, o)
+	_framed(c, Rect2(barrel.position + Vector2(0, 3), Vector2(barrel.size.x * 0.7, 2)), metal.darkened(0.3), o)
+	var stock := PackedVector2Array([Vector2(r.position.x, mid - 2), Vector2(r.position.x + r.size.x * 0.36, mid - 4),
+		Vector2(r.position.x + r.size.x * 0.4, mid + 3), Vector2(r.position.x + r.size.x * 0.3, mid + 3),
+		Vector2(r.position.x + 1, mid + 6)])
+	c.draw_colored_polygon(stock, wood)
+	stock.append(stock[0])
+	c.draw_polyline(stock, o, 1.0)
+
+
+static func _shells(c: CanvasItem, b: Rect2, red: Color, brass: Color, o: Color) -> void:
+	for i in 3:
+		var x := 0.16 + i * 0.25
+		_framed(c, _r(b, x, 0.2, 0.2, 0.5), red, o)
+		_framed(c, _r(b, x, 0.7, 0.2, 0.14), brass, o)
+
+
+static func _key(c: CanvasItem, b: Rect2, base: Color, o: Color) -> void:
+	var ring := _p(b, 0.3, 0.5)
+	c.draw_circle(ring, b.size.x * 0.2, o)
+	c.draw_circle(ring, b.size.x * 0.16, base)
+	c.draw_circle(ring, b.size.x * 0.07, o)
+	_framed(c, _r(b, 0.46, 0.45, 0.46, 0.1), base, o)
+	_framed(c, _r(b, 0.74, 0.55, 0.07, 0.14), base, o)
+	_framed(c, _r(b, 0.84, 0.55, 0.07, 0.1), base, o)

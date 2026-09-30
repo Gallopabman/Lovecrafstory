@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="Resource" path="res://assets/items/ammo_shells.tres" id="2_ammo"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/shotgun_held.tscn" id="3_held"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"weapon_shotgun"
+display_name = "Escopeta"
+short_name = "ESC"
+description = "La escopeta de la comisaría, recortada a mano. Dos cartuchos, siete perdigones cada uno. De cerca no perdona; de lejos, casi no llega."
+kind = 4
+grid_size = Vector2i(3, 1)
+is_ranged = true
+damage = 11.0
+attack_range = 14.0
+attack_cooldown = 1.0
+magazine_size = 2
+ammo_item = ExtResource("2_ammo")
+noise_radius = 30.0
+pellets = 7
+pellet_spread = 5.0
+shot_sound = &"shotgun_shot"
+reload_sound = &"shotgun_pump"
+world_color = Color(0.36, 0.28, 0.22, 1)
+held_scene = ExtResource("3_held")
+pickup_rotation = Vector3(0, 0, -90)

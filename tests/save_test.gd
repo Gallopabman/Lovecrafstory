@@ -73,6 +73,8 @@ func _initialize() -> void:
 
 	print("-- Menú de pausa")
 	var pause: Control = current_scene.get_node("GameUI/PauseMenu")
+	# El cursor real sobre un botón le daría el foco (hover): se lo lleva a una esquina.
+	root.warp_mouse(Vector2(2, 2))
 	await send_action("pause")
 	check(pause.visible and paused, "Esc abre la pausa y pausa el juego")
 	check(pause.continue_button.has_focus(), "el foco en Continuar")

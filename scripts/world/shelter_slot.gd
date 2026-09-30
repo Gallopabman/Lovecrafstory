@@ -1,23 +1,25 @@
 class_name ShelterSlot
 extends Node3D
-## Un espacio fijo del blueprint del refugio (fuego, cama, ventanas...).
+## Un espacio fijo del blueprint de un refugio (fuego, cama, ventanas...).
 ## Muestra la versión que corresponde al nivel actual según el nombre de cada hijo:
 ##   "Only<n>..." visible solo en el nivel n  (p. ej. Only0 = el colchón en el piso)
 ##   "From<n>..." visible desde el nivel n    (p. ej. From1Lights = luces con el generador)
 ## Los hijos ocultos se desactivan (luces, colisiones y estaciones incluidas).
 
 @export var slot_id: StringName = &"fire"
+## A qué refugio pertenece (Shelter.REFUGES).
+@export var refuge_id: StringName = &"hospital"
 
 
 func _ready() -> void:
-	Shelter.slot_upgraded.connect(func(slot: StringName, _level: int) -> void:
-		if slot == slot_id:
+	Shelter.slot_upgraded.connect(func(slot: StringName, _level: int, refuge: StringName) -> void:
+		if slot == slot_id and refuge == refuge_id:
 			_apply())
 	_apply()
 
 
 func _apply() -> void:
-	var current := Shelter.level(slot_id)
+	var current := Shelter.level(slot_id, refuge_id)
 	for child in get_children():
 		var child_name := String(child.name)
 		var present := true

@@ -289,6 +289,7 @@ func _house_pension() -> float:
 	_prop("chair", Vector3(0.6, 0, -3.4), 90)
 	_prop("radio", Vector3(0.2, 0.0, -6.5), 0)
 	_pickup("LetterSosa", "letter_sosa_01", Vector3(3.9, 0.58, -6.4))
+	_pickup("KeyTheater", "key_theater", Vector3(3.6, 0.58, -6.2))
 	_pickup("Wood", "material_wood", Vector3(0.4, 0.0, -5.0), 2)
 	_pickup("Water", "food_water_bottle", Vector3(1.0, 0.05, -1.0))
 	_inspect(Vector3(3.3, 0.8, -4.6), ["La cama está hecha con prolijidad de cuartel. Sobre la almohada, una gorra de policía."], 1.2)

@@ -114,7 +114,7 @@ func reload() -> void:
 		GameState.post_message("No me quedan balas.")
 		return
 	player.play_action(ANIM_RELOAD)
-	Audio.play_sfx(&"reload", player.global_position)
+	Audio.play_sfx(weapon.reload_sound, player.global_position)
 	Inventory.reload_equipped()
 
 
@@ -132,23 +132,29 @@ func _shoot(weapon: ItemData) -> void:
 	_cooldown = weapon.attack_cooldown
 	player.play_action(ANIM_SHOOT)
 	_flash_muzzle()
-	Audio.play_sfx(&"gunshot", player.global_position)
+	Audio.play_sfx(weapon.shot_sound, player.global_position)
 	GameState.track(&"shots")
 	get_tree().call_group(&"enemies", &"hear_noise", player.global_position, weapon.noise_radius)
 
 	var from := player.global_position + Vector3.UP * 1.4
 	var aim_at: Vector3 = target.aim_point() if target else from + _camera_forward() * weapon.attack_range
-	var direction := (aim_at - from).normalized()
-	# La locura abre la dispersión: con poca cordura se erra más.
+	var aim_direction := (aim_at - from).normalized()
+	# La locura abre la dispersión: con poca cordura se erra más. La escopeta suma su abanico.
 	var spread := deg_to_rad(lerpf(sane_spread, insane_spread, Sanity.insanity()))
-	var side := direction.cross(Vector3.UP).normalized()
-	direction = direction.rotated(Vector3.UP, randf_range(-spread, spread))
-	direction = direction.rotated(side, randf_range(-spread, spread) * 0.5)
-	var query := PhysicsRayQueryParameters3D.create(from, from + direction * weapon.attack_range, 3)
-	query.exclude = [player.get_rid()]
-	var hit := player.get_world_3d().direct_space_state.intersect_ray(query)
-	if not hit.is_empty() and hit.collider.has_method(&"take_damage"):
-		hit.collider.take_damage(weapon.damage)
+	var fan := deg_to_rad(weapon.pellet_spread)
+	var side := aim_direction.cross(Vector3.UP).normalized()
+	# Los perdigones que pegan en el mismo enemigo se suman en un solo golpe (un solo tambaleo).
+	var damage_by_target := {}
+	for i in maxi(weapon.pellets, 1):
+		var direction := aim_direction.rotated(Vector3.UP, randf_range(-spread, spread) + randf_range(-fan, fan))
+		direction = direction.rotated(side, (randf_range(-spread, spread) + randf_range(-fan, fan)) * 0.5)
+		var query := PhysicsRayQueryParameters3D.create(from, from + direction * weapon.attack_range, 3)
+		query.exclude = [player.get_rid()]
+		var hit := player.get_world_3d().direct_space_state.intersect_ray(query)
+		if not hit.is_empty() and hit.collider.has_method(&"take_damage"):
+			damage_by_target[hit.collider] = damage_by_target.get(hit.collider, 0.0) + weapon.damage
+	for enemy: Node in damage_by_target:
+		enemy.take_damage(damage_by_target[enemy])
 
 
 func _melee(damage: float, reach: float, cooldown: float, anim: StringName, anim_speed := 1.0) -> void:

@@ -239,6 +239,8 @@ func use(item: ItemData, entry: Dictionary = {}) -> String:
 			result = "Caliente. Como en casa." if cooked else "Por un momento, todo parece normal."
 		ItemData.Kind.MATERIAL:
 			return "Esto sirve para el refugio. Se descarga solo al llegar."
+		ItemData.Kind.KEY:
+			return "Tiene que abrir algo. Lo pruebo cuando lo encuentre."
 		ItemData.Kind.COMIC, ItemData.Kind.MOVIE:
 			var times: int = _use_counts.get(item.id, 0)
 			Sanity.restore(item.sanity_restore * pow(item.reuse_falloff, times))

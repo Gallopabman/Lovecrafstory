@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"ammo_shells"
+display_name = "Cartuchos"
+short_name = "CAR"
+description = "Cartuchos de calibre 12, rojos, con el latón manchado. Huelen a pólvora vieja."
+kind = 5
+max_stack = 12
+world_color = Color(0.7, 0.18, 0.12, 1)

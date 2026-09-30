@@ -25,6 +25,7 @@ const ZONE_NAMES := {
 	&"Hospital": "Hospital San Judas", &"Street": "La avenida", &"TestRoom": "Sala de prueba",
 	&"HouseIbarra": "Depto. de los Ibarra", &"HouseAlmacen": "Almacén La Estrella",
 	&"HouseRelojeria": "Relojería Kaufmann", &"HousePension": "Pensión Doña Rosa",
+	&"Theater": "Teatro Imperio",
 }
 const DIRECTIONS := {
 	"ui_left": Vector2i.LEFT, "move_left": Vector2i.LEFT,

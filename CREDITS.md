@@ -89,3 +89,24 @@ Variantes numeradas (`step_1`, `step_2`...) se eligen al azar.
 | `drone` (zumbido de la locura) | Dark Ambient | Vinrax | **CC-BY 3.0** | [opengameart.org/content/dark-ambient-1](https://opengameart.org/content/dark-ambient-1) |
 | `street` (ambiente) | Wind Loop | AntumDeluge | **CC-BY 3.0** | [opengameart.org/content/wind-loop](https://opengameart.org/content/wind-loop) |
 | `menu_music` | PS2 horror / mystery ambient theme | Tarush Singhal | CC0 | [opengameart.org/content/ps2-horror-mystery-ambient-theme](https://opengameart.org/content/ps2-horror-mystery-ambient-theme) |
+
+## Teatro Imperio (zona 3)
+
+| Asset | Autor | Licencia | Fuente | Ubicación |
+| --- | --- | --- | --- | --- |
+| Giant Mutant (el jefe, "la cantante"), con animaciones | Eldritch Grim | CC0 | [opengameart.org/content/giant-mutant](https://opengameart.org/content/giant-mutant) | `assets/models/enemies/giant_mutant/` |
+| Shotgun (escopeta, Ultimate Gun Pack) | Quaternius | CC0 | [poly.pizza/m/ZmPTnh7njL](https://poly.pizza/m/ZmPTnh7njL) | `assets/models/weapons/shotgun.glb` |
+
+Nota: el esqueleto del Giant Mutant es de Mixamo (`mixamorig`), así que sus animaciones probablemente
+vengan de Mixamo. Usarlas dentro del juego está permitido; lo que no se puede es redistribuir el .glb
+suelto como asset. Si el repositorio se vuelve público como paquete de assets, revisar esto.
+
+| Sonidos del juego | Original | Autor | Licencia | Fuente |
+| --- | --- | --- | --- | --- |
+| `shotgun_shot`, `shotgun_pump` | Free Firearm Sound Library (Mossberg, Winchester Model 12; recortados) | The Free Firearm Sound Library (subido por bart) | CC0 | [opengameart.org/content/the-free-firearm-sound-library](https://opengameart.org/content/the-free-firearm-sound-library) |
+| `boss_roar_1` | CC0 Deep Monster Roar | trazzz123 | CC0 | [opengameart.org/content/cc0-deep-monster-roar](https://opengameart.org/content/cc0-deep-monster-roar) |
+| `boss_roar_2`, `boss_death` | Monster or Beast Sounds (grave) | pauliuw | CC0 | [opengameart.org/content/monster-or-beast-sounds](https://opengameart.org/content/monster-or-beast-sounds) |
+| `boss_roar_3` | Big Scary Troll Sounds | darsycho | CC0 | [opengameart.org/content/big-scary-troll-sounds](https://opengameart.org/content/big-scary-troll-sounds) |
+| `boss_attack`, `boss_hurt` | 80 CC0 creature SFX (1 y 2, tono más grave) | rubberduck | CC0 | [opengameart.org/content/80-cc0-creature-sfx](https://opengameart.org/content/80-cc0-creature-sfx) |
+| `boss_music` | "Final Boss Lair" | hitctrl | **CC-BY 3.0** | [opengameart.org/content/finalbosslair](https://opengameart.org/content/finalbosslair) |
+| `theater` (ambiente) | "Vampire's Piano" | tad | CC0 | [opengameart.org/content/vampires-piano](https://opengameart.org/content/vampires-piano) |

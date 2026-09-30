@@ -7,7 +7,9 @@ extends Node
 ## Todo esto sobrevive a la muerte del sobreviviente: el refugio se conserva.
 
 signal changed
-signal slot_upgraded(slot_id: StringName, level: int)
+signal slot_upgraded(slot_id: StringName, level: int, refuge: StringName)
+## Cambió el refugio activo.
+signal moved(refuge: StringName)
 signal materials_deposited(amounts: Dictionary)
 
 const MATERIALS := {
@@ -72,7 +74,23 @@ const SLOT_ORDER: Array[StringName] = [&"fire", &"power", &"bed", &"windows", &"
 @export var bonus_per_letter := 4.0
 @export var bonus_max := 30.0
 
-var levels: Dictionary = {}
+## Los lugares que pueden ser refugio (GDD: uno solo activo; mudarse es una decisión).
+## Cada uno tiene sus propias mejoras; los materiales del depósito se llevan al mudarse.
+const REFUGES := {
+	&"hospital": {"name": "Refugio del San Judas", "scene": "res://scenes/levels/hospital.tscn",
+		"spawn": &"refuge"},
+	&"theater": {"name": "Camarín del Imperio", "scene": "res://scenes/levels/theater.tscn",
+		"spawn": &"refuge"},
+}
+
+## Refugio activo: ahí llegan los sobrevivientes nuevos y solo ahí baja lento la cordura.
+var active: StringName = &"hospital"
+## Mejoras de cada refugio: { refugio: { espacio: nivel } }. Se conservan al mudarse.
+var refuge_levels: Dictionary = {}
+## Mejoras del refugio activo (atajo).
+var levels: Dictionary:
+	get:
+		return refuge_levels[active]
 var stock: Dictionary = {}
 ## Lugares descubiertos alguna vez (por cualquier sobreviviente).
 var discovered: Dictionary = {}
@@ -93,8 +111,13 @@ func _ready() -> void:
 
 
 func new_game() -> void:
-	for slot in SLOT_ORDER:
-		levels[slot] = 0
+	active = &"hospital"
+	refuge_levels.clear()
+	for refuge in REFUGES:
+		var slots := {}
+		for slot in SLOT_ORDER:
+			slots[slot] = 0
+		refuge_levels[refuge] = slots
 	for id in MATERIALS:
 		stock[id] = 0
 	discovered.clear()
@@ -104,13 +127,19 @@ func new_game() -> void:
 
 
 func save_data() -> Dictionary:
-	return {"levels": levels.duplicate(), "stock": stock.duplicate(), "discovered": discovered.duplicate(),
-		"trip": [_trip_active, _trip_places, _trip_items, _trip_letters]}
+	return {"active": active, "refuge_levels": refuge_levels.duplicate(true), "stock": stock.duplicate(),
+		"discovered": discovered.duplicate(), "trip": [_trip_active, _trip_places, _trip_items, _trip_letters]}
 
 
 func load_data(data: Dictionary) -> void:
 	new_game()
-	levels.merge(data.get("levels", {}), true)
+	var saved_levels: Dictionary = data.get("refuge_levels", {})
+	for refuge: StringName in saved_levels:
+		if refuge_levels.has(refuge):
+			refuge_levels[refuge].merge(saved_levels[refuge], true)
+	if data.has("levels"):  # partidas de antes de los refugios múltiples
+		refuge_levels[&"hospital"].merge(data.levels, true)
+	active = data.get("active", &"hospital")
 	stock.merge(data.get("stock", {}), true)
 	discovered = data.get("discovered", {})
 	var trip: Array = data.get("trip", [false, 0, 0, 0])
@@ -121,10 +150,38 @@ func load_data(data: Dictionary) -> void:
 	changed.emit()
 
 
-# --- Blueprint ---------------------------------------------------------------
+# --- Refugios ----------------------------------------------------------------
 
-func level(slot: StringName) -> int:
-	return levels.get(slot, 0)
+func refuge_name(refuge: StringName = &"") -> String:
+	return REFUGES[_r(refuge)].name
+
+
+func refuge_scene() -> String:
+	return REFUGES[active].scene
+
+
+func refuge_spawn() -> StringName:
+	return REFUGES[active].spawn
+
+
+func is_active(refuge: StringName) -> bool:
+	return refuge == active
+
+
+## Mudarse: los sobrevivientes nuevos llegan acá y el refugio anterior queda como está.
+func move_to(refuge: StringName) -> void:
+	if refuge == active or not REFUGES.has(refuge):
+		return
+	active = refuge
+	moved.emit(refuge)
+	changed.emit()
+
+
+# --- Blueprint ---------------------------------------------------------------
+# `refuge` vacío = el activo.
+
+func level(slot: StringName, refuge: StringName = &"") -> int:
+	return refuge_levels[_r(refuge)].get(slot, 0)
 
 
 func max_level(slot: StringName) -> int:
@@ -132,8 +189,8 @@ func max_level(slot: StringName) -> int:
 
 
 ## Datos del próximo nivel, o {} si el espacio está completo.
-func next_upgrade(slot: StringName) -> Dictionary:
-	var current := level(slot)
+func next_upgrade(slot: StringName, refuge: StringName = &"") -> Dictionary:
+	var current := level(slot, refuge)
 	return SLOTS[slot].levels[current] if current < max_level(slot) else {}
 
 
@@ -144,22 +201,23 @@ func can_afford(cost: Dictionary) -> bool:
 	return true
 
 
-func upgrade(slot: StringName) -> bool:
-	var next := next_upgrade(slot)
+func upgrade(slot: StringName, refuge: StringName = &"") -> bool:
+	var r := _r(refuge)
+	var next := next_upgrade(slot, r)
 	if next.is_empty() or not can_afford(next.cost):
 		return false
 	for id in next.cost:
 		stock[id] -= next.cost[id]
-	levels[slot] = level(slot) + 1
-	slot_upgraded.emit(slot, levels[slot])
+	refuge_levels[r][slot] = level(slot, r) + 1
+	slot_upgraded.emit(slot, refuge_levels[r][slot], r)
 	changed.emit()
 	return true
 
 
-func cozy() -> int:
+func cozy(refuge: StringName = &"") -> int:
 	var total := 0
 	for slot in SLOT_ORDER:
-		for i in level(slot):
+		for i in level(slot, refuge):
 			total += SLOTS[slot].levels[i].cozy
 	return total
 
@@ -173,12 +231,16 @@ func cozy_max() -> int:
 
 
 ## Cuánto se frena el goteo de cordura en el refugio según el nivel cozy.
-func drain_multiplier() -> float:
-	return lerpf(drain_multiplier_bare, drain_multiplier_full, float(cozy()) / cozy_max())
+func drain_multiplier(refuge: StringName = &"") -> float:
+	return lerpf(drain_multiplier_bare, drain_multiplier_full, float(cozy(refuge)) / cozy_max())
 
 
-func has_electricity() -> bool:
-	return level(&"power") >= 1
+func has_electricity(refuge: StringName = &"") -> bool:
+	return level(&"power", refuge) >= 1
+
+
+func _r(refuge: StringName) -> StringName:
+	return active if refuge == &"" else refuge
 
 
 func material_name(id: StringName) -> String:
@@ -204,8 +266,8 @@ func deposit_materials() -> Dictionary:
 
 # --- Estaciones --------------------------------------------------------------
 
-func cook() -> String:
-	if level(&"fire") < 1:
+func cook(refuge: StringName = &"") -> String:
+	if level(&"fire", refuge) < 1:
 		return "Sin fuego no hay forma de cocinar."
 	for entry in Inventory.entries:
 		var item: ItemData = entry.item
@@ -216,18 +278,18 @@ func cook() -> String:
 	return "No tengo nada para cocinar."
 
 
-func rest() -> String:
-	if level(&"bed") < 1:
+func rest(refuge: StringName = &"") -> String:
+	if level(&"bed", refuge) < 1:
 		return "En este colchón no se descansa. Hay que armar una cama."
 	if not _cooldown_ready(&"rest"):
 		return "No tengo sueño. Todavía no."
-	Sanity.restore(rest_amount[mini(level(&"bed"), rest_amount.size()) - 1])
+	Sanity.restore(rest_amount[mini(level(&"bed", refuge), rest_amount.size()) - 1])
 	_start_cooldown(&"rest", rest_cooldown)
 	return "Dormí un rato. Soñé con una casa con ventanas."
 
 
-func play_radio() -> String:
-	if level(&"power") < 2:
+func play_radio(refuge: StringName = &"") -> String:
+	if level(&"power", refuge) < 2:
 		return "La radio está muerta. Falta una instalación decente."
 	if not _cooldown_ready(&"radio"):
 		return "Solo estática. Mejor más tarde."

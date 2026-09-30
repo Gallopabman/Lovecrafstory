@@ -566,9 +566,24 @@ func _inspectables() -> void:
 		"El cinturón del conductor está cortado. No hay sangre. No hay nadie."], 2.2)
 	_inspect(Vector3(49.5, 1.0, 0.8), ["Barricada de la policía. Nadie la custodia.",
 		"Del lado del teatro, la niebla es más espesa. Casi tibia."], 2.0)
-	_inspect(Vector3(64.9, 1.2, 0), ["Las puertas del Imperio están encadenadas y tapiadas con tablones.",
-		"Adentro alguien toca el piano. La misma melodía, una y otra vez.",
-		"(El teatro será la próxima zona.)"], 1.3)
+	# Teatro Imperio (zona 3): la cadena tiene un candado; la llave la tenía Sosa (pensión).
+	var theater := Area3D.new()
+	theater.set_script(load("res://scripts/world/zone_door.gd"))
+	theater.set("target_scene", "res://scenes/levels/theater.tscn")
+	theater.set("target_spawn", &"from_street")
+	theater.set("required_item", load("res://assets/items/key_theater.tres"))
+	theater.set("unlock_flag", &"theater_unlocked")
+	theater.set("locked_text", "Las puertas del Imperio están encadenadas con un candado. Adentro alguien toca el piano, la misma melodía, una y otra vez.")
+	theater.set("unlock_text", "La llave de Sosa entra en el candado. La cadena cae al piso como si pesara una tonelada.")
+	theater.set("radius", 1.3)
+	theater.position = Vector3(64.9, 1.2, 0)
+	_add(groups.Inspectables, theater, "TheaterDoor")
+	var from_theater := Marker3D.new()
+	from_theater.set_script(load("res://scripts/world/spawn_point.gd"))
+	from_theater.set("spawn_id", &"from_theater")
+	from_theater.position = Vector3(62.8, 0.05, 0.0)
+	from_theater.rotation_degrees.y = 90.0
+	_add(scene_root, from_theater, "SpawnFromTheater")
 	_inspect(Vector3(12.0, 1.0, 2.2), ["Las llaves siguen puestas. El motor no hace ni un ruido.",
 		"En el asiento de atrás, una sillita de bebé vacía."], 2.0)
 	_inspect(Vector3(35.5, 1.2, -6.8), ["Un callejón. Huele a basura mojada y a algo dulce que no debería estar ahí."], 1.5)
@@ -585,6 +600,7 @@ func _items() -> void:
 		["Chocolate1", "food_chocolate_bar", Vector3(58.0, 0.05, 1.3), 1],
 		["Peaches1", "food_canned_peaches", Vector3(43.5, 0.05, -26.5), 1],
 		["Ammo1", "ammo_9mm", Vector3(51.4, 0.05, 3.2), 8],
+		["Shells1", "ammo_shells", Vector3(49.2, 0.05, 5.2), 4],
 		["Ammo2", "ammo_9mm", Vector3(31.2, 0.22, -29.6), 6],
 		["Wood1", "material_wood", Vector3(44.3, 0.0, -24.8), 3],
 		["Wood2", "material_wood", Vector3(36.8, 0.0, -14.8), 2],

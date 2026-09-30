@@ -1149,6 +1149,12 @@ func _systems() -> void:
 	spawn.position = Vector3(34.6, 0.05, 9.5)
 	spawn.rotation_degrees.y = 90.0
 	_add(scene_root, spawn, "SpawnFromStreet")
+	# Donde llega cada sobreviviente nuevo mientras este sea el refugio activo.
+	var refuge_spawn := Marker3D.new()
+	refuge_spawn.set_script(load("res://scripts/world/spawn_point.gd"))
+	refuge_spawn.set("spawn_id", &"refuge")
+	refuge_spawn.position = Vector3(30.0, 0.05, 3.6)
+	_add(scene_root, refuge_spawn, "SpawnRefuge")
 	# El sobreviviente arranca en el refugio, mirando al televisor.
 	_instance("res://scenes/player/player.tscn", scene_root, "Player", Vector3(30.0, 0.05, 3.6))
 	_instance("res://scenes/effects/ps1_post_process.tscn", scene_root, "PS1PostProcess", Vector3.ZERO)

@@ -70,6 +70,11 @@ en vez de inventarlo.
     → x0.1 completo), `has_electricity()` (generador), estaciones `cook()` / `rest()` / `play_radio()`,
     `discover(place)` y el bono de llegar a casa (lugares nuevos + objetos + cartas de la salida, tope
     30). Los materiales se descargan solos de la mochila al entrar. Persiste entre sobrevivientes.
+    **Varios refugios** (`REFUGES`: `hospital`, `theater`), uno solo `active`: cada uno tiene sus mejoras
+    (`refuge_levels`; casi todas las funciones aceptan `refuge`, vacío = el activo). `move_to()` = mudarse
+    (se decide desde el plano de un refugio que no es el activo; los materiales viajan). `RefugeZone`,
+    `ShelterSlot` y `ShelterStation` tienen `refuge_id`; la zona solo cuenta como refugio si es el activo.
+    Los sobrevivientes nuevos llegan a `refuge_scene()` en el SpawnPoint `refuge`.
   - `GameState` ([scripts/autoload/game_state.gd](scripts/autoload/game_state.gd)): persiste entre
     sobrevivientes (pickups recogidos por ruta de nodo, objetos tirados, cuerpos y `lost_ones`, los tres
     **por escena**; enemigos muertos, `flags` del mundo, número de sobreviviente) y `post_message()`.
@@ -106,12 +111,18 @@ en vez de inventarlo.
   arma que tenía en la mano. Estilo según `playstyle` (`dominant_style`): **tirador** (dispara de lejos si
   tenía arma de fuego), **bruto** (pega fuerte y seguido), **corredor** (persigue a 4.2 m/s), **sigiloso**
   (sin ruido, solo se ve de cerca), **errante** (nada especial). Al morir suelta todo lo que llevaba.
+- **Jefes** ([scripts/enemies/boss.gd](scripts/enemies/boss.gd), `Boss extends Stalker`): duermen invisibles hasta
+  `awaken()` (un `BossTrigger` o recibir daño), no se tambalean hasta acumular `stagger_threshold`, gritan
+  a distancia media (baja cordura), se enfurecen a la mitad de la vida, música `boss_music`. Al morir marcan
+  `death_flag`. `FlagGate`: bloqueo que desaparece cuando se marca un flag (`GameState.flag_set`).
 - **Combate** ([scripts/player/player_combat.gd](scripts/player/player_combat.gd), nodo `Combat` hijo
   del jugador; su `setup()` lo llama Player): apuntar/disparar/recargar, cuerpo a cuerpo, arma en la
   mano vía BoneAttachment3D en `hand_r`. Las escenas `scenes/weapons/*_held.tscn` están en metros en
   el espacio del hueso (si el esqueleto viene escalado se compensa al equipar).
   Armas = `ItemData` kind WEAPON (grupo "Arma": `is_ranged`, `damage`, `magazine_size`, `ammo_item`,
-  `noise_radius`, `held_scene`); munición = kind AMMO con `max_stack`.
+  `noise_radius`, `held_scene`, `pellets` + `pellet_spread` para la escopeta, `shot_sound`, `reload_sound`);
+  munición = kind AMMO con `max_stack`. Escopeta: 7 perdigones de 11, 2 cartuchos, 14 m; los perdigones
+  que pegan en el mismo enemigo se suman en un solo golpe. Kind KEY = llaves (`key_theater`).
 - **Capas de colisión**: 1 escenario + jugador, 2 enemigos, 3 interactuables.
 - **Interacción**: el jugador busca Areas del grupo `interactable` (capa 3) y llama `interact(player)`.
 - **UI** ([scenes/ui/game_ui.tscn](scenes/ui/game_ui.tscn), CanvasLayer 50): menú de inventario (pausa
@@ -210,6 +221,24 @@ modificar la escena a mano o actualizar el script y avisar.
   Doña Rosa, pasando la barricada (pieza del agente Sosa: su cuaderno, y un acechador). Las otras puertas
   son `Inspectable` "cerrada". Spawn en la calle: `house_<id>`; adentro: `inside`.
 
+## Zona 3: Teatro Imperio
+
+[scenes/levels/theater.tscn](scenes/levels/theater.tscn), generada por [tools/build_theater.gd](tools/build_theater.gd)
+(extiende build_hospital.gd). Se entra desde la avenida con la **llave del candado** (en la pieza de Sosa,
+pensión); flag `theater_unlocked`.
+- Vestíbulo (alfombra roja, araña, boletería, guardarropa, escalera al pullman derrumbada, la gorra de Sosa
+  y **la escopeta**), sala con 12 filas de butacas y pasillos, escenario a 1.1 m con rampas, telón, candilejas
+  y piano; bambalinas (camarín 2, depósito de utilería con un acechador) y el **camarín principal**.
+- **La cantante** (`Enemies/Singer`, [scenes/enemies/boss.tscn](scenes/enemies/boss.tscn)): 700 de vida, despierta
+  al acercarse al escenario. Al morir: `theater_boss_dead` → se destraba el camarín principal (`FlagGate`).
+- **Segundo refugio** (`theater`): el camarín principal, con sus 5 espacios (brasero/estufa, luces del espejo
+  con el grupo electrógeno, cama, ventana, fotos y flores) y su plano. Arranca como "no es mi refugio": el
+  plano ofrece mudarse. Última carta de Marta en el tocador.
+- Secretos: "FILA 7 / BUTACA 13" (Inquieto) y una sala de ensayo detrás del vestíbulo (Quebrado) con el
+  programa de 1979; en Quebrado, figuras paradas en los pasillos y "ELLA CANTA PARA VOS" en el telón.
+- Lore: la soprano Elena M. de Sosa (la mamá del agente) cantó "La Paloma" en 1979 y no volvió; el maestro
+  Kaufmann (el relojero) la acompañaba. La cantante "se viste con lo que recordamos".
+
 ## Estructura
 
 ```
@@ -249,7 +278,9 @@ Godot **4.7.2** (no está en el PATH):
 - **Test del guardado**: `<godot> --path . -s res://tests/save_test.gd` (pausa, opciones, guardar,
   cargar y comparar todo, guardado automático al cambiar de zona, volver al menú).
 - Regenerar el hospital / la calle / las casas: `<godot> --headless --path . -s res://tools/build_hospital.gd`
-  (o `build_street.gd`, `build_houses.gd`).
+  (o `build_street.gd`, `build_houses.gd`, `build_theater.gd`).
+- **Test del teatro**: `<godot> --path . -s res://tests/theater_test.gd` (llave, escopeta, jefe, camarín,
+  mudarse, el sobreviviente nuevo llega al teatro).
 - Una `class_name` nueva no existe para los tests hasta correr `--import` (refresca la caché de clases).
 - Muebles de Poly Haven: `powershell -File tools/fetch_polyhaven.ps1 -Ids <id>,...` y revisar escala y
   frente con `<godot> --path . -s res://tools/preview_props.gd -- res://assets/models/props/polyhaven/ salida.png 4 id1,id2`.
@@ -312,4 +343,4 @@ Pendiente / preguntas abiertas:
 - El usuario escuchó los sonidos: todos bien salvo "uno de disparos" (no sabía cuál). Se sacó el
   22 Magnum recortado (`gunshot_2`); queda `gunshot.wav` (Michel Baradari). Si era el otro, cambiarlo.
 - ¿Guardar en cualquier lado o solo en el refugio? Hoy: en cualquier lado desde la pausa (a confirmar).
-- Teatro Imperio (zona 3), alucinaciones inofensivas "de verdad", cámaras fijas en interiores.
+- Alucinaciones inofensivas "de verdad", cámaras fijas en interiores. ¿Qué hay después del teatro?

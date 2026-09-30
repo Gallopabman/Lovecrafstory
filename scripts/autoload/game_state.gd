@@ -6,6 +6,8 @@ extends Node
 
 ## Mensaje breve para mostrar en pantalla (lo muestra GameUI).
 signal message_posted(text: String)
+## Se marcó un hecho del mundo (puertas que se abren, jefes muertos...).
+signal flag_set(flag: StringName)
 
 var survivor_number := 1
 ## Pickups colocados en los niveles que ya se recogieron (clave: ruta del nodo).
@@ -27,8 +29,8 @@ var playstyle: Dictionary = {}
 ## Hechos del mundo que persisten (puertas forzadas, etc.).
 var flags: Dictionary = {}
 
-## Escena del refugio: ahí llega cada sobreviviente nuevo.
-var refuge_scene := "res://scenes/levels/hospital.tscn"
+## Si no está vacía, reemplaza la escena del refugio activo (los tests usan la sala de prueba).
+var refuge_scene := ""
 ## SpawnPoint donde aparecer al cargar la próxima escena (vacío = donde esté el jugador).
 var next_spawn: StringName = &""
 ## Al cargar una partida: { "position": Vector3, "yaw": float } del jugador.
@@ -151,6 +153,7 @@ func has_flag(flag: StringName) -> bool:
 
 func set_flag(flag: StringName, value := true) -> void:
 	flags[flag] = value
+	flag_set.emit(flag)
 
 
 ## Pasa a otra zona. El jugador aparece en el SpawnPoint `spawn`.
@@ -159,12 +162,12 @@ func travel(scene_path: String, spawn: StringName) -> void:
 	change_scene(scene_path)
 
 
-## Nuevo sobreviviente: llega al refugio.
+## Nuevo sobreviviente: llega al refugio activo (Shelter).
 func new_survivor() -> void:
 	survivor_number += 1
 	playstyle.clear()
-	next_spawn = &""
-	change_scene(refuge_scene)
+	next_spawn = &"" if refuge_scene != "" else Shelter.refuge_spawn()
+	change_scene(refuge_scene if refuge_scene != "" else Shelter.refuge_scene())
 
 
 ## Partida nueva desde el menú de inicio.

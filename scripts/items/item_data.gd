@@ -4,7 +4,8 @@ extends Resource
 ## Crear nuevos objetos como .tres en assets/items/.
 
 ## MATERIAL: para las mejoras del refugio (se descarga solo al llegar a casa).
-enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL }
+## KEY: abre algo del mundo (ZoneDoor.required_item); no se "usa" desde la mochila.
+enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL, KEY }
 
 @export var id: StringName
 @export var display_name := ""
@@ -41,6 +42,12 @@ enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL }
 @export var ammo_item: ItemData
 ## Radio en metros en el que los enemigos oyen el ataque (disparos).
 @export var noise_radius := 0.0
+## Perdigones por disparo (escopeta) y su abanico en grados. `damage` es por perdigón.
+@export var pellets := 1
+@export var pellet_spread := 0.0
+## Sonidos del disparo y de la recarga (Audio, por nombre).
+@export var shot_sound: StringName = &"gunshot"
+@export var reload_sound: StringName = &"reload"
 ## Modelo que se sostiene en la mano (y se muestra en el piso como pickup).
 @export var held_scene: PackedScene
 

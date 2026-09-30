@@ -7,6 +7,8 @@ enum Kind { BLUEPRINT, COOK, REST, RADIO }
 
 @export var kind := Kind.BLUEPRINT
 @export var radius := 0.9
+## A qué refugio pertenece (Shelter.REFUGES).
+@export var refuge_id: StringName = &"hospital"
 ## Cuánto suena la radio al prenderla.
 @export var radio_seconds := 45.0
 
@@ -30,14 +32,14 @@ func interact(_player: Player) -> void:
 		Kind.BLUEPRINT:
 			var menu := get_tree().get_first_node_in_group(&"shelter_menu")
 			if menu:
-				menu.open()
+				menu.open(refuge_id)
 		Kind.COOK:
-			GameState.post_message(Shelter.cook())
+			GameState.post_message(Shelter.cook(refuge_id))
 		Kind.REST:
-			GameState.post_message(Shelter.rest())
+			GameState.post_message(Shelter.rest(refuge_id))
 		Kind.RADIO:
-			var worked := Shelter.level(&"power") >= 2 and Shelter.radio_ready()
-			GameState.post_message(Shelter.play_radio())
+			var worked := Shelter.level(&"power", refuge_id) >= 2 and Shelter.radio_ready()
+			GameState.post_message(Shelter.play_radio(refuge_id))
 			_play_radio(worked)
 
 
