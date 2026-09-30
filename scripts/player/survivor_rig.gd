@@ -1,48 +1,45 @@
 class_name SurvivorRig
-## Animaciones del superviviente: el modelo (Quaternius, esqueleto UE-mannequin) no
-## trae animaciones; se cargan de la Universal Animation Library (CC0), que usa el
-## mismo esqueleto. Lo usan el jugador y los cuerpos que quedan en el refugio.
+## Animaciones del superviviente (Adventurer de Quaternius, rig "CharacterArmature").
+## El modelo trae casi todo; lo que falta se completa en runtime:
+## - salto: Jump / Jump_Idle / Jump_Land del alien de Quaternius (mismo rig, solo rotaciones)
+## - agacharse: pose del primer cuadro del "Duck" del alien, y la caminata agachada
+##   mezclando Walk con esa pose.
+## Lo usan el jugador y los cuerpos que quedan en el refugio.
 
-const UAL1 := preload("res://assets/animations/ual/UAL1_Standard.glb")
+const EXTRA_SOURCE := preload("res://assets/models/enemies/tentacled/tentacled.glb")
 
-const IDLE := &"Idle"
-const WALK := &"Walk"
-const RUN := &"Jog_Fwd"
-const CROUCH_IDLE := &"Crouch_Idle"
-const CROUCH_WALK := &"Crouch_Fwd"
-## El impulso (Jump_Start) dura 1.3 s: el salto arranca directo en la pose en el aire.
-const JUMP := &"Jump"
-const AIRBORNE := &"Jump"
-const LAND := &"Jump_Land"
-const HIT := &"Hit_Chest"
-## "Interact" dura 2 s; agarrar algo de una mesa es más ágil (0.8 s).
-const INTERACT := &"PickUp_Table"
-const DEATH := &"Death01"
-const AIM := &"Pistol_Aim_Neutral"
-const SHOOT := &"Pistol_Shoot"
-const RELOAD := &"Pistol_Reload"
-const MELEE := &"Sword_Attack"
-const PUNCH := &"Punch_Jab"
+const IDLE := &"CharacterArmature|Idle"
+const WALK := &"CharacterArmature|Walk"
+const RUN := &"CharacterArmature|Run"
+const CROUCH_IDLE := &"CrouchIdle"
+const CROUCH_WALK := &"CrouchWalk"
+const JUMP := &"CharacterArmature|Jump"
+const AIRBORNE := &"CharacterArmature|Jump_Idle"
+const LAND := &"CharacterArmature|Jump_Land"
+const HIT := &"CharacterArmature|HitRecieve"
+const INTERACT := &"CharacterArmature|Interact"
+const DEATH := &"CharacterArmature|Death"
+const AIM := &"CharacterArmature|Idle_Gun_Pointing"
+const SHOOT := &"CharacterArmature|Gun_Shoot"
+const RELOAD := &"CharacterArmature|Interact"
+const MELEE := &"CharacterArmature|Sword_Slash"
+const PUNCH := &"CharacterArmature|Punch_Right"
+## Hueso de la mano derecha (las escenas scenes/weapons/*_held.tscn están en su espacio).
+const HAND_BONE := "Wrist.R"
 
-const CLIPS: Array[StringName] = [IDLE, WALK, RUN, CROUCH_IDLE, CROUCH_WALK, JUMP, AIRBORNE, LAND,
-	HIT, INTERACT, DEATH, AIM, SHOOT, RELOAD, MELEE, PUNCH]
-const LOOPING: Array[StringName] = [IDLE, WALK, RUN, CROUCH_IDLE, CROUCH_WALK, AIRBORNE, AIM]
-## La raíz y la pelvis también se mueven (agacharse baja el cuerpo, caminar tiene rebote).
-const POSITION_BONES: Array[StringName] = [&"root", &"pelvis"]
+const DUCK := &"CharacterArmature|Duck"
+const LOOPING: Array[StringName] = [IDLE, WALK, RUN, AIRBORNE, CROUCH_WALK, CROUCH_IDLE]
+## Cuánto de la pose agachada se mezcla en la caminata agachada.
+const CROUCH_WALK_BLEND := 0.7
 
 
-## Devuelve el AnimationPlayer del modelo (lo crea si hace falta) con todas las animaciones.
+## Devuelve el AnimationPlayer del modelo con todas las animaciones listas.
 static func setup(model: Node3D) -> AnimationPlayer:
 	var player := model.find_child("AnimationPlayer") as AnimationPlayer
-	if player == null:
-		player = AnimationPlayer.new()
-		player.name = "AnimationPlayer"
-		model.add_child(player)
-		player.root_node = NodePath("..")
-	if not player.has_animation_library(&""):
-		player.add_animation_library(&"", AnimationLibrary.new())
 	var skeleton := model.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
-	AnimationRetarget.import_animations(UAL1, CLIPS, player, skeleton, POSITION_BONES)
+	AnimationRetarget.import_animations(EXTRA_SOURCE, [JUMP, AIRBORNE, LAND, DUCK], player, skeleton)
+	AnimationRetarget.make_pose(player, DUCK, 0.0, CROUCH_IDLE)
+	AnimationRetarget.make_blend(player, WALK, DUCK, 0.0, CROUCH_WALK_BLEND, CROUCH_WALK)
 	for clip in LOOPING:
 		player.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
 	return player

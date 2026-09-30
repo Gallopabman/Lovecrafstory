@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://do3me2hkuiosm"
-path="res://.godot/imported/UAL1_Standard.glb-052050ec3e18c11e2ad2213e29c4bd09.scn"
+uid="uid://dlbtq7yc5ttey"
+path="res://.godot/imported/tentacled.glb-4eda0ecec9ca291f869cdb10614c0419.scn"
 
 [deps]
 
-source_file="res://assets/animations/ual/UAL1_Standard.glb"
-dest_files=["res://.godot/imported/UAL1_Standard.glb-052050ec3e18c11e2ad2213e29c4bd09.scn"]
+source_file="res://assets/models/enemies/tentacled/tentacled.glb"
+dest_files=["res://.godot/imported/tentacled.glb-4eda0ecec9ca291f869cdb10614c0419.scn"]
 
 [params]
 

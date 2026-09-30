@@ -101,16 +101,13 @@ en vez de inventarlo.
   En el menú: usar (E, Enter / A), `inventory_move` (R / X), `inventory_rotate` (Q / RB),
   `inventory_drop` (X / Y). En el menú "usar" solo acepta la E del teclado, no `interact` del gamepad.
 - **Personajes**:
-  - Superviviente: [assets/models/characters/survivor_v2/survivor.glb](assets/models/characters/survivor_v2/survivor.glb),
-    cabeza de Universal Base Characters + ropa "Peasant" de Modular Outfits (Quaternius, CC0), armado con
-    [tools/blender/build_survivor.py](tools/blender/build_survivor.py) (Blender 4.2 portable en `%TEMP%\bl42`
-    si sigue ahí; si no, bajar Blender). Esqueleto UE-mannequin (65 huesos, `pelvis`, `hand_r`...), sin
-    animaciones propias: `SurvivorRig.setup(model)` ([scripts/player/survivor_rig.gd](scripts/player/survivor_rig.gd))
-    crea el AnimationPlayer y copia los clips de la **Universal Animation Library** (`assets/animations/ual/`,
-    CC0, mismo esqueleto) con `AnimationRetarget.import_animations` (rotaciones + posición de root/pelvis).
-    Los nombres de clips están en `SurvivorRig` (Idle, Walk, Jog_Fwd, Crouch_Idle, Crouch_Fwd, Jump, Jump_Land,
-    Pistol_Aim_Neutral, Pistol_Shoot, Pistol_Reload, Sword_Attack x1.5, Punch_Jab, Hit_Chest, PickUp_Table, Death01).
-    El importador de Godot quita el sufijo `_Loop` de los clips y los deja en loop.
+  - Superviviente: el Adventurer de Quaternius ([assets/models/characters/survivor/survivor.glb](assets/models/characters/survivor/survivor.glb)).
+    Se probó un modelo realista (cabeza UBC + ropa "Peasant" + Universal Animation Library) y **el usuario lo
+    rechazó por medieval**; tampoco sirvió el "survival character" de Daren (malla y rig desalineados).
+    `SurvivorRig.setup(model)` ([scripts/player/survivor_rig.gd](scripts/player/survivor_rig.gd)) completa las
+    animaciones: salto y "Duck" copiados del rig del alien (mismo rig Quaternius), `CrouchIdle` y `CrouchWalk`
+    generados. Todos los nombres de clips y el hueso de la mano (`Wrist.R`) están en `SurvivorRig`.
+    `tools/blender/build_survivor.py` queda como referencia de cómo armar un personaje con Blender headless.
   - Enemigo: Thin Zombie (Rosswet Mobile, **CC-BY**) a escala 0.27 (el glb mide 8.4 m), textura aparte
     (`Stalker.albedo_texture`); los nombres de sus animaciones son exports del `Stalker`.
 - **Agacharse / sigilo**: `Player.set_crouching()` (cápsula 1.2 m, 1.2 m/s, cámara baja; no se para

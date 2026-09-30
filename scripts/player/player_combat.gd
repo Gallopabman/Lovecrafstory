@@ -11,8 +11,7 @@ const ANIM_SHOOT := SurvivorRig.SHOOT
 const ANIM_SLASH := SurvivorRig.MELEE
 const ANIM_PUNCH := SurvivorRig.PUNCH
 const ANIM_RELOAD := SurvivorRig.RELOAD
-## Hueso de la mano derecha del esqueleto UE-mannequin.
-const HAND_BONE := "hand_r"
+const HAND_BONE := SurvivorRig.HAND_BONE
 
 @export_group("Apuntar")
 @export var auto_aim_range := 20.0
@@ -27,8 +26,8 @@ const HAND_BONE := "hand_r"
 ## Momento del golpe dentro de la animación.
 @export var melee_hit_time := 0.4
 @export_range(0.0, 180.0) var melee_half_angle := 70.0
-## El golpe con arma de la animation library dura 1.5 s: se reproduce más rápido.
-@export var melee_anim_speed := 1.5
+## Velocidad de la animación del golpe con arma (1 = la original, ~1 s).
+@export var melee_anim_speed := 1.2
 @export var unarmed_damage := 6.0
 @export var unarmed_range := 1.3
 @export var unarmed_cooldown := 0.85
