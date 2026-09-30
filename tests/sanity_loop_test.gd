@@ -112,6 +112,8 @@ func _initialize() -> void:
 	# Aislar de los dispositivos reales (ver hospital_tour_test).
 	for action in InputMap.get_actions():
 		InputMap.action_erase_events(action)
+	# Los tests guardan en otro archivo para no pisar la partida del jugador.
+	root.get_node("SaveGame").path = "user://test_save.dat"
 	sanity = root.get_node("Sanity")
 	inventory = root.get_node("Inventory")
 	game_state = root.get_node("GameState")

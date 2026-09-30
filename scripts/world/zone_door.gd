@@ -40,4 +40,5 @@ func interact(_player: Player) -> void:
 		GameState.set_flag(unlock_flag)
 		if unlock_text:
 			GameState.post_message(unlock_text)
+	Audio.play_ui(&"door_open")
 	GameState.travel(target_scene, target_spawn)

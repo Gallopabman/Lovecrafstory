@@ -47,6 +47,8 @@ func _initialize() -> void:
 	# usa Input.action_press / InputEventAction, que no dependen de los bindings.
 	for action in InputMap.get_actions():
 		InputMap.action_erase_events(action)
+	# Los tests guardan en otro archivo para no pisar la partida del jugador.
+	root.get_node("SaveGame").path = "user://test_save.dat"
 	var sanity := root.get_node("Sanity")
 	change_scene_to_file("res://scenes/levels/hospital.tscn")
 	await frames(90)

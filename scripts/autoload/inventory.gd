@@ -133,6 +133,35 @@ func clear() -> void:
 	changed.emit()
 
 
+func save_data() -> Dictionary:
+	var saved_entries := []
+	for entry in entries:
+		var copy := entry.duplicate()
+		copy.item = (entry.item as ItemData).resource_path
+		saved_entries.append(copy)
+	return {
+		"entries": saved_entries,
+		"letters": letters.map(func(item: ItemData) -> String: return item.resource_path),
+		"equipped": _index_of(equipped) if not equipped.is_empty() else -1,
+		"use_counts": _use_counts.duplicate(),
+	}
+
+
+func load_data(data: Dictionary) -> void:
+	entries.clear()
+	for saved: Dictionary in data.get("entries", []):
+		var entry := saved.duplicate()
+		entry.item = load(saved.item)
+		entries.append(entry)
+	letters.clear()
+	for path: String in data.get("letters", []):
+		letters.append(load(path))
+	_use_counts.clear()
+	_use_counts = data.get("use_counts", {}).duplicate()
+	var index: int = data.get("equipped", -1)
+	equip(entries[index] if index >= 0 and index < entries.size() else {})
+
+
 func is_equipped(entry: Dictionary) -> bool:
 	return not equipped.is_empty() and is_same(entry, equipped)
 

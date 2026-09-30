@@ -85,14 +85,40 @@ var _cooldowns: Dictionary = {}
 
 
 func _ready() -> void:
-	for slot in SLOT_ORDER:
-		levels[slot] = 0
-	for id in MATERIALS:
-		stock[id] = 0
+	new_game()
 	Sanity.refuge_entered.connect(_on_refuge_entered)
 	Sanity.refuge_exited.connect(_on_refuge_exited)
 	Sanity.lost.connect(func() -> void: _trip_active = false)
 	Inventory.item_added.connect(_on_item_added)
+
+
+func new_game() -> void:
+	for slot in SLOT_ORDER:
+		levels[slot] = 0
+	for id in MATERIALS:
+		stock[id] = 0
+	discovered.clear()
+	_trip_active = false
+	_cooldowns.clear()
+	changed.emit()
+
+
+func save_data() -> Dictionary:
+	return {"levels": levels.duplicate(), "stock": stock.duplicate(), "discovered": discovered.duplicate(),
+		"trip": [_trip_active, _trip_places, _trip_items, _trip_letters]}
+
+
+func load_data(data: Dictionary) -> void:
+	new_game()
+	levels.merge(data.get("levels", {}), true)
+	stock.merge(data.get("stock", {}), true)
+	discovered = data.get("discovered", {})
+	var trip: Array = data.get("trip", [false, 0, 0, 0])
+	_trip_active = trip[0]
+	_trip_places = trip[1]
+	_trip_items = trip[2]
+	_trip_letters = trip[3]
+	changed.emit()
 
 
 # --- Blueprint ---------------------------------------------------------------

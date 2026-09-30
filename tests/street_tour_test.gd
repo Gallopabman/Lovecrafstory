@@ -66,6 +66,8 @@ func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(OUT)
 	for action in InputMap.get_actions():
 		InputMap.action_erase_events(action)
+	# Los tests guardan en otro archivo para no pisar la partida del jugador.
+	root.get_node("SaveGame").path = "user://test_save.dat"
 	sanity = root.get_node("Sanity")
 	inventory = root.get_node("Inventory")
 	game_state = root.get_node("GameState")
@@ -136,6 +138,28 @@ func _initialize() -> void:
 	await create_timer(2.0).timeout
 	await shot("10_nicho")
 	sanity._set_current(sanity.maximum)
+
+	print("-- Casas")
+	var houses := {
+		"ibarra": ["HouseIbarra", [["20_ibarra_living", Vector3(0.0, 0.05, -1.2), 20.0], ["21_ibarra_cocina", Vector3(-0.5, 0.05, -1.5), -60.0]]],
+		"almacen": ["HouseAlmacen", [["22_almacen", Vector3(-0.5, 0.05, -1.0), -20.0], ["23_almacen_estantes", Vector3(0.0, 0.05, -3.0), -80.0]]],
+		"relojeria": ["HouseRelojeria", [["24_relojeria", Vector3(0.0, 0.05, -1.0), 10.0]]],
+		"pension": ["HousePension", [["25_pension_pasillo", Vector3(-2.4, 0.05, -1.0), 0.0], ["26_pension_pieza", Vector3(1.2, 0.05, -1.4), 30.0]]],
+	}
+	for id: String in houses:
+		var door: Node3D = current_scene.get_node("Inspectables/Door_" + id)
+		place(door.global_position * Vector3(1, 0, 1) + Vector3(0, 0.05, 0), 0.0)
+		door.interact(player())
+		await settle()
+		check(current_scene.name == houses[id][0], "se entra a %s" % id)
+		for s: Array in houses[id][1]:
+			place(s[1], s[2])
+			await shot(s[0])
+		current_scene.get_node("Inspectables/StreetDoor").interact(player())
+		await settle()
+		var spawn: Node3D = current_scene.get_node("SpawnHouse_" + id)
+		check(current_scene.name == "Street" and player().global_position.distance_to(spawn.global_position) < 0.5,
+			"se sale de %s a la vereda" % id)
 
 	print("-- Vuelta al hospital")
 	place(Vector3(1.4, 0.05, 0), 90.0)

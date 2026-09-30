@@ -75,12 +75,18 @@ en vez de inventarlo.
     **por escena**; enemigos muertos, `flags` del mundo, número de sobreviviente) y `post_message()`.
     `playstyle` junta estadísticas del sobreviviente actual (`track(&"shots")`, `melee`, `run_time`,
     `crouch_time`) para el Perdido. Viajes: `travel(escena, spawn)` + `next_spawn`; `new_survivor()`
-    carga `refuge_scene` (el hospital; los tests la cambian); `new_game()` reinicia todo. No guarda a disco.
+    carga `refuge_scene` (el hospital; los tests la cambian); `new_game()` reinicia todo. `change_scene()`
+    hace un fundido a negro (lo usan todos los cambios de escena del juego); `pending_player` = posición al cargar.
   - `Audio` ([scripts/autoload/audio.gd](scripts/autoload/audio.gd)): busca sonidos **por nombre** en
     `assets/audio/{sfx,ambience,music}/` (`step` = `step.ogg` o variantes `step_1`, `step_2`... al azar;
     si no existe, no suena y no falla). `play_sfx(nombre, posición 3D opcional)`, `play_ui`,
     `set_ambience`, `play_music`, latido automático desde Quebrado, susto al ver un horror nuevo.
     Buses Master / Music / SFX / Ambience (se crean en runtime). Volumen general en `user://settings.cfg`.
+  - `SaveGame` ([scripts/autoload/save_game.gd](scripts/autoload/save_game.gd)): **guardado a disco**, un solo
+    espacio en `user://save.dat` (texto de `var_to_str`; objetos por ruta de recurso). Junta `save_data()` /
+    `load_data()` de GameState, Inventory, Sanity y Shelter + escena + posición del jugador. Manual desde la
+    pausa; automático al llegar a otra zona (`Player._place_at_spawn`) y al entrar al refugio. `new_game()`
+    reinicia todo. **Los tests usan `path = "user://test_save.dat"`** para no pisar la partida del usuario.
 - **Objetos**: `ItemData` ([scripts/items/item_data.gd](scripts/items/item_data.gd)), un `.tres` por
   objeto en `assets/items/` (`grid_size`, `short_name` de 3 letras para la cuadrícula).
   En el mundo: [scenes/world/pickup.tscn](scenes/world/pickup.tscn).
@@ -117,8 +123,12 @@ en vez de inventarlo.
   Tema global [assets/ui/ps1_theme.tres](assets/ui/ps1_theme.tres), Pixel Operator 8px (botones y sliders
   incluidos).
 - **Menú de inicio** ([scenes/ui/main_menu.tscn](scenes/ui/main_menu.tscn), **escena principal**): niebla
-  animada ([shaders/menu_fog.gdshader](shaders/menu_fog.gdshader)), Jugar (partida nueva → hospital),
-  Opciones (solo volumen general, pedido del usuario) y Salir. Música `menu_music`.
+  animada ([shaders/menu_fog.gdshader](shaders/menu_fog.gdshader)), Continuar (si hay partida, con un
+  resumen), Jugar (partida nueva → hospital), Opciones (solo volumen general, pedido del usuario) y Salir.
+  Música `menu_music`. Las opciones son una escena aparte ([scenes/ui/options_panel.tscn](scenes/ui/options_panel.tscn),
+  `OptionsPanel`) que también usa la pausa.
+- **Menú de pausa** (`PauseMenu` en `game_ui.tscn`, Esc / Start): Continuar, Guardar partida, Opciones,
+  Menú principal, Salir del juego. No se abre con otro menú abierto ni muerto.
 - **Zonas y puertas**: `ZoneDoor` (Area3D interactuable: `target_scene`, `target_spawn`, opcionalmente
   `required_item` + `unlock_flag` para forzarla una vez) y `SpawnPoint` (Marker3D con `spawn_id`; el
   jugador aparece mirando a su -Z). `LevelAudio` fija el ambiente, los pasos y un zumbido que crece con la
@@ -192,6 +202,13 @@ modificar la escena a mano o actualizar el script y avisar.
 - Piezas modulares con `Prop.anchor = ORIGIN` (respeta el origen del modelo). Paredes de ladrillo con
   piezas de una cara: `_brick_wall` pone otra de espaldas. Los `Label3D` no usan el shader PS1: se
   desvanecen con `visibility_range_end` para no atravesar la niebla.
+- **Casas** (pedido del usuario: "pequeñas casas" detrás de las puertas laterales): cuatro puertas de la
+  avenida son `ZoneDoor` a escenas chicas en [scenes/levels/street_houses/](scenes/levels/street_houses/),
+  generadas por [tools/build_houses.gd](tools/build_houses.gd) (que **extiende build_hospital.gd** para
+  reusar muebles y paredes). Depto. de los Ibarra (living y cocina), Almacén La Estrella (un acechador entre
+  los estantes), Relojería Kaufmann (relojes parados a las 3:15; texto que aparece en Quebrado) y Pensión
+  Doña Rosa, pasando la barricada (pieza del agente Sosa: su cuaderno, y un acechador). Las otras puertas
+  son `Inspectable` "cerrada". Spawn en la calle: `house_<id>`; adentro: `inside`.
 
 ## Estructura
 
@@ -228,9 +245,11 @@ Godot **4.7.2** (no está en el PATH):
 - **Test de la calle**: `<godot> --path . -s res://tests/street_tour_test.gd` (forzar la salida con la
   barreta, spawn, navmesh, barricada, límites, secreto, vuelta al hospital; `test_shots\street\`).
 - **Test del menú de inicio**: `<godot> --path . -s res://tests/main_menu_test.gd` (foco, volumen
-  guardado, Jugar → hospital).
-- Regenerar el hospital / la calle: `<godot> --headless --path . -s res://tools/build_hospital.gd`
-  (o `build_street.gd`).
+  guardado, Jugar → hospital, Continuar con partida guardada).
+- **Test del guardado**: `<godot> --path . -s res://tests/save_test.gd` (pausa, opciones, guardar,
+  cargar y comparar todo, guardado automático al cambiar de zona, volver al menú).
+- Regenerar el hospital / la calle / las casas: `<godot> --headless --path . -s res://tools/build_hospital.gd`
+  (o `build_street.gd`, `build_houses.gd`).
 - Una `class_name` nueva no existe para los tests hasta correr `--import` (refresca la caché de clases).
 - Muebles de Poly Haven: `powershell -File tools/fetch_polyhaven.ps1 -Ids <id>,...` y revisar escala y
   frente con `<godot> --path . -s res://tools/preview_props.gd -- res://assets/models/props/polyhaven/ salida.png 4 id1,id2`.
@@ -290,7 +309,7 @@ mudarse a otro refugio (edificios con más slots), baúl para guardar cosas, mes
 
 Pendiente / preguntas abiertas:
 - ¿Los horrores reaparecen en zonas limpias? (pregunta abierta del GDD; hoy no).
-- Nadie escuchó los sonidos todavía (se eligieron por descripción): revisar cuáles quedan bien,
-  sobre todo los del zombie (gruñido / ataque se asignaron a ojo) y que los loops no corten.
-- Teatro Imperio (zona 3), alucinaciones inofensivas "de verdad", cámaras fijas en interiores,
-  guardado a disco, volver al menú de inicio desde el juego (hoy Esc solo suelta el mouse).
+- El usuario escuchó los sonidos: todos bien salvo "uno de disparos" (no sabía cuál). Se sacó el
+  22 Magnum recortado (`gunshot_2`); queda `gunshot.wav` (Michel Baradari). Si era el otro, cambiarlo.
+- ¿Guardar en cualquier lado o solo en el refugio? Hoy: en cualquier lado desde la pausa (a confirmar).
+- Teatro Imperio (zona 3), alucinaciones inofensivas "de verdad", cámaras fijas en interiores.

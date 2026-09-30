@@ -73,6 +73,7 @@ func _initialize() -> void:
 	_secrets()
 	_discovery()
 	_inspectables()
+	_house_doors()
 	_items()
 	_enemies()
 	_systems()
@@ -463,7 +464,7 @@ func _parked_cars() -> void:
 func _street_furniture() -> void:
 	for x in [5.0, 17.0, 29.0, 41.0, 53.0]:
 		_prop(CITY + "Prop_Bollard.gltf", Vector3(x, 0, -3.3), 0, {"col": false})
-	for x in [10.0, 26.0, 44.0]:
+	for x in [10.0, 22.5, 44.0]:
 		_prop(CITY + "Prop_Planter_Single.gltf", Vector3(x, 0, 4.6), 0)
 	for p in [Vector3(9.0, 0, -3.1), Vector3(23.0, 0, 3.1), Vector3(47.0, 0, -3.1)]:
 		_prop(CITY + "Prop_Drain.gltf", p, 0, {"col": false})
@@ -521,6 +522,43 @@ func _discovery() -> void:
 		zone.set("size", Vector3(p[3] - p[1] - 0.4, 3.0, p[4] - p[2] - 0.4))
 		zone.position = Vector3((p[1] + p[3]) / 2.0, 1.5, (p[2] + p[4]) / 2.0)
 		_add(parent, zone, String(p[0]))
+
+
+## Puertas de los edificios: cuatro se pueden abrir (casas chicas, tools/build_houses.gd),
+## el resto están cerradas con llave. [x del edificio, vereda (-1 norte / 1 sur), casa o "", porche]
+func _house_doors() -> void:
+	var doors := [
+		[7.23, -1, "ibarra", true], [21.72, -1, "", false], [45.53, -1, "relojeria", false], [60.3, -1, "", true],
+		[11.32, 1, "", false], [25.87, 1, "almacen", true], [40.63, 1, "", false], [55.69, 1, "pension", false],
+	]
+	var locked := [
+		"Cerrada con llave. Del otro lado, una radio encendida sin sintonizar.",
+		"No abre. Alguien apiló muebles contra la puerta desde adentro.",
+		"Cerrada. En el vidrio esmerilado se dibuja una mano del lado de adentro.",
+		"Cerrada con llave. El picaporte está tibio.",
+	]
+	var locked_index := 0
+	for d: Array in doors:
+		var side: int = d[1]
+		var door_pos := Vector3(d[0], 1.2, side * (WALK - 0.4))
+		if d[2] == "":
+			_inspect(door_pos, [locked[locked_index % locked.size()]], 1.3)
+			locked_index += 1
+			continue
+		var door := Area3D.new()
+		door.set_script(load("res://scripts/world/zone_door.gd"))
+		door.set("target_scene", "res://scenes/levels/street_houses/%s.tscn" % d[2])
+		door.set("target_spawn", &"inside")
+		door.set("radius", 1.3)
+		door.position = door_pos
+		_add(groups.Inspectables, door, "Door_" + d[2])
+		# Al salir se aparece en la vereda mirando a la calle (las de porche, al pie de la escalera).
+		var spawn := Marker3D.new()
+		spawn.set_script(load("res://scripts/world/spawn_point.gd"))
+		spawn.set("spawn_id", StringName("house_" + d[2]))
+		spawn.position = Vector3(d[0], 0.05, side * (3.2 if d[3] else 4.6))
+		spawn.rotation_degrees.y = 180.0 if side < 0 else 0.0
+		_add(scene_root, spawn, "SpawnHouse_" + d[2])
 
 
 func _inspectables() -> void:

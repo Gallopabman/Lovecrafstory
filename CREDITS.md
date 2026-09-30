@@ -68,8 +68,7 @@ Variantes numeradas (`step_1`, `step_2`...) se eligen al azar.
 | --- | --- | --- | --- | --- |
 | `step`, `punch_hit` | Impact Sounds | Kenney | CC0 | [kenney.nl/assets/impact-sounds](https://kenney.nl/assets/impact-sounds) |
 | `pickup`, `inventory_open/close`, `menu_move/confirm/back`, `dry_fire_2`, `door_open` | Interface Sounds, RPG Audio | Kenney | CC0 | [kenney.nl/assets/interface-sounds](https://kenney.nl/assets/interface-sounds), [rpg-audio](https://kenney.nl/assets/rpg-audio) |
-| `gunshot_1`, `dry_fire_1` | Chaingun, pistol, rifle, shotgun shots / 2 metal weapon clicks | Michel Baradari (publicado por qubodup) | **CC-BY 3.0** | [opengameart.org/content/chaingun-pistol-rifle-shotgun-shots](https://opengameart.org/content/chaingun-pistol-rifle-shotgun-shots) |
-| `gunshot_2` | Gunshots (22 Magnum, recortado) | kurt | CC0 | [opengameart.org/content/gunshots](https://opengameart.org/content/gunshots) |
+| `gunshot`, `dry_fire_1` | Chaingun, pistol, rifle, shotgun shots / 2 metal weapon clicks | Michel Baradari (publicado por qubodup) | **CC-BY 3.0** | [opengameart.org/content/chaingun-pistol-rifle-shotgun-shots](https://opengameart.org/content/chaingun-pistol-rifle-shotgun-shots) |
 | `reload` | Handgun Reload Sound Effect | zer0_sol | CC0 | [opengameart.org/content/handgun-reload-sound-effect](https://opengameart.org/content/handgun-reload-sound-effect) |
 | `swing_1..4` | Swishes Sound Pack | artisticdude | CC0 | [opengameart.org/content/swishes-sound-pack](https://opengameart.org/content/swishes-sound-pack) |
 | `swing_5` | 3 Melee sounds | remaxim | CC0 | [opengameart.org/content/3-melee-sounds](https://opengameart.org/content/3-melee-sounds) |

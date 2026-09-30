@@ -153,6 +153,28 @@ func reset() -> void:
 	changed.emit(current, maximum)
 
 
+## Partida nueva: además, se olvidan los horrores vistos.
+func new_game() -> void:
+	_seen_horrors.clear()
+	reset()
+
+
+func save_data() -> Dictionary:
+	return {"current": current, "maximum": maximum, "seen": _seen_horrors.keys()}
+
+
+func load_data(data: Dictionary) -> void:
+	_refuges.clear()
+	active = true
+	maximum = data.get("maximum", base_maximum)
+	current = clampf(data.get("current", maximum), 0.0, maximum)
+	_seen_horrors.clear()
+	for horror: StringName in data.get("seen", []):
+		_seen_horrors[horror] = true
+	_update_state()
+	changed.emit(current, maximum)
+
+
 func _set_current(value: float) -> void:
 	if not active:
 		return

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_sosa_01"
+display_name = "Cuaderno del agente Sosa"
+short_name = "CUAD"
+description = "Un cuaderno de tapas duras en la mesa de luz de la pensión. Las últimas páginas están escritas apretado, sin márgenes."
+kind = 3
+max_sanity_bonus = 10.0
+letter_text = "Hoy volvió mamá.\n\nNo me asusté. Eso es lo que más me asusta: que no me asusté. Estaba en la vereda de la pensión, con el tapado verde que le compré en el '78, y me dijo que la función empezaba a las tres y cuarto, que no llegara tarde como siempre.\n\nRíos dice que no es ella. Ríos no la conoció.\n\nEl relojero de la esquina me paró todos los relojes a esa hora. \"Así no te perdés la función, pibe\", me dijo, y se rió con una boca que no era la suya.\n\nSi alguien lee esto: la marquesina del Imperio no se apaga porque adentro alguien la necesita prendida. Para que la encontremos.\n\nYa es casi la hora.\n\n- R. Sosa"
+world_color = Color(0.55, 0.45, 0.35, 1)

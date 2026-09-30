@@ -1,7 +1,8 @@
 extends Node
 ## Autoload "GameState": lo que persiste entre sobrevivientes de una misma partida.
 ## El mundo sigue tal cual quedó (GDD): objetos recogidos, objetos tirados y
-## cuerpos. Todavía no se guarda a disco.
+## cuerpos. Se guarda a disco con SaveGame (`save_data` / `load_data`).
+## También hace los fundidos a negro entre escenas (`change_scene`).
 
 ## Mensaje breve para mostrar en pantalla (lo muestra GameUI).
 signal message_posted(text: String)
@@ -30,11 +31,44 @@ var flags: Dictionary = {}
 var refuge_scene := "res://scenes/levels/hospital.tscn"
 ## SpawnPoint donde aparecer al cargar la próxima escena (vacío = donde esté el jugador).
 var next_spawn: StringName = &""
+## Al cargar una partida: { "position": Vector3, "yaw": float } del jugador.
+var pending_player: Dictionary = {}
+
+## Duración de cada mitad del fundido entre escenas.
+@export var fade_time := 0.35
+
+var _fade: ColorRect
 
 ## Enemigos muertos (clave: ruta del nodo). No reaparecen.
 var killed_enemies: Dictionary = {}
 
 var _next_id := 1
+
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	# Debajo del post-proceso (100) para que el negro también tenga el dithering.
+	var layer := CanvasLayer.new()
+	layer.layer = 90
+	add_child(layer)
+	_fade = ColorRect.new()
+	_fade.color = Color.BLACK
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fade.modulate.a = 0.0
+	layer.add_child(_fade)
+
+
+## Cambia de escena con un fundido a negro.
+func change_scene(scene_path: String) -> void:
+	var tween := create_tween()
+	tween.tween_property(_fade, "modulate:a", 1.0, fade_time)
+	await tween.finished
+	get_tree().paused = false
+	get_tree().change_scene_to_file(scene_path)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	create_tween().tween_property(_fade, "modulate:a", 0.0, fade_time)
 
 
 func post_message(text: String) -> void:
@@ -122,7 +156,7 @@ func set_flag(flag: StringName, value := true) -> void:
 ## Pasa a otra zona. El jugador aparece en el SpawnPoint `spawn`.
 func travel(scene_path: String, spawn: StringName) -> void:
 	next_spawn = spawn
-	get_tree().change_scene_to_file.call_deferred(scene_path)
+	change_scene(scene_path)
 
 
 ## Nuevo sobreviviente: llega al refugio.
@@ -130,7 +164,7 @@ func new_survivor() -> void:
 	survivor_number += 1
 	playstyle.clear()
 	next_spawn = &""
-	get_tree().change_scene_to_file.call_deferred(refuge_scene)
+	change_scene(refuge_scene)
 
 
 ## Partida nueva desde el menú de inicio.
@@ -144,6 +178,58 @@ func new_game() -> void:
 	playstyle.clear()
 	flags.clear()
 	next_spawn = &""
+	pending_player = {}
+
+
+# --- Guardado ------------------------------------------------------------------
+
+func save_data() -> Dictionary:
+	return {
+		"survivor_number": survivor_number,
+		"collected_pickups": collected_pickups.duplicate(),
+		"dropped_items": dropped_items.map(_with_item_paths),
+		"corpses": corpses.map(_with_item_paths),
+		"lost_ones": lost_ones.map(_with_item_paths),
+		"killed_enemies": killed_enemies.duplicate(),
+		"playstyle": playstyle.duplicate(),
+		"flags": flags.duplicate(),
+		"next_id": _next_id,
+	}
+
+
+func load_data(data: Dictionary) -> void:
+	survivor_number = data.get("survivor_number", 1)
+	collected_pickups = data.get("collected_pickups", {})
+	dropped_items.assign(data.get("dropped_items", []).map(_with_items))
+	corpses.assign(data.get("corpses", []).map(_with_items))
+	lost_ones.assign(data.get("lost_ones", []).map(_with_items))
+	killed_enemies = data.get("killed_enemies", {})
+	playstyle = data.get("playstyle", {})
+	flags = data.get("flags", {})
+	_next_id = data.get("next_id", 1)
+	next_spawn = &""
+
+
+## Copia de un registro con los ItemData cambiados por su ruta (`item` e `items`).
+static func _with_item_paths(record: Dictionary) -> Dictionary:
+	var copy := record.duplicate()
+	if copy.has("item"):
+		copy.item = (copy.item as ItemData).resource_path
+	if copy.has("items"):
+		copy.items = copy.items.map(func(item: ItemData) -> String: return item.resource_path)
+	return copy
+
+
+static func _with_items(record: Dictionary) -> Dictionary:
+	var copy := record.duplicate()
+	if copy.has("item"):
+		copy.item = load(copy.item)
+	if copy.has("items"):
+		var items: Array[ItemData] = []
+		for path: String in copy.items:
+			items.append(load(path))
+		copy.items = items
+	return copy
 
 
 func _new_id() -> int:

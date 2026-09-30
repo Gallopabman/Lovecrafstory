@@ -21,7 +21,11 @@ const STATE_HINTS := [
 const STATE_COLORS := [
 	Color(0.75, 0.85, 0.7), Color(0.9, 0.8, 0.5), Color(0.95, 0.55, 0.35), Color(0.95, 0.25, 0.2), Color(0.6, 0.1, 0.1),
 ]
-const ZONE_NAMES := {&"Hospital": "Hospital San Judas", &"Street": "La avenida", &"TestRoom": "Sala de prueba"}
+const ZONE_NAMES := {
+	&"Hospital": "Hospital San Judas", &"Street": "La avenida", &"TestRoom": "Sala de prueba",
+	&"HouseIbarra": "Depto. de los Ibarra", &"HouseAlmacen": "Almacén La Estrella",
+	&"HouseRelojeria": "Relojería Kaufmann", &"HousePension": "Pensión Doña Rosa",
+}
 const DIRECTIONS := {
 	"ui_left": Vector2i.LEFT, "move_left": Vector2i.LEFT,
 	"ui_right": Vector2i.RIGHT, "move_right": Vector2i.RIGHT,

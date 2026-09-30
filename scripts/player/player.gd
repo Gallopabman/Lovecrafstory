@@ -111,8 +111,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		_yaw -= event.relative.x * mouse_sensitivity
 		_pitch -= event.relative.y * mouse_sensitivity
-	elif event.is_action_pressed("pause"):
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	elif event is InputEventMouseButton and event.pressed and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	elif not can_control:
@@ -323,7 +321,13 @@ func _update_footsteps(distance: float, on_floor: bool) -> void:
 
 
 ## Al llegar desde otra zona aparece en el SpawnPoint pedido, mirando hacia su -Z.
+## Al cargar una partida, aparece donde estaba. En los dos casos se guarda solo.
 func _place_at_spawn() -> void:
+	if not GameState.pending_player.is_empty():
+		global_position = GameState.pending_player.position
+		visual.global_rotation.y = GameState.pending_player.yaw
+		GameState.pending_player = {}
+		return
 	if GameState.next_spawn == &"":
 		return
 	for node in get_parent().find_children("*", "Marker3D", true, false):
@@ -332,6 +336,7 @@ func _place_at_spawn() -> void:
 			visual.global_rotation.y = node.global_rotation.y
 			break
 	GameState.next_spawn = &""
+	SaveGame.autosave.call_deferred()
 
 
 func _camera_target() -> Vector3:
