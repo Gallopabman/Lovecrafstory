@@ -153,7 +153,6 @@ func _shell_home() -> void:
 	for x in [1.3, 6.0, 10.5]:
 		_point_light(Vector3(x, 1.6, 9.3), Color(0.7, 0.75, 0.8), 0.35, 3.5)
 	_point_light(Vector3(2.5, 1.6, 0.7), Color(0.7, 0.75, 0.8), 0.3, 3.0)
-	_closed_door(Vector3(3.5, 0, 10.0), 0.0, 1.2, 2.2)
 	# Paredes interiores.
 	_wall("x", 4.5, 0.0, 7.5, 0.0, HC, T, [[2.5, 1.0, 0.0, 2.1], [6.3, 1.0, 0.0, 2.1]], "home_wall3", false)
 	_wall("z", 5.0, 0.0, 4.5, 0.0, HC, T, [], "home_wall2", false)
@@ -331,8 +330,8 @@ func _attic() -> void:
 	gate.set("locked_text", "No puedo entrar ahí. Mi madre se llevó la llave cuando guardó sus estúpidos medicamentos. Piensa que voy a recaer.")
 	gate.position = Vector3(7.55, AF, 1.0)
 	_add(groups.Structure, gate, "AtticGate")
-	_box(gate, "Door", Vector3(0.05, 1.0, 0), Vector3(0.06, 2.0, 1.0), "planks")
-	_box(gate, "Padlock", Vector3(0.12, 1.0, 0.35), Vector3(0.05, 0.12, 0.08), "metal", false)
+	_box(gate, "Door", Vector3(0.05, 1.0, 0), Vector3(0.06, 2.0, 1.0), "planks", true, false)
+	_door_prop(gate, "Chained", "door_chained", Vector3(0.06, 0, 0), 90.0, 1.0, 2.0)
 
 	var y := AF
 	# Paredes del ático (las exteriores ya llegan al techo): vigas y tablas.
@@ -415,7 +414,8 @@ func _home_systems() -> void:
 	door.set("radius", 1.0)
 	door.position = Vector3(3.5, 1.2, 9.6)
 	_add(groups.Inspectables, door, "StreetDoor")
-	for s: Array in [[&"refuge", Vector3(2.6, 0.05, 2.6), 180.0], [&"from_street", Vector3(3.5, 0.05, 8.8), 0.0]]:
+	_zone_door_visuals(door, Vector3(3.5, 0, 10.0 - TE / 2 - 0.02), 180.0, "door_wood_open", "", 1.2, 2.2)
+	for s: Array in [[&"refuge", Vector3(2.6, 0.05, 2.6), 180.0], [&"from_street", Vector3(3.5, 0.05, 7.8), 0.0]]:
 		var spawn := Marker3D.new()
 		spawn.set_script(load("res://scripts/world/spawn_point.gd"))
 		spawn.set("spawn_id", s[0])

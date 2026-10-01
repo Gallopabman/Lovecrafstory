@@ -101,8 +101,6 @@ func _shell(w: float, d: float, floor_mat: String, wall_mat: String, door_x := 0
 	_wall("x", -d, -hw - T / 2, hw + T / 2, 0.0, CEIL, T, openings, wall_mat, true)
 	_wall("z", -hw, -d, 0.0, 0.0, CEIL, T, [], wall_mat, false)
 	_wall("z", hw, -d, 0.0, 0.0, CEIL, T, [], wall_mat, false)
-	# La hoja de la puerta de calle, cerrada del lado de afuera.
-	_closed_door(Vector3(door_x, 0, 0), 0.0, DOOR_W, DOOR_H)
 	for x: float in windows:
 		_point_light(Vector3(x, 1.6, -d + 0.6), Color(0.7, 0.75, 0.8), 0.35, 3.5)
 
@@ -153,10 +151,11 @@ func _house_systems(door_x: float) -> void:
 	door.set("radius", 1.1)
 	door.position = Vector3(door_x, 1.2, -0.3)
 	_add(groups.Inspectables, door, "StreetDoor")
+	_zone_door_visuals(door, Vector3(door_x, 0, -T / 2 - 0.02), 180.0, "door_wood_open", "", DOOR_W, DOOR_H)
 	var spawn := Marker3D.new()
 	spawn.set_script(load("res://scripts/world/spawn_point.gd"))
 	spawn.set("spawn_id", &"inside")
-	spawn.position = Vector3(door_x, 0.05, -1.3)
+	spawn.position = Vector3(door_x, 0.05, -2.1)
 	_add(scene_root, spawn, "SpawnInside")
 	_instance("res://scenes/player/player.tscn", scene_root, "Player", Vector3(door_x, 0.05, -1.3))
 	_instance("res://scenes/effects/ps1_post_process.tscn", scene_root, "PS1PostProcess", Vector3.ZERO)

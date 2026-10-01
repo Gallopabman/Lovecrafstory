@@ -37,7 +37,8 @@ en vez de inventarlo.
   refugio → edificio → calle → teatro. Hoy: **casa** (refugio inicial) → calle de la plaza → hospital →
   avenida → teatro. Cada zona tiene un secreto visible solo con poca cordura.
 - **Cámaras**: fijas en interiores, libre en exteriores (pendiente).
-- **Sin HUD**: la cordura solo se ve en el menú de estado/inventario (Tab).
+- **HUD** (cambio del usuario, antes no había): barras de **vida** y **locura** siempre visibles arriba a la
+  izquierda, y la dificultad cuando no es Normal ([scripts/ui/hud.gd](scripts/ui/hud.gd), nodo `Hud` de game_ui).
 
 ## Decisiones técnicas
 
@@ -59,9 +60,17 @@ en vez de inventarlo.
     Los escribe **solo** `Atmosphere` ([scripts/world/atmosphere.gd](scripts/world/atmosphere.gd)),
     que interpola entre valores "Lúcido" y "Al borde" según `Sanity.insanity()`.
 - **Autoloads**:
-  - `Sanity` ([scripts/autoload/sanity_manager.gd](scripts/autoload/sanity_manager.gd)): cordura,
-    estados, goteo, refugios, golpes (`take_hit`), horrores vistos (`register_sighting`), señal `lost`
-    + `lost_in_refuge`.
+  - `Sanity` ([scripts/autoload/sanity_manager.gd](scripts/autoload/sanity_manager.gd)): por dentro, la
+    cordura (`current`, estados, refugios, horrores vistos, `lost` + `lost_in_refuge`); **en pantalla es la
+    locura** (`madness()` = 1 - cordura, pedido del usuario): afuera sube con el goteo, en el refugio activo
+    baja (`refuge_recovery_per_second` x `RefugeZone.current_recovery_multiplier()`, que en los refugios sale
+    del cozy: x1 pelado → x3 completo). `add_madness()` = susto/grito. `take_hit()` = golpe físico: lo pasa a
+    `Health`. **Dificultad** según la locura (`difficulty`, señal `difficulty_changed`): Normal < 50 %, Difícil
+    50-75 %, Insane > 75 % (el usuario escribió los rangos al revés, en términos de cordura; se interpretó así).
+    `player_damage_multiplier()` [1, 0.8, 0.6] y `damage_taken_multiplier()` [1, 1.35, 1.75].
+  - `Health` ([scripts/autoload/health.gd](scripts/autoload/health.gd)): la vida (100). `take_damage` aplica
+    la dificultad; en 0, `died` (el cuerpo queda donde cayó, con lo que llevaba, siempre) y `Sanity.end_life()`.
+    Cura con comida (`health_restore`), remedios (kind MEDICINE: vendas, botiquín) y descansando (`rest_health`).
   - `Inventory` ([scripts/autoload/inventory.gd](scripts/autoload/inventory.gd)): cuadrícula
     `grid_size`, entradas `{item, cell, rotated}`, `letters` aparte; `add()` devuelve false si no
     entra; `use(item, entry)`, `move`, `drop` (emite `item_dropped`).
@@ -88,7 +97,7 @@ en vez de inventarlo.
     **por escena**; enemigos muertos, `flags` del mundo, número de sobreviviente) y `post_message()`.
     `playstyle` junta estadísticas del sobreviviente actual (`track(&"shots")`, `melee`, `run_time`,
     `crouch_time`) para el Perdido. Viajes: `travel(escena, spawn)` + `next_spawn`; `new_survivor()`
-    carga `refuge_scene` (el hospital; los tests la cambian); `new_game()` reinicia todo. `change_scene()`
+    carga el refugio activo de `Shelter` (o `refuge_scene` si no está vacía: los tests usan la sala de prueba); `new_game()` reinicia todo. `change_scene()`
     hace un fundido a negro (lo usan todos los cambios de escena del juego); `pending_player` = posición al cargar.
   - `Audio` ([scripts/autoload/audio.gd](scripts/autoload/audio.gd)): busca sonidos **por nombre** en
     `assets/audio/{sfx,ambience,music}/` (`step` = `step.ogg` o variantes `step_1`, `step_2`... al azar;
@@ -150,11 +159,24 @@ en vez de inventarlo.
   incluidos).
 - **Menú de inicio** ([scenes/ui/main_menu.tscn](scenes/ui/main_menu.tscn), **escena principal**): niebla
   animada ([shaders/menu_fog.gdshader](shaders/menu_fog.gdshader)), Continuar (si hay partida, con un
-  resumen), Jugar (partida nueva → hospital), Opciones (solo volumen general, pedido del usuario) y Salir.
+  resumen), Jugar (partida nueva → la casa), Opciones (solo volumen general, pedido del usuario) y Salir.
   Música `menu_music`. Las opciones son una escena aparte ([scenes/ui/options_panel.tscn](scenes/ui/options_panel.tscn),
   `OptionsPanel`) que también usa la pausa.
 - **Menú de pausa** (`PauseMenu` en `game_ui.tscn`, Esc / Start): Continuar, Guardar partida, Opciones,
   Menú principal, Salir del juego. No se abre con otro menú abierto ni muerto.
+- **Dificultad en el mundo**: `DifficultySpawn` ([scripts/world/difficulty_spawn.gd](scripts/world/difficulty_spawn.gd)): un
+  enemigo extra desde Difícil o Insane (se instancia al cargar, o lejos del jugador si se llega a esa dificultad
+  en la zona). Todos los niveles tienen `ExtraHard*` / `ExtraInsane*` (helper `_extra_enemy` de los
+  generadores). `SanityGated.use_difficulty`: secretos y recompensas por dificultad (helper `_difficulty_gate`):
+  la **armería del hospital** detrás de Seguridad (Difícil: escopeta, cartuchos, botiquín), la **pistola en la
+  fuente de la plaza** (Insane: el portón deja de existir), el depósito de evidencias de la comisaría (Difícil),
+  el calabozo 3 (Insane) y la cripta de la iglesia (Insane).
+- **Puertas visibles** (pedido del usuario: que se note cuáles se pueden cruzar): [assets/models/doors/](assets/models/doors/)
+  (`door_wood_open`, `door_metal_open` entreabiertas con una ranura oscura; `door_boarded` tapiada;
+  `door_chained` con cadenas y candado). Una `ZoneDoor` muestra sus hijos `OpenDoor` / `LockedDoor` según esté
+  abierta (helper `_zone_door_visuals`; con `facade` la hoja se abre hacia afuera y atrás hay un hueco oscuro,
+  para fachadas sin abertura real). `FlagGate.open_model` aparece al abrirse. Las puertas que no se cruzan
+  están tapiadas o encadenadas. Los SpawnPoint quedan a ~2.5 m de la puerta (si no, la cámara queda contra el modelo).
 - **Zonas y puertas**: `ZoneDoor` (Area3D interactuable: `target_scene`, `target_spawn`, opcionalmente
   `required_item` + `unlock_flag` para forzarla una vez) y `SpawnPoint` (Marker3D con `spawn_id`; el
   jugador aparece mirando a su -Z). `LevelAudio` fija el ambiente, los pasos y un zumbido que crece con la
@@ -259,6 +281,20 @@ modificar la escena a mano o actualizar el script y avisar.
   Doña Rosa, pasando la barricada (pieza del agente Sosa: su cuaderno, y un acechador). Las otras puertas
   son `Inspectable` "cerrada". Spawn en la calle: `house_<id>`; adentro: `inside`.
 
+## Zona 2b: la comisaría y la iglesia (pedido del usuario: "dos zonas nuevas" en la avenida)
+
+Generadas por [tools/build_avenue_places.gd](tools/build_avenue_places.gd) (extiende build_hospital.gd). Se entra por
+dos puertas de la avenida (spawn de vuelta `house_comisaria` / `house_iglesia`; adentro, `inside`).
+- **Comisaría 12** ([scenes/levels/police_station.tscn](scenes/levels/police_station.tscn)): mesa de entradas (el
+  **libro de guardia**: Kaufmann preso el día 3, desaparecido del calabozo 2), oficina del comisario (el expediente
+  de Elena de Sosa), sala de guardia (el locker de Sosa), tres calabozos. Secretos: el **depósito de evidencias**
+  detrás de la guardia (Difícil: cartuchos, balas, botiquín) y el **calabozo 3** (Insane: "ACÁ ESTUVO TU MADRE").
+- **Parroquia San Judas Tadeo** ([scenes/levels/church.tscn](scenes/levels/church.tscn)): nave con bancos y vitrales,
+  altar con la imagen del santo, confesionario (alguien respira del otro lado), sacristía (**diario del padre
+  Ernesto**). En Insane se abre la trampa frente al altar: escalera a la **cripta** (a -3 m) con la **carta de
+  Elena (1979)** (su depresión, su hijo Rodolfo = el agente Sosa), un botiquín y cartuchos. En Inquieto, una
+  mujer arrodillada en la primera fila.
+
 ## Zona 3: Teatro Imperio
 
 [scenes/levels/theater.tscn](scenes/levels/theater.tscn), generada por [tools/build_theater.gd](tools/build_theater.gd)
@@ -312,16 +348,22 @@ Godot **4.7.2** (no está en el PATH):
 - **Test de la calle**: `<godot> --path . -s res://tests/street_tour_test.gd` (forzar la salida con la
   barreta, spawn, navmesh, barricada, límites, secreto, vuelta al hospital; `test_shots\street\`).
 - **Test del menú de inicio**: `<godot> --path . -s res://tests/main_menu_test.gd` (foco, volumen
-  guardado, Jugar → hospital, Continuar con partida guardada).
+  guardado, Jugar → casa, Continuar con partida guardada).
 - **Test del guardado**: `<godot> --path . -s res://tests/save_test.gd` (pausa, opciones, guardar,
   cargar y comparar todo, guardado automático al cambiar de zona, volver al menú).
 - Regenerar el hospital / la calle / las casas: `<godot> --headless --path . -s res://tools/build_hospital.gd`
-  (o `build_street.gd`, `build_houses.gd`, `build_theater.gd`, `build_home.gd`, `build_park.gd`).
+  (o `build_street.gd`, `build_houses.gd`, `build_theater.gd`, `build_home.gd`, `build_park.gd`,
+  `build_avenue_places.gd`). **Antes de regenerar, mirar `git status`**: si el usuario editó la escena en el
+  editor, pasar sus cambios al generador primero (pasó con la tele de la casa).
 - **Test del comienzo**: `<godot> --path . -s res://tests/home_test.gd` (casa, ático, rejas, calle cortada, puerta
   de guardia, el sobreviviente nuevo llega a casa). Los tests del refugio del hospital hacen `move_to(&"hospital")`.
+- **Test de la comisaría y la iglesia**: `<godot> --path . -s res://tests/avenue_places_test.gd` (entrada y
+  salida, secretos por dificultad, bajar a la cripta).
 - **Test del teatro**: `<godot> --path . -s res://tests/theater_test.gd` (llave, escopeta, jefe, camarín,
   mudarse, el sobreviviente nuevo llega al teatro).
 - Una `class_name` nueva no existe para los tests hasta correr `--import` (refresca la caché de clases).
+- No usar `@export_multiline` en listas (`PackedStringArray`): el editor de Godot 4.7 no lo conserva y borra
+  los valores al guardar la escena (pasó con los textos de los `Inspectable`).
 - **Al empaquetar un nivel, Godot guarda todas las propiedades de cada escena instanciada** (enemigos,
   pickups) tal como estaban: si se cambia `stalker.tscn`, `boss.tscn`, `attic_boss.tscn`, etc., hay que
   **regenerar los niveles** que las usan (si no, siguen con los valores viejos).

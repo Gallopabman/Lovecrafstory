@@ -179,7 +179,6 @@ func _foyer() -> void:
 	# Pared sur con la abertura de la sala de ensayo escondida (la tapa la "pared que miente").
 	_wall("x", 14.0, -TE / 2, 14.0, 0.0, FOYER_H, TE, [[5.0, 2.0, 0.0, DOOR_H]], "theater_wall", false)
 	_wall("z", 0.0, 0.0, 14.0, 0.0, FOYER_H, TE, [[7.0, 2.4, 0.0, 3.0]], "theater_wall", false)
-	_closed_door(Vector3(0.0, 0, 7.0), -90.0, 2.4, 3.0)
 	# Zócalo dorado.
 	for z in [0.17, 13.83]:
 		_box(groups.Structure, "Trim", Vector3(7, 1.0, z), Vector3(14, 0.08, 0.04), "gold", false)
@@ -246,6 +245,9 @@ func _foyer() -> void:
 	door.set("radius", 1.3)
 	door.position = Vector3(0.6, 1.2, 7.0)
 	_add(groups.Inspectables, door, "StreetDoor")
+	# Puertas dobles de la entrada (dos hojas entreabiertas).
+	_zone_door_visuals(door, Vector3(TE / 2 + 0.02, 0, 6.4), 90.0, "door_wood_open", "", 1.2, 3.0)
+	_door_prop(door, "OpenDoorB", "door_wood_open", Vector3(TE / 2 + 0.02, 0, 7.6) - door.position, 90.0, 1.2, 3.0, true)
 
 
 ## La sala: butacas rojas, pasillos, pullman colgando y las puertas desde el vestíbulo.
@@ -400,10 +402,13 @@ func _camarin_refuge() -> void:
 	gate.set("flag", &"theater_boss_dead")
 	gate.set("locked_text", "La puerta del camarín principal no cede. Mientras ella cante, no va a ceder.")
 	gate.set("open_text", "En el fondo del teatro, una puerta se destraba sola.")
+	gate.set("open_model", load(DOORS + "door_wood_open.glb"))
+	gate.set("open_model_scale", Vector3(DOOR_W / 1.02, DOOR_H / 2.1, 1.0))
+	gate.set("open_model_yaw", -90.0)
 	gate.position = Vector3(45.0, S, 12.5)
 	_add(groups.Structure, gate, "CamarinGate")
-	_box(gate, "Door", Vector3(0, 1.2, 0), Vector3(0.1, 2.4, DOOR_W), "stage")
-	_box(gate, "Star", Vector3(-0.07, 1.9, 0), Vector3(0.02, 0.3, 0.3), "gold", false)
+	_box(gate, "Door", Vector3(0, 1.2, 0), Vector3(0.1, 2.4, DOOR_W), "stage", true, false)
+	_door_prop(gate, "Chained", "door_chained", Vector3(-0.06, 0, 0), -90.0, DOOR_W, DOOR_H)
 	_label(groups.Structure, "PRIMERA ACTRIZ", Vector3(44.92, S + 2.5, 12.5), -90, Color(0.8, 0.65, 0.35), 0.005)
 
 	var zone := Area3D.new()
@@ -591,7 +596,7 @@ func _theater_systems() -> void:
 	level_audio.set("ambience", &"theater")
 	level_audio.set("ambience_db", -8.0)
 	_add(scene_root, level_audio, "LevelAudio")
-	for s: Array in [[&"from_street", Vector3(1.6, 0.05, 7.0), -90.0], [&"refuge", Vector3(49.0, S + 0.05, 12.0), 90.0]]:
+	for s: Array in [[&"from_street", Vector3(2.8, 0.05, 7.0), -90.0], [&"refuge", Vector3(49.0, S + 0.05, 12.0), 90.0]]:
 		var spawn := Marker3D.new()
 		spawn.set_script(load("res://scripts/world/spawn_point.gd"))
 		spawn.set("spawn_id", s[0])

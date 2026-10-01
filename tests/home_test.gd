@@ -111,7 +111,7 @@ func _initialize() -> void:
 	current_scene.get_node("Inspectables/StreetDoor").interact(player())
 	await settle()
 	check(current_scene.name == "ParkStreet", "al salir de casa, la calle de la plaza")
-	check(player().global_position.distance_to(Vector3(5.5, 0, -4.6)) < 0.5, "frente a la puerta de casa")
+	check(player().global_position.distance_to(Vector3(5.5, 0, -3.4)) < 0.5, "frente a la puerta de casa")
 	await shot("07_salida")
 	for s: Array in [["08_plaza", Vector3(20.0, 0.05, 3.5), 180.0], ["09_calle_este", Vector3(10.0, 0.05, 0.0), -90.0],
 			["10_casa", Vector3(8.0, 0.05, 4.5), 20.0], ["11_hospital", Vector3(50.0, 0.05, 1.0), -90.0],
@@ -151,12 +151,12 @@ func _initialize() -> void:
 	current_scene.get_node("Inspectables/HospitalDoor").interact(player())
 	await settle()
 	check(current_scene.name == "Hospital", "la puerta de guardia lleva al hospital")
-	check(player().global_position.distance_to(Vector3(1.5, 0, 9.5)) < 0.5, "entra por el oeste del pasillo")
+	check(player().global_position.distance_to(Vector3(2.7, 0, 9.5)) < 0.5, "entra por el oeste del pasillo")
 	check(not sanity.in_refuge(), "la sala del personal ya no es el refugio")
 	await shot("14_guardia")
 	current_scene.get_node("Inspectables/GuardDoor").interact(player())
 	await settle()
-	check(current_scene.name == "ParkStreet" and player().global_position.distance_to(Vector3(60.0, 0, 0)) < 0.5,
+	check(current_scene.name == "ParkStreet" and player().global_position.distance_to(Vector3(58.8, 0, 0)) < 0.5,
 		"y se vuelve a la calle de la plaza")
 
 	print("-- El que viene después llega a casa")

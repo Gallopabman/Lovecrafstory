@@ -78,7 +78,7 @@ func _initialize() -> void:
 	door.interact(player())
 	await settle()
 	check(current_scene.name == "Theater", "con la llave de Sosa se entra al teatro")
-	check(player().global_position.distance_to(Vector3(1.6, 0, 7.0)) < 0.5, "aparece en la entrada del vestíbulo")
+	check(player().global_position.distance_to(Vector3(2.8, 0, 7.0)) < 0.5, "aparece en la entrada del vestíbulo")
 	var boss: Node3D = current_scene.get_node("Enemies/Singer")
 	check(boss.dormant and not boss.visual.visible, "la cantante duerme, invisible")
 	await shot("01_vestibulo")

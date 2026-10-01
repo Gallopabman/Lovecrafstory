@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_envelope.glb" id="2_env"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_elena_01"
+display_name = "Carta de Elena (1979)"
+short_name = "CARTA"
+description = "Un sobre con perfume viejo, en un nicho de la cripta. \"Para el padre Ernesto. Abrir después de la función.\""
+kind = 3
+max_sanity_bonus = 15.0
+letter_text = "Padre:\n\nMañana canto \"La Paloma\" en el Imperio. El maestro Kaufmann dice que nunca la canté tan bien, que la canto como si me fuera a ir.\n\nTengo miedo de algo que no sé decir. Hay noches en que la tristeza me habla con mi propia voz y me dice que nadie me va a extrañar. Mi hijo tiene siete años. Lo miro dormir y la voz se calla un rato.\n\nSi mañana no vuelvo, dígale a mi Rodolfo que no fue culpa suya. Que la tristeza no es una persona: es una niebla. Y que de la niebla se sale pidiendo ayuda, no cantando más fuerte.\n\nYo no supe pedirla.\n\nElena"
+world_color = Color(0.9, 0.82, 0.8, 1)
+world_scene = ExtResource("2_env")
+world_size = 0.26
+world_rotation = Vector3(-90, 0, 0)
+world_tint = Color(1, 0.88, 0.85, 1)

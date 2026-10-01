@@ -104,6 +104,7 @@ func _make_materials() -> void:
 		"tape": ["", Color(0.85, 0.7, 0.15), 1.0],
 		"plywood": ["wood_floor", Color(0.62, 0.52, 0.4), 0.8],
 		"metal": ["metal_green", Color(0.5, 0.52, 0.5), 0.9],
+		"door_gap": ["", Color(0.015, 0.012, 0.012), 1.0],
 	}
 	for key: String in defs:
 		var d: Array = defs[key]
@@ -338,9 +339,6 @@ func _hospital_back() -> void:
 	var holder := _add(groups.Structure, Node3D.new(), "HospitalBack")
 	_brick_wall(Vector3(0, 0, WALK + 1.5), Vector3(0, 0, -WALK - 1.5), 2, holder, false)
 	_box(holder, "Cornice", Vector3(-0.2, 8.1, 0), Vector3(0.8, 0.3, 15.6), "cap", false)
-	# Puerta de metal (la que se forzó desde adentro).
-	_piece(CITY + "DoorFrame_Metal_Single.gltf", Vector3(0.05, 0, 0), 90.0, holder, Color(0.6, 0.62, 0.6))
-	_piece(CITY + "Door_1.gltf", Vector3(0.1, 0, 0.5), 90.0, holder, Color(0.5, 0.55, 0.52))
 	_label(holder, "HOSPITAL SAN JUDAS", Vector3(0.12, 3.3, 0), 90, Color(0.75, 0.75, 0.7), 0.012)
 	_label(holder, "SALIDA DE EMERGENCIA", Vector3(0.12, 2.55, 0), 90, Color(0.6, 0.1, 0.08), 0.006)
 	for z in [-4.5, 4.5]:
@@ -351,6 +349,8 @@ func _hospital_back() -> void:
 	door.set("target_spawn", &"from_street")
 	door.position = Vector3(0.6, 1.2, 0)
 	_add(groups.Inspectables, door, "HospitalDoor")
+	# La puerta de metal de la salida de emergencia (la que se forzó desde adentro).
+	_zone_door_visuals(door, Vector3(0.03, 0, 0), 90.0, "door_metal_open", "", 1.2, 2.3, true)
 
 
 func _buildings() -> void:
@@ -426,8 +426,6 @@ func _theater() -> void:
 	_label(holder, "HOY: \"LA PALOMA\" - FUNCIÓN ÚNICA", Vector3(63.47, 3.42, 0), -90, Color(0.9, 0.8, 0.65), 0.005)
 	_light(Vector3(62.8, 3.6, 0), Color(1.0, 0.75, 0.45), 1.6, 9.0, true)
 	# Puertas encadenadas.
-	_box(holder, "Chain", Vector3(65.25, 1.2, 0), Vector3(0.06, 0.06, 1.6), "metal", false)
-	_box(holder, "Plank", Vector3(65.3, 1.6, 0), Vector3(0.05, 0.25, 2.4), "plywood", false)
 	for z in [-2.8, 2.8]:
 		_prop(_ph("street_lamp_02"), Vector3(65.3, 2.2, z), -90, {"anchor": 2, "col": false, "h": 0.8})
 
@@ -527,37 +525,50 @@ func _discovery() -> void:
 
 ## Puertas de los edificios: cuatro se pueden abrir (casas chicas, tools/build_houses.gd),
 ## el resto están cerradas con llave. [x del edificio, vereda (-1 norte / 1 sur), casa o "", porche]
+## Puertas de los edificios: cuatro casas chicas (tools/build_houses.gd), dos zonas nuevas
+## (comisaría e iglesia, tools/build_avenue_places.gd) y el resto tapiadas.
+## [x del edificio, vereda (-1 norte / 1 sur), id o "", porche, escena, modelo, ancho, alto]
 func _house_doors() -> void:
+	var houses := "res://scenes/levels/street_houses/%s.tscn"
 	var doors := [
-		[7.23, -1, "ibarra", true], [21.72, -1, "", false], [45.53, -1, "relojeria", false], [60.3, -1, "", true],
-		[11.32, 1, "", false], [25.87, 1, "almacen", true], [40.63, 1, "", false], [55.69, 1, "pension", false],
+		[7.23, -1, "ibarra", true, houses, "door_wood_open", 1.2, 2.3],
+		[21.72, -1, "comisaria", false, "res://scenes/levels/police_station.tscn", "door_metal_open", 1.4, 2.4],
+		[45.53, -1, "relojeria", false, houses, "door_wood_open", 1.2, 2.3],
+		[60.3, -1, "", true, "", "", 1.2, 2.3],
+		[11.32, 1, "iglesia", false, "res://scenes/levels/church.tscn", "door_wood_open", 1.7, 2.8],
+		[25.87, 1, "almacen", true, houses, "door_wood_open", 1.2, 2.3],
+		[40.63, 1, "", false, "", "", 1.2, 2.3],
+		[55.69, 1, "pension", false, houses, "door_wood_open", 1.2, 2.3],
 	]
 	var locked := [
-		"Cerrada con llave. Del otro lado, una radio encendida sin sintonizar.",
-		"No abre. Alguien apiló muebles contra la puerta desde adentro.",
-		"Cerrada. En el vidrio esmerilado se dibuja una mano del lado de adentro.",
-		"Cerrada con llave. El picaporte está tibio.",
+		"Tapiada con tablas, desde afuera. Del otro lado, una radio encendida sin sintonizar.",
+		"Tapiada. Alguien clavó las tablas con apuro: hay clavos doblados en el piso.",
 	]
 	var locked_index := 0
 	for d: Array in doors:
 		var side: int = d[1]
 		var door_pos := Vector3(d[0], 1.2, side * (WALK - 0.4))
+		var wall_pos := Vector3(d[0], 0, side * (WALK - 0.05))
+		var yaw := 0.0 if side < 0 else 180.0
 		if d[2] == "":
+			_door_prop(groups.Props, "BoardedDoor", "door_boarded", wall_pos, yaw, d[6], d[7])
 			_inspect(door_pos, [locked[locked_index % locked.size()]], 1.3)
 			locked_index += 1
 			continue
 		var door := Area3D.new()
 		door.set_script(load("res://scripts/world/zone_door.gd"))
-		door.set("target_scene", "res://scenes/levels/street_houses/%s.tscn" % d[2])
+		var scene: String = d[4]
+		door.set("target_scene", scene % d[2] if scene.contains("%s") else scene)
 		door.set("target_spawn", &"inside")
 		door.set("radius", 1.3)
 		door.position = door_pos
 		_add(groups.Inspectables, door, "Door_" + d[2])
+		_zone_door_visuals(door, wall_pos, yaw, d[5], "", d[6], d[7], true)
 		# Al salir se aparece en la vereda mirando a la calle (las de porche, al pie de la escalera).
 		var spawn := Marker3D.new()
 		spawn.set_script(load("res://scripts/world/spawn_point.gd"))
 		spawn.set("spawn_id", StringName("house_" + d[2]))
-		spawn.position = Vector3(d[0], 0.05, side * (3.2 if d[3] else 4.6))
+		spawn.position = Vector3(d[0], 0.05, side * (2.4 if d[3] else 3.4))
 		spawn.rotation_degrees.y = 180.0 if side < 0 else 0.0
 		_add(scene_root, spawn, "SpawnHouse_" + d[2])
 
@@ -579,10 +590,11 @@ func _inspectables() -> void:
 	theater.set("radius", 1.3)
 	theater.position = Vector3(64.9, 1.2, 0)
 	_add(groups.Inspectables, theater, "TheaterDoor")
+	_zone_door_visuals(theater, Vector3(65.36, 0, 0), -90.0, "door_wood_open", "door_chained", 1.5, 2.6, true)
 	var from_theater := Marker3D.new()
 	from_theater.set_script(load("res://scripts/world/spawn_point.gd"))
 	from_theater.set("spawn_id", &"from_theater")
-	from_theater.position = Vector3(62.8, 0.05, 0.0)
+	from_theater.position = Vector3(61.6, 0.05, 0.0)
 	from_theater.rotation_degrees.y = 90.0
 	_add(scene_root, from_theater, "SpawnFromTheater")
 	_inspect(Vector3(12.0, 1.0, 2.2), ["Las llaves siguen puestas. El motor no hace ni un ruido.",
@@ -656,7 +668,7 @@ func _systems() -> void:
 	var spawn := Marker3D.new()
 	spawn.set_script(load("res://scripts/world/spawn_point.gd"))
 	spawn.set("spawn_id", &"from_hospital")
-	spawn.position = Vector3(1.6, 0.05, 0)
+	spawn.position = Vector3(2.8, 0.05, 0)
 	spawn.rotation_degrees.y = -90.0
 	_add(scene_root, spawn, "SpawnFromHospital")
 	# Por defecto (si se abre la escena directo) se aparece en la puerta del hospital.
@@ -727,7 +739,17 @@ func _door_prop(parent: Node, node_name: String, model: String, pos: Vector3, ya
 ## Las puertas visibles de una ZoneDoor: la entreabierta y, si se traba, la cerrada.
 ## `wall_pos` es el pie de la puerta sobre la pared (en coordenadas del nivel).
 func _zone_door_visuals(door: Node3D, wall_pos: Vector3, yaw: float, open_model: String,
-		locked_model := "", width := 1.02, height := 2.1) -> void:
-	_door_prop(door, "OpenDoor", open_model, wall_pos - door.position, yaw, width, height, true)
+		locked_model := "", width := 1.02, height := 2.1, facade := false) -> void:
+	var rel := wall_pos - door.position
+	var open_yaw := yaw
+	if facade:
+		# Fachada sin hueco real: la hoja se abre hacia afuera y atrás hay un "interior" oscuro.
+		open_yaw = yaw + 180.0
+		var front := Basis(Vector3.UP, deg_to_rad(yaw)) * Vector3.FORWARD * -1.0
+		var size := Basis(Vector3.UP, deg_to_rad(yaw)) * Vector3(width * 0.92, height * 0.97, 0.02)
+		var gap := _box(door, "DoorGap", rel + front * 0.012 + Vector3.UP * height * 0.485,
+			Vector3(absf(size.x), absf(size.y), absf(size.z)), "door_gap", false)
+		gap.name = "DoorGap"
+	_door_prop(door, "OpenDoor", open_model, rel, open_yaw, width, height, true)
 	if locked_model != "":
-		_door_prop(door, "LockedDoor", locked_model, wall_pos - door.position, yaw, width, height, true)
+		_door_prop(door, "LockedDoor", locked_model, rel, yaw, width, height, true)

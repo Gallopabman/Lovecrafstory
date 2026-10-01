@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_notebook.glb" id="2_note"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_police_02"
+display_name = "Libro de guardia"
+short_name = "LIBRO"
+description = "El libro de novedades de la Comisaría 12, abierto en la mesa de entradas. La última página está escrita con otra letra."
+kind = 3
+letter_text = "Día 3. Detenido: Kaufmann, Alberto, 71 años, relojero. Motivo: parar los relojes del barrio a la misma hora, casa por casa. No opuso resistencia. Pidió que no le sacaran el reloj de bolsillo.\n\nDía 4. El detenido Kaufmann canta toda la noche. Siempre la misma canción. El agente Sosa pide que lo cambien de celda: dice que la conoce.\n\nDía 6. Calabozo 2 vacío. La reja con el candado puesto. En el piso, el reloj de bolsillo, parado a las tres y cuarto.\n\nDía 7. El Cabo Ríos sale con el móvil 12 a la barricada del Imperio. Sosa va con él.\n\nDía 8. (Otra letra, temblorosa:) Ya no queda nadie en la comisaría. Si llegaste hasta acá: el depósito de evidencias está detrás de la guardia. Lo tapiamos nosotros. No sé por qué. No me acuerdo de haberlo hecho."
+world_color = Color(0.4, 0.45, 0.6, 1)
+world_scene = ExtResource("2_note")
+world_size = 0.32
+world_tint = Color(0.75, 0.8, 0.95, 1)

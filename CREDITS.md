@@ -140,3 +140,13 @@ suelto como asset. Si el repositorio se vuelve público como paquete de assets, 
 | Asset | Autor | Licencia | Fuente | Ubicación |
 | --- | --- | --- | --- | --- |
 | 3D Horror Game Monster (el jefe del ático; FBX unidos en un .glb) | City Building Game Art / HorrorGameMaker.com | CC0 | [opengameart.org/content/3d-horror-game-monster](https://opengameart.org/content/3d-horror-game-monster) | `assets/models/enemies/attic_monster/` |
+
+## Puertas (`assets/models/doors/`)
+
+Armadas en Godot con piezas CC0 (las cadenas son eslabones generados en Godot).
+
+| Puerta | Piezas | Autor | Licencia | Fuente |
+| --- | --- | --- | --- | --- |
+| `door_wood_open` (entreabierta), `door_metal_open` | Furniture Kit (`doorway`, `doorwayFront`) | Kenney | CC0 | [kenney.nl/assets/furniture-kit](https://kenney.nl/assets/furniture-kit) |
+| `door_boarded` (tapiada) | Furniture Kit `doorway` + Building Kit `barricade-doorway-c` | Kenney | CC0 | [kenney.nl/assets/building-kit](https://kenney.nl/assets/building-kit) |
+| `door_chained` (con cadenas y candado) | Furniture Kit `doorwayFront` + "Padlock" | Kenney, Quaternius | CC0 | [poly.pizza/m/2ZSHgKVr3F](https://poly.pizza/m/2ZSHgKVr3F) |

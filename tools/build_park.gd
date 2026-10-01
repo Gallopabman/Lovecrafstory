@@ -149,8 +149,6 @@ func _home_facade() -> void:
 	for wx in [2.5, 9.8, 12.8]:
 		_box(holder, "Window", Vector3(wx, 1.6, -5.97), Vector3(1.2, 1.1, 0.04), "window_dark", false)
 		_box(holder, "WindowSill", Vector3(wx, 1.0, -5.92), Vector3(1.35, 0.08, 0.14), "cap", false)
-	_piece(CITY + "DoorFrame_Metal_Single.gltf", Vector3(5.5, 0, -5.97), 0.0, holder, Color(0.55, 0.5, 0.45))
-	_piece(CITY + "Door_1.gltf", Vector3(6.0, 0, -5.92), 0.0, holder, Color(0.55, 0.42, 0.32))
 	_label(holder, "1312", Vector3(5.5, 2.55, -5.9), 0, Color(0.75, 0.72, 0.65), 0.006)
 	var door := Area3D.new()
 	door.set_script(load("res://scripts/world/zone_door.gd"))
@@ -159,6 +157,7 @@ func _home_facade() -> void:
 	door.set("radius", 1.2)
 	door.position = Vector3(5.5, 1.2, -5.6)
 	_add(groups.Inspectables, door, "HomeDoor")
+	_zone_door_visuals(door, Vector3(5.5, 0, -5.95), 0.0, "door_wood_open", "", 1.2, 2.3, true)
 	_inspect(Vector3(3.6, 1.0, -5.4), ["El buzón de casa. Adentro, folletos del centro de día y una boleta de luz sin pagar."], 0.8)
 	_inspect(Vector3(9.0, 2.0, -5.3), ["Arriba, en la ventanita del ático, hay una luz. Mamá no dejaría nada prendido."], 1.2)
 
@@ -188,8 +187,6 @@ func _hospital_side() -> void:
 	var holder := _add(groups.Buildings, Node3D.new(), "HospitalWest")
 	_brick_wall(Vector3(62.0, 0, -16.0), Vector3(62.0, 0, 16.0), 2, holder, false)
 	_box(holder, "Cornice", Vector3(62.2, 8.1, 0), Vector3(0.8, 0.3, 32.2), "cap", false)
-	_piece(CITY + "DoorFrame_Metal_Single.gltf", Vector3(61.95, 0, 0), -90.0, holder, Color(0.6, 0.62, 0.6))
-	_piece(CITY + "Door_2.gltf", Vector3(61.9, 0, -0.5), -90.0, holder, Color(0.6, 0.65, 0.62))
 	_label(holder, "HOSPITAL SAN JUDAS", Vector3(61.88, 3.4, 0), -90, Color(0.75, 0.75, 0.7), 0.012)
 	_label(holder, "GUARDIA - AMBULANCIAS", Vector3(61.88, 2.6, 0), -90, Color(0.7, 0.12, 0.1), 0.007)
 	_box(holder, "Canopy", Vector3(60.9, 2.95, 0), Vector3(2.2, 0.15, 4.0), "cap", false)
@@ -204,6 +201,7 @@ func _hospital_side() -> void:
 	door.set("radius", 1.3)
 	door.position = Vector3(61.4, 1.2, 0)
 	_add(groups.Inspectables, door, "HospitalDoor")
+	_zone_door_visuals(door, Vector3(61.95, 0, 0), -90.0, "door_metal_open", "", 1.4, 2.4, true)
 
 
 ## La plaza (detrás de las rejas): pasto, senderos, una fuente, árboles y hamacas.
@@ -376,7 +374,7 @@ func _park_systems() -> void:
 	level_audio.set("ambience", &"street")
 	level_audio.set("ambience_db", -4.0)
 	_add(scene_root, level_audio, "LevelAudio")
-	for s: Array in [[&"from_home", Vector3(5.5, 0.05, -4.6), 180.0], [&"from_hospital", Vector3(60.0, 0.05, 0.0), 90.0]]:
+	for s: Array in [[&"from_home", Vector3(5.5, 0.05, -3.4), 180.0], [&"from_hospital", Vector3(58.8, 0.05, 0.0), 90.0]]:
 		var spawn := Marker3D.new()
 		spawn.set_script(load("res://scripts/world/spawn_point.gd"))
 		spawn.set("spawn_id", s[0])

@@ -84,7 +84,7 @@ func _initialize() -> void:
 	await settle()
 	check(current_scene.name == "Street", "con la barreta se sale a la calle")
 	check(game_state.has_flag(&"hospital_exit_forced"), "la puerta queda forzada")
-	check(player().global_position.distance_to(Vector3(1.6, 0, 0)) < 0.5, "aparece en la puerta del hospital: %s" % player().global_position)
+	check(player().global_position.distance_to(Vector3(2.8, 0, 0)) < 0.5, "aparece en la puerta del hospital: %s" % player().global_position)
 	check(get_nodes_in_group(&"enemies").size() == 4, "4 acechadores en la calle")
 	await shot("01_salida")
 
@@ -167,7 +167,7 @@ func _initialize() -> void:
 	current_scene.get_node("Inspectables/HospitalDoor").interact(player())
 	await settle()
 	check(current_scene.name == "Hospital", "vuelve al hospital")
-	check(player().global_position.distance_to(Vector3(34.6, 0, 9.5)) < 0.5, "entra por la salida de emergencia: %s" % player().global_position)
+	check(player().global_position.distance_to(Vector3(33.4, 0, 9.5)) < 0.5, "entra por la salida de emergencia: %s" % player().global_position)
 	await shot("11_vuelta")
 
 	print("RESULT: %d fallas" % fails)

@@ -170,6 +170,7 @@ func _make_materials() -> void:
 		"wall": ["wall_hospital", Color(1, 1, 1), 1.0 / H],
 		"ceiling": ["ceiling_office", Color(0.72, 0.72, 0.7), 0.42],
 		"metal": ["metal_green", Color(0.75, 0.78, 0.75), 0.9],
+		"door_gap": ["", Color(0.015, 0.012, 0.012), 1.0],
 		"ground": ["concrete", Color(0.3, 0.3, 0.3), 0.15],
 		"bars": ["", Color(0.1, 0.1, 0.1), 1.0],
 		"lamp": ["", Color(0.9, 0.95, 0.9), 1.0],
@@ -604,9 +605,9 @@ func _structure() -> void:
 	# Puertas cerradas: ascensor (dos pisos), entrada principal, salida de emergencia.
 	_closed_door(Vector3(7.5, 0, 8.0), 0.0, 1.4)
 	_closed_door(Vector3(7.5, H, 8.0), 0.0, 1.4)
-	_closed_door(Vector3(15.0, 0, D - 0.02), 180.0, 0.95, 2.4)
-	_closed_door(Vector3(16.0, 0, D - 0.02), 180.0, 0.95, 2.4)
-	_closed_door(Vector3(W - 0.02, 0, 9.5), -90.0, 1.2, 2.3)
+	# La entrada principal, encadenada por Ferreyra (dos hojas, del lado de adentro).
+	for x in [15.0, 16.0]:
+		_door_prop(groups.Structure, "MainDoor", "door_chained", Vector3(x, 0, D - TE / 2 - 0.02), 180.0, 1.0, 2.4)
 
 
 ## Escalera recta de PB a P1 dentro del hueco (x 0.3-2.7). Los escalones son solo
@@ -878,14 +879,15 @@ func _ground_floor_rooms() -> void:
 	exit.set("unlock_text", "Metí la barreta en la traba y empujé. Cedió con un chillido.")
 	exit.position = Vector3(35.6, 1.2, 9.5)
 	_add(groups.Inspectables, exit, "EmergencyExit")
+	_zone_door_visuals(exit, Vector3(W - TE / 2 - 0.02, 0, 9.5), -90.0, "door_metal_open", "door_chained", 1.2, 2.3)
 	# Puerta de guardia (oeste del pasillo): por acá se entra desde la calle de la plaza, la de casa.
-	_closed_door(Vector3(0.02, 0, 9.5), -90.0, 1.4, 2.3)
 	var guard := Area3D.new()
 	guard.set_script(load("res://scripts/world/zone_door.gd"))
 	guard.set("target_scene", "res://scenes/levels/park_street.tscn")
 	guard.set("target_spawn", &"from_hospital")
 	guard.position = Vector3(0.6, 1.2, 9.5)
 	_add(groups.Inspectables, guard, "GuardDoor")
+	_zone_door_visuals(guard, Vector3(TE / 2 + 0.02, 0, 9.5), 90.0, "door_metal_open", "", DOOR_W, DOOR_H)
 	var guard_sign := Label3D.new()
 	guard_sign.text = "GUARDIA - AMBULANCIAS"
 	guard_sign.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
@@ -1170,13 +1172,13 @@ func _systems() -> void:
 	var spawn := Marker3D.new()
 	spawn.set_script(load("res://scripts/world/spawn_point.gd"))
 	spawn.set("spawn_id", &"from_street")
-	spawn.position = Vector3(34.6, 0.05, 9.5)
+	spawn.position = Vector3(33.4, 0.05, 9.5)
 	spawn.rotation_degrees.y = 90.0
 	_add(scene_root, spawn, "SpawnFromStreet")
 	var park_spawn := Marker3D.new()
 	park_spawn.set_script(load("res://scripts/world/spawn_point.gd"))
 	park_spawn.set("spawn_id", &"from_park")
-	park_spawn.position = Vector3(1.5, 0.05, 9.5)
+	park_spawn.position = Vector3(2.7, 0.05, 9.5)
 	park_spawn.rotation_degrees.y = -90.0
 	_add(scene_root, park_spawn, "SpawnFromPark")
 	# Donde llega cada sobreviviente nuevo mientras este sea el refugio activo.
@@ -1309,7 +1311,17 @@ func _door_prop(parent: Node, node_name: String, model: String, pos: Vector3, ya
 ## Las puertas visibles de una ZoneDoor: la entreabierta y, si se traba, la cerrada.
 ## `wall_pos` es el pie de la puerta sobre la pared (en coordenadas del nivel).
 func _zone_door_visuals(door: Node3D, wall_pos: Vector3, yaw: float, open_model: String,
-		locked_model := "", width := 1.02, height := 2.1) -> void:
-	_door_prop(door, "OpenDoor", open_model, wall_pos - door.position, yaw, width, height, true)
+		locked_model := "", width := 1.02, height := 2.1, facade := false) -> void:
+	var rel := wall_pos - door.position
+	var open_yaw := yaw
+	if facade:
+		# Fachada sin hueco real: la hoja se abre hacia afuera y atrás hay un "interior" oscuro.
+		open_yaw = yaw + 180.0
+		var front := Basis(Vector3.UP, deg_to_rad(yaw)) * Vector3.FORWARD * -1.0
+		var size := Basis(Vector3.UP, deg_to_rad(yaw)) * Vector3(width * 0.92, height * 0.97, 0.02)
+		var gap := _box(door, "DoorGap", rel + front * 0.012 + Vector3.UP * height * 0.485,
+			Vector3(absf(size.x), absf(size.y), absf(size.z)), "door_gap", false)
+		gap.name = "DoorGap"
+	_door_prop(door, "OpenDoor", open_model, rel, open_yaw, width, height, true)
 	if locked_model != "":
-		_door_prop(door, "LockedDoor", locked_model, wall_pos - door.position, yaw, width, height, true)
+		_door_prop(door, "LockedDoor", locked_model, rel, yaw, width, height, true)

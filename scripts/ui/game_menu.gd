@@ -26,6 +26,7 @@ const ZONE_NAMES := {
 	&"HouseIbarra": "Depto. de los Ibarra", &"HouseAlmacen": "Almacén La Estrella",
 	&"HouseRelojeria": "Relojería Kaufmann", &"HousePension": "Pensión Doña Rosa",
 	&"Theater": "Teatro Imperio", &"Home": "Casa", &"ParkStreet": "La plaza",
+	&"PoliceStation": "Comisaría 12", &"Church": "Parroquia San Judas",
 }
 const DIRECTIONS := {
 	"ui_left": Vector2i.LEFT, "move_left": Vector2i.LEFT,

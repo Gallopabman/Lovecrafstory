@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_notebook.glb" id="2_note"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_priest_01"
+display_name = "Diario del padre Ernesto"
+short_name = "DIAR"
+description = "Un cuaderno de tapas negras en la sacristía, con estampitas de San Judas Tadeo entre las hojas."
+kind = 3
+letter_text = "San Judas Tadeo, patrono de las causas perdidas. Nunca me pareció tan apropiado.\n\nLa gente vino a la parroquia los primeros días. Rezaban, cantaban, se quedaban a dormir en los bancos. Después empezaron a venir otros. Se sentaban en la última fila, quietos, sin rezar. Nadie los veía entrar.\n\nAyer uno se confesó. Me contó cosas de mi vida que no le conté nunca a nadie. Al final me dio la absolución él a mí.\n\nCerré la cripta. Hay cosas abajo que no son de Dios ni del Diablo: son nuestras. Todo lo que guardamos para no mirarlo.\n\nSi la niebla se te mete en la cabeza y la cripta se abre sola, bajá. No por lo que hay. Por lo que vas a entender."
+world_color = Color(0.15, 0.13, 0.12, 1)
+world_scene = ExtResource("2_note")
+world_size = 0.26
+world_tint = Color(0.35, 0.32, 0.3, 1)
