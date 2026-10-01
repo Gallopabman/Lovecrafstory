@@ -105,6 +105,7 @@ func _initialize() -> void:
 	game_state.set_flag(&"hospital_exit_forced")
 	shelter.stock[&"material_wood"] = 4
 	shelter.levels[&"fire"] = 1
+	shelter.stash.append({"item": peaches, "count": 2, "loaded": 0})
 	# Recoger un chocolate del mundo.
 	current_scene.get_node("Items/Chocolate1").interact(player())
 	player().global_position = Vector3(20.0, 0.05, 9.5)
@@ -135,6 +136,7 @@ func _initialize() -> void:
 	check(absf(sanity.current - 55.0) < 1.0, "cordura guardada: %.1f" % sanity.current)
 	check(game_state.has_flag(&"hospital_exit_forced"), "vuelven los hechos del mundo")
 	check(shelter.stock[&"material_wood"] == 4 and shelter.level(&"fire") == 1, "vuelve el refugio")
+	check(shelter.stash.size() == 1 and shelter.stash[0].item == peaches and shelter.stash[0].count == 2, "vuelve el alijo")
 	check(not current_scene.has_node("Items/Chocolate1"), "lo recogido no reaparece")
 
 	print("-- Guardado automático al cambiar de zona")

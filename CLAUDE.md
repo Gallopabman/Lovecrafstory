@@ -69,7 +69,14 @@ en vez de inventarlo.
     materiales, +1 cozy por nivel), `stock` de materiales, `cozy()` → `drain_multiplier()` (x0.6 pelado
     → x0.1 completo), `has_electricity()` (generador), estaciones `cook()` / `rest()` / `play_radio()`,
     `discover(place)` y el bono de llegar a casa (lugares nuevos + objetos + cartas de la salida, tope
-    30). Los materiales se descargan solos de la mochila al entrar. Persiste entre sobrevivientes.
+    30). Persiste entre sobrevivientes.
+    **Alijo** (pedido del usuario): nada se guarda solo al llegar; hay que dejarlo en el alijo
+    (`ShelterStation` kind STASH → `StashMenu`, [scripts/ui/stash_menu.gd](scripts/ui/stash_menu.gd): mochila a la
+    izquierda, alijo a la derecha, E pasa, X deja todos los materiales). `Shelter.stash` (entradas sin
+    celda; las pilas ocupan un lugar), `store()`, `take()` (usa `Inventory.add_entry`, todo o nada),
+    `store_materials()`. Los materiales van al depósito de construcción (`stock`), no ocupan lugar. Espacio
+    `stash` del plano: caja de cartón (8) → baúl (16) → armario con candado (28) (`stash_capacity`, no suma
+    cozy). Hay uno solo: se usa en el refugio activo, viaja al mudarse y sobrevive a la muerte.
     **Varios refugios** (`REFUGES`: `hospital`, `theater`), uno solo `active`: cada uno tiene sus mejoras
     (`refuge_levels`; casi todas las funciones aceptan `refuge`, vacío = el activo). `move_to()` = mudarse
     (se decide desde el plano de un refugio que no es el activo; los materiales viajan). `RefugeZone`,

@@ -107,11 +107,47 @@ func _initialize() -> void:
 	var before: float = sanity.current
 	await place(REFUGE_POS)
 	check(sanity.in_refuge(), "volvió al refugio")
-	check(shelter.stock[&"material_wood"] == 3 and shelter.stock[&"material_cable"] == 2 and shelter.stock[&"material_metal"] == 1,
-		"descargó los materiales: %s" % shelter.stock)
-	check(inventory.entries.filter(func(e): return e.item.is_material()).is_empty(), "la mochila quedó sin materiales")
+	check(shelter.stock[&"material_wood"] == 0 and inventory.entries.any(func(e): return e.item == wood),
+		"los materiales no se guardan solos")
 	check(sanity.current - before > 10.0, "bono de llegar a casa: +%.1f" % (sanity.current - before))
-	check(message().begins_with("Dejé en el refugio"), "aviso: '%s'" % message())
+	check(message().contains("alijo"), "aviso de dejarlos en el alijo: '%s'" % message())
+
+	print("-- Alijo")
+	var stash_menu: Control = current_scene.get_node("GameUI/StashMenu")
+	check(slot_part("SlotStash", "Only0").visible, "el alijo arranca como una caja de cartón")
+	await place(Vector3(34.1, 0.05, 5.4), -90.0)
+	player()._try_interact()
+	await frames(3)
+	check(stash_menu.visible and paused, "la caja abre el alijo y pausa")
+	stash_menu.store_materials()
+	await frames(2)
+	check(shelter.stock[&"material_wood"] == 3 and shelter.stock[&"material_cable"] == 2 and shelter.stock[&"material_metal"] == 1,
+		"X deja los materiales para construir: %s" % shelter.stock)
+	check(inventory.entries.filter(func(e): return e.item.is_material()).is_empty(), "la mochila quedó sin materiales")
+	# Guardar el VHS (es lo único que queda en la mochila) y volver a sacarlo.
+	stash_menu.transfer()
+	await frames(2)
+	check(shelter.stash.size() == 1 and shelter.stash[0].item == vhs and inventory.entries.is_empty(), "el VHS quedó en el alijo")
+	await shot("01b_alijo")
+	stash_menu._side = 1
+	stash_menu.transfer()
+	await frames(2)
+	check(shelter.stash.is_empty() and inventory.entries.size() == 1, "y se puede volver a sacar")
+	# Capacidad: 8 lugares en la caja; las pilas ocupan uno.
+	inventory.clear()
+	for i in 9:
+		inventory.add_entry({"item": vhs, "count": 1})
+	stash_menu._side = 0
+	for i in 9:
+		stash_menu._index[0] = 0
+		stash_menu.transfer()
+	check(shelter.stash_used() == 8 and inventory.entries.size() == 1, "la caja de cartón tiene 8 lugares")
+	check(stash_menu.result_label.text.begins_with("El alijo está lleno"), "avisa que está lleno")
+	stash_menu.close()
+	await frames(3)
+	shelter.stash.clear()
+	inventory.clear()
+	inventory.add(vhs)
 	# Salir y volver sin lograr nada: no hay bono (no se puede farmear).
 	await place(Vector3(20.0, 0.05, 9.5))
 	var s0: float = sanity.current
@@ -165,6 +201,7 @@ func _initialize() -> void:
 		while shelter.upgrade(slot):
 			pass
 	check(shelter.cozy() == shelter.cozy_max(), "refugio completo: cozy %d/%d" % [shelter.cozy(), shelter.cozy_max()])
+	check(shelter.stash_capacity_now() == 28, "el alijo mejorado (armario) tiene 28 lugares")
 	check(is_equal_approx(sanity.drain_multiplier(), 0.1), "goteo con el refugio completo x%.2f" % sanity.drain_multiplier())
 	var s2: float = sanity.current
 	check((shelter.rest() as String).begins_with("Dormí") and sanity.current - s2 > 9.0, "descansar en la cama con mantas: +%.1f" % (sanity.current - s2))
@@ -173,6 +210,7 @@ func _initialize() -> void:
 	check((shelter.play_radio() as String).begins_with("Un tango") and sanity.current > s3, "la radio suena con la instalación prolija")
 	await frames(5)
 	check(slot_part("SlotWindows", "Only2").visible and slot_part("SlotDecor", "From2").visible, "cortinas, plantas y alfombra")
+	check(slot_part("SlotStash", "Only2").visible and not slot_part("SlotStash", "Only0").visible, "el alijo ahora es un armario")
 	await place(Vector3(27.0, 0.05, 6.8), -60.0)
 	await shot("04_refugio_completo")
 	await place(Vector3(34.5, 0.05, 6.5), -130.0)

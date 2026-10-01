@@ -18,6 +18,7 @@ const HEART_TEXT := "Su corazón no aguantó.\n\nAlguien más llegará al refugi
 @onready var game_menu: GameMenu = $GameMenu
 @onready var shelter_menu: ShelterMenu = $ShelterMenu
 @onready var pause_menu: PauseMenu = $PauseMenu
+@onready var stash_menu: StashMenu = $StashMenu
 
 var _message_timer := 0.0
 
@@ -32,7 +33,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	pickup_label.visible = not game_menu.visible and not shelter_menu.visible and not pause_menu.visible
+	pickup_label.visible = not game_menu.visible and not shelter_menu.visible and not pause_menu.visible \
+		and not stash_menu.visible
 	if _message_timer > 0.0:
 		_message_timer -= delta
 		pickup_label.modulate.a = clampf(_message_timer / 0.5, 0.0, 1.0)

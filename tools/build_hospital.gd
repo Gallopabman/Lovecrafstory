@@ -100,6 +100,7 @@ var upgrades := {
 	"wall_clock": ["wall_clock", {"anchor": 2, "col": false}], "WetFloorSign_01": ["WetFloorSign_01", {"col": false}],
 	"wooden_broom": ["wooden_broom", {"col": false}], "trashbag": ["trashbag", {}],
 	"mounted_fluorescent_lights": ["mounted_fluorescent_lights", {"anchor": 1, "col": false}],
+	"wooden_crate_02": ["wooden_crate_02", {}],
 }
 const POLYHAVEN := "res://assets/models/props/polyhaven/"
 ## Correcciones por modelo de Poly Haven (rotación para que el frente mire a +Z, etc.).
@@ -761,6 +762,11 @@ func _refuge() -> void:
 	_prop("pottedPlant", Vector3(29.6, 0, 0.5), 0, {"parent": d2})
 	_prop("plantSmall1", Vector3(27.9, 0.78, 5.6), 0, {"parent": d2})
 
+	# Alijo: caja de cartón -> baúl -> armario con candado. Las cosas hay que dejarlas acá.
+	var stash := _slot("stash", "SlotStash", Vector3(35.3, 0, 5.4))
+	_stash_visuals(stash, -90.0)
+	_station(Vector3(-0.5, 0.7, 0), _from(stash, 0), "StashStation", 4, 1.0)
+
 
 func _ground_floor_rooms() -> void:
 	var y := 0.0
@@ -1160,3 +1166,10 @@ func _systems() -> void:
 	_instance("res://scenes/effects/ps1_post_process.tscn", scene_root, "PS1PostProcess", Vector3.ZERO)
 	var ui: Node = load("res://scenes/ui/game_ui.tscn").instantiate()
 	_add(scene_root, ui, "GameUI")
+
+
+## El alijo de un refugio según su nivel (lo usa también el teatro).
+func _stash_visuals(slot: Node3D, rot: float) -> void:
+	_prop("cardboardBoxClosed", Vector3.ZERO, rot, {"parent": _only(slot, 0), "h": 0.55})
+	_prop("wooden_crate_02", Vector3.ZERO, rot, {"parent": _only(slot, 1), "h": 0.75})
+	_prop("locker", Vector3.ZERO, rot, {"parent": _only(slot, 2), "tint": Color(0.55, 0.6, 0.58)})

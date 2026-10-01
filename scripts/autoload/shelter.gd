@@ -51,8 +51,15 @@ const SLOTS := {
 		{"name": "Plantas y alfombra", "cozy": 1, "cost": {&"material_cloth": 2},
 			"desc": "Algo vivo en el cuarto. Una alfombra para los pies fríos."},
 	]},
+	# El alijo no suma cozy: suma lugar (ver `stash_capacity`).
+	&"stash": {"name": "Alijo", "levels": [
+		{"name": "Baúl de madera", "cozy": 0, "cost": {&"material_wood": 3, &"material_metal": 1},
+			"desc": "Un baúl con bisagras de verdad. Entra el doble que en la caja de cartón."},
+		{"name": "Armario con candado", "cozy": 0, "cost": {&"material_metal": 3, &"material_cable": 1},
+			"desc": "Un armario de chapa, con estantes. Entra casi todo lo que uno junta."},
+	]},
 }
-const SLOT_ORDER: Array[StringName] = [&"fire", &"power", &"bed", &"windows", &"decor"]
+const SLOT_ORDER: Array[StringName] = [&"fire", &"power", &"bed", &"windows", &"decor", &"stash"]
 
 @export_group("Goteo en el refugio")
 ## Multiplicador del goteo de cordura sin mejoras y con el refugio completo.
@@ -74,6 +81,10 @@ const SLOT_ORDER: Array[StringName] = [&"fire", &"power", &"bed", &"windows", &"
 @export var bonus_per_letter := 4.0
 @export var bonus_max := 30.0
 
+@export_group("Alijo")
+## Lugares del alijo por nivel (caja de cartón, baúl, armario). Las pilas ocupan uno solo.
+@export var stash_capacity: Array[int] = [8, 16, 28]
+
 ## Los lugares que pueden ser refugio (GDD: uno solo activo; mudarse es una decisión).
 ## Cada uno tiene sus propias mejoras; los materiales del depósito se llevan al mudarse.
 const REFUGES := {
@@ -92,6 +103,10 @@ var levels: Dictionary:
 	get:
 		return refuge_levels[active]
 var stock: Dictionary = {}
+## El alijo (como el baúl de Resident Evil): lo que se deja en casa. Uno solo, en el refugio
+## activo (viaja al mudarse) y sobrevive a la muerte del sobreviviente.
+## Entradas como las de la mochila, sin lugar en la cuadrícula: { item, count, loaded, cooked }.
+var stash: Array[Dictionary] = []
 ## Lugares descubiertos alguna vez (por cualquier sobreviviente).
 var discovered: Dictionary = {}
 
@@ -121,14 +136,21 @@ func new_game() -> void:
 	for id in MATERIALS:
 		stock[id] = 0
 	discovered.clear()
+	stash.clear()
 	_trip_active = false
 	_cooldowns.clear()
 	changed.emit()
 
 
 func save_data() -> Dictionary:
+	var saved_stash := []
+	for entry in stash:
+		var copy := entry.duplicate()
+		copy.item = (entry.item as ItemData).resource_path
+		saved_stash.append(copy)
 	return {"active": active, "refuge_levels": refuge_levels.duplicate(true), "stock": stock.duplicate(),
-		"discovered": discovered.duplicate(), "trip": [_trip_active, _trip_places, _trip_items, _trip_letters]}
+		"stash": saved_stash, "discovered": discovered.duplicate(),
+		"trip": [_trip_active, _trip_places, _trip_items, _trip_letters]}
 
 
 func load_data(data: Dictionary) -> void:
@@ -141,6 +163,11 @@ func load_data(data: Dictionary) -> void:
 		refuge_levels[&"hospital"].merge(data.levels, true)
 	active = data.get("active", &"hospital")
 	stock.merge(data.get("stock", {}), true)
+	stash.clear()
+	for saved: Dictionary in data.get("stash", []):
+		var entry := saved.duplicate()
+		entry.item = load(saved.item)
+		stash.append(entry)
 	discovered = data.get("discovered", {})
 	var trip: Array = data.get("trip", [false, 0, 0, 0])
 	_trip_active = trip[0]
@@ -249,19 +276,71 @@ func material_name(id: StringName) -> String:
 
 # --- Materiales --------------------------------------------------------------
 
-## Pasa todos los materiales de la mochila al depósito del refugio.
-func deposit_materials() -> Dictionary:
+## Lugares del alijo según su nivel.
+func stash_capacity_now() -> int:
+	return stash_capacity[mini(level(&"stash"), stash_capacity.size() - 1)]
+
+
+## Lugares ocupados (las pilas de munición o comida ocupan uno).
+func stash_used() -> int:
+	return stash.size()
+
+
+## Deja una entrada de la mochila en el alijo. Los materiales van al depósito de
+## construcción (no ocupan lugar). Devuelve el texto para la UI.
+func store(entry: Dictionary) -> String:
+	var item: ItemData = entry.item
+	if item.is_material():
+		stock[item.id] = stock.get(item.id, 0) + entry.count
+		Inventory.remove_entry(entry)
+		materials_deposited.emit({item.id: entry.count})
+		changed.emit()
+		return "Dejé %d de %s para construir." % [entry.count, item.display_name.to_lower()]
+	var stack := _stash_stack(item)
+	if stack.is_empty() and stash_used() >= stash_capacity_now():
+		return "El alijo está lleno. Hay que mejorarlo (ver el plano)."
+	if not stack.is_empty():
+		stack.count += entry.count
+	else:
+		var copy := entry.duplicate()
+		copy.erase("cell")
+		copy.erase("rotated")
+		stash.append(copy)
+	Inventory.remove_entry(entry)
+	changed.emit()
+	return "Guardado: %s." % item.display_name
+
+
+## Pasa todos los materiales de la mochila al depósito. Devuelve {material: cantidad}.
+func store_materials() -> Dictionary:
 	var amounts := {}
 	for entry in Inventory.entries.duplicate():
 		var item: ItemData = entry.item
 		if item.is_material():
 			amounts[item.id] = amounts.get(item.id, 0) + entry.count
-			stock[item.id] = stock.get(item.id, 0) + entry.count
-			Inventory.remove_entry(entry)
-	if not amounts.is_empty():
-		materials_deposited.emit(amounts)
-		changed.emit()
+			store(entry)
 	return amounts
+
+
+## Saca una entrada del alijo a la mochila (si entra).
+func take(index: int) -> String:
+	if index < 0 or index >= stash.size():
+		return ""
+	var entry: Dictionary = stash[index]
+	if not Inventory.add_entry(entry):
+		return "No me entra en la mochila."
+	stash.remove_at(index)
+	changed.emit()
+	return "En la mochila: %s." % (entry.item as ItemData).display_name
+
+
+func _stash_stack(item: ItemData) -> Dictionary:
+	if item.max_stack <= 1:
+		return {}
+	for entry in stash:
+		if entry.item == item:
+			return entry
+	return {}
 
 
 # --- Estaciones --------------------------------------------------------------
@@ -339,13 +418,8 @@ func _on_refuge_exited() -> void:
 
 
 func _on_refuge_entered() -> void:
-	var deposited := deposit_materials()
+	# Las cosas no se guardan solas: hay que dejarlas en el alijo (GDD: el refugio como casa).
 	var lines: PackedStringArray = []
-	if not deposited.is_empty():
-		var parts: PackedStringArray = []
-		for id in deposited:
-			parts.append("%d %s" % [deposited[id], material_name(id).to_lower()])
-		lines.append("Dejé en el refugio: %s." % ", ".join(parts))
 	if _trip_active:
 		_trip_active = false
 		var bonus := minf(bonus_max, _trip_places * bonus_per_new_place
@@ -353,5 +427,7 @@ func _on_refuge_entered() -> void:
 		if bonus > 0.0:
 			Sanity.restore(bonus)
 			lines.append("Volver a casa. Por fin." if bonus >= bonus_max * 0.5 else "Volver a casa.")
+	if Inventory.entries.any(func(e: Dictionary) -> bool: return (e.item as ItemData).is_material()):
+		lines.append("Los materiales los tengo que dejar en el alijo.")
 	if not lines.is_empty():
 		GameState.post_message(" ".join(lines))

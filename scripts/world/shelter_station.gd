@@ -1,9 +1,9 @@
 class_name ShelterStation
 extends Area3D
 ## Estación del refugio que se usa con "interact": el plano (abre el menú de
-## mejoras), el fuego (cocinar), la cama (descansar) o la radio (música).
+## mejoras), el fuego (cocinar), la cama (descansar), la radio (música) o el alijo.
 
-enum Kind { BLUEPRINT, COOK, REST, RADIO }
+enum Kind { BLUEPRINT, COOK, REST, RADIO, STASH }
 
 @export var kind := Kind.BLUEPRINT
 @export var radius := 0.9
@@ -37,6 +37,14 @@ func interact(_player: Player) -> void:
 			GameState.post_message(Shelter.cook(refuge_id))
 		Kind.REST:
 			GameState.post_message(Shelter.rest(refuge_id))
+		Kind.STASH:
+			# Solo en casa: el alijo vive en el refugio activo.
+			if not Shelter.is_active(refuge_id):
+				GameState.post_message("Todavía no vivo acá. Mis cosas están en %s." % Shelter.refuge_name())
+				return
+			var stash := get_tree().get_first_node_in_group(&"stash_menu")
+			if stash:
+				stash.open()
 		Kind.RADIO:
 			var worked := Shelter.level(&"power", refuge_id) >= 2 and Shelter.radio_ready()
 			GameState.post_message(Shelter.play_radio(refuge_id))

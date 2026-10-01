@@ -58,6 +58,41 @@ func add(item: ItemData) -> bool:
 	return true
 
 
+## Vuelve a meter una entrada entera (p. ej. sacada del alijo) con su cantidad, balas y
+## si estaba cocinada. Las pilas se reparten respetando `max_stack`. Todo o nada:
+## si no entra completa, la mochila queda como estaba y devuelve false.
+## No emite `item_added` (no es algo que se encontró).
+func add_entry(data: Dictionary) -> bool:
+	var item: ItemData = data.item
+	var backup: Array[Dictionary] = []
+	for entry in entries:
+		backup.append(entry.duplicate())
+	var remaining: int = data.get("count", 1)
+	if item.max_stack > 1:
+		for entry in entries:
+			if entry.item == item and entry.count < item.max_stack:
+				var moved := mini(item.max_stack - entry.count, remaining)
+				entry.count += moved
+				remaining -= moved
+	while remaining > 0:
+		var spot := find_space(item)
+		if spot.is_empty():
+			# Deshacer (las entradas se restauran en su lugar, conservando el arma en la mano).
+			for i in backup.size():
+				entries[i].merge(backup[i], true)
+			entries.resize(backup.size())
+			return false
+		var amount := mini(remaining, maxi(item.max_stack, 1))
+		var entry := {"item": item, "cell": spot.cell, "rotated": spot.rotated, "count": amount,
+			"loaded": data.get("loaded", item.magazine_size)}
+		if data.get("cooked", false):
+			entry.cooked = true
+		entries.append(entry)
+		remaining -= amount
+	changed.emit()
+	return true
+
+
 func find_space(item: ItemData) -> Dictionary:
 	for rotated in [false, true]:
 		if rotated and item.grid_size.x == item.grid_size.y:
