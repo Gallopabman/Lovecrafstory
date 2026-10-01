@@ -338,7 +338,7 @@ func _attic() -> void:
 	# Paredes del ático (las exteriores ya llegan al techo): vigas y tablas.
 	for x in [1.0, 3.0, 5.0, 7.0]:
 		_box(groups.Structure, "Beam", Vector3(x, TOP - 0.15, 5.0), Vector3(0.2, 0.2, 10.0), "attic_wood", false)
-	_bulb(Vector3(3.5, TOP - 0.6, 4.0), 0.5, true)
+	_bulb(Vector3(3.5, TOP - 0.6, 4.0), 1.0, true)
 	_point_light(Vector3(5.0, y + 0.6, 8.5), Color(0.75, 0.85, 1.0), 0.3, 4.0, true)
 	# Los insumos: cajas apiladas, sueros, tubos de oxígeno, un armario con candado.
 	for p in [Vector3(0.6, y, 0.6), Vector3(1.4, y, 0.6), Vector3(0.6, y + 0.5, 0.6), Vector3(0.6, y, 1.4),

@@ -101,7 +101,8 @@ func _initialize() -> void:
 	# Una mirada adentro (solo para la captura).
 	thing.awaken()
 	thing.set_physics_process(false)
-	place(Vector3(6.5, AF + 0.05, 8.5), 135.0 - 180.0, -15.0)
+	place(Vector3(1.4, AF + 0.05, 1.3), -142.0, -12.0)
+	await create_timer(1.4).timeout
 	await shot("06_atico")
 
 	print("-- La calle de la plaza")

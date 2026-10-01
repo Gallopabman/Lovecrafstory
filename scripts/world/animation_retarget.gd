@@ -74,3 +74,34 @@ static func make_blend(player: AnimationPlayer, base: StringName, pose_anim: Str
 			var q: Quaternion = anim.track_get_key_value(i, k)
 			anim.track_set_key_value(i, k, q.slerp(target, weight))
 	library.add_animation(new_name, anim)
+
+
+## Arma `new_name` con poses tomadas de otras animaciones del mismo esqueleto.
+## `keys`: [[animación, segundo de esa animación, segundo en la nueva], ...] en orden.
+## Sirve para modelos a los que les faltan clips (p. ej. un ataque hecho con dos poses,
+## o una muerte que es una animación al revés). Copia rotaciones y posiciones.
+static func make_sequence(player: AnimationPlayer, keys: Array, new_name: StringName, loop := false) -> void:
+	var library := player.get_animation_library(&"")
+	if library.has_animation(new_name) or keys.is_empty():
+		return
+	var first := player.get_animation(keys[0][0])
+	var result := Animation.new()
+	result.length = keys[-1][2]
+	result.loop_mode = Animation.LOOP_LINEAR if loop else Animation.LOOP_NONE
+	for i in first.get_track_count():
+		var type := first.track_get_type(i)
+		if type != Animation.TYPE_ROTATION_3D and type != Animation.TYPE_POSITION_3D:
+			continue
+		var path := first.track_get_path(i)
+		var t := result.add_track(type)
+		result.track_set_path(t, path)
+		for key: Array in keys:
+			var src := player.get_animation(key[0])
+			var src_track := src.find_track(path, type)
+			if src_track < 0:
+				continue
+			if type == Animation.TYPE_ROTATION_3D:
+				result.rotation_track_insert_key(t, key[2], src.rotation_track_interpolate(src_track, key[1]))
+			else:
+				result.position_track_insert_key(t, key[2], src.position_track_interpolate(src_track, key[1]))
+	library.add_animation(new_name, result)

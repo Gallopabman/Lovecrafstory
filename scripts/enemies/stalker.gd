@@ -23,6 +23,9 @@ enum State { WANDER, CHASE, ATTACK, STAGGER, DEAD }
 @export var anim_death: StringName = &"dead1"
 ## Velocidad de reproducción de la animación de correr (para que no patine).
 @export var run_anim_speed := 1.0
+## Animaciones que el modelo no trae, armadas con poses de otras al cargar
+## (AnimationRetarget.make_sequence): { nombre: [[animación, segundo, segundo nuevo], ...] }.
+@export var generated_animations: Dictionary = {}
 @export var max_health := 100.0
 ## Cordura que recupera el jugador al matarlo (alivio de sobrevivir al horror).
 @export var kill_sanity_reward := 5.0
@@ -105,6 +108,8 @@ func _ready() -> void:
 	_materials = PS1Materials.apply(model, tint, {}, albedo_texture)
 	for material in _materials:
 		_base_colors.append(material.get_shader_parameter(&"albedo_color"))
+	for anim_name: StringName in generated_animations:
+		AnimationRetarget.make_sequence(anim_player, generated_animations[anim_name], anim_name)
 	for anim_name in [anim_idle, anim_walk, anim_run]:
 		anim_player.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
 	anim_player.play(anim_idle)

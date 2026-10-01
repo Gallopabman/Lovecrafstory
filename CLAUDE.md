@@ -195,7 +195,9 @@ recaiga. La nota de mamá dice que la llamaron del San Judas por la niebla: eso 
   usuario, ajustado): "No puedo entrar ahí. Mi madre se llevó la llave cuando guardó sus estúpidos
   medicamentos. Piensa que voy a recaer." Adentro: cajas, sueros, oxígeno, jeringas, una cama de hospital y
   el **jefe del ático** (`Enemies/AtticThing`, [scenes/enemies/attic_boss.tscn](scenes/enemies/attic_boss.tscn),
-  dormido, flag de muerte `attic_boss_dead`).
+  dormido, flag de muerte `attic_boss_dead`). Modelo: 3D Horror Game Monster (CC0, sin cara, boca vertical);
+  no trae ataque ni muerte: se arman con `Stalker.generated_animations` (`AnimationRetarget.make_sequence`):
+  ataque con dos cuadros de `Poses`, muerte = `Jump` al revés (se hunde en el piso), `Jump` = aparición.
 - **Calle de la plaza** ([scenes/levels/park_street.tscn](scenes/levels/park_street.tscn),
   [tools/build_park.gd](tools/build_park.gd), extiende build_street.gd): la casa en la vereda norte; la plaza al
   sur, rodeada de rejas (barrotes combinados en una sola malla: el shader PS1 no lee MultiMesh), con fuente,
@@ -320,6 +322,9 @@ Godot **4.7.2** (no está en el PATH):
 - **Test del teatro**: `<godot> --path . -s res://tests/theater_test.gd` (llave, escopeta, jefe, camarín,
   mudarse, el sobreviviente nuevo llega al teatro).
 - Una `class_name` nueva no existe para los tests hasta correr `--import` (refresca la caché de clases).
+- **Al empaquetar un nivel, Godot guarda todas las propiedades de cada escena instanciada** (enemigos,
+  pickups) tal como estaban: si se cambia `stalker.tscn`, `boss.tscn`, `attic_boss.tscn`, etc., hay que
+  **regenerar los niveles** que las usan (si no, siguen con los valores viejos).
 - Muebles de Poly Haven: `powershell -File tools/fetch_polyhaven.ps1 -Ids <id>,...` y revisar escala y
   frente con `<godot> --path . -s res://tools/preview_props.gd -- res://assets/models/props/polyhaven/ salida.png 4 id1,id2`.
   Correcciones por modelo en `upgrades` / `ph_fixes` del generador.

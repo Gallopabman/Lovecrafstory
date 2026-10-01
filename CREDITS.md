@@ -134,3 +134,9 @@ suelto como asset. Si el repositorio se vuelve público como paquete de assets, 
 | Asset | Autor | Licencia | Fuente | Ubicación |
 | --- | --- | --- | --- | --- |
 | Nature Kit (árboles, arbustos, piedras, tocón) | Kenney | CC0 | [kenney.nl/assets/nature-kit](https://kenney.nl/assets/nature-kit) | `assets/models/nature/` |
+
+## El ático
+
+| Asset | Autor | Licencia | Fuente | Ubicación |
+| --- | --- | --- | --- | --- |
+| 3D Horror Game Monster (el jefe del ático; FBX unidos en un .glb) | City Building Game Art / HorrorGameMaker.com | CC0 | [opengameart.org/content/3d-horror-game-monster](https://opengameart.org/content/3d-horror-game-monster) | `assets/models/enemies/attic_monster/` |
