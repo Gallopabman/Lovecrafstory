@@ -76,6 +76,7 @@ func _initialize() -> void:
 	_house_doors()
 	_items()
 	_enemies()
+	_street_extras()
 	_systems()
 
 	var packed := PackedScene.new()
@@ -663,3 +664,70 @@ func _systems() -> void:
 	_instance("res://scenes/effects/ps1_post_process.tscn", scene_root, "PS1PostProcess", Vector3.ZERO)
 	var ui: Node = load("res://scenes/ui/game_ui.tscn").instantiate()
 	_add(scene_root, ui, "GameUI")
+
+
+# --- Dificultad (pedido del usuario: más locura = más difícil, con recompensas) ---------
+
+func _extra_enemy(pos: Vector3, min_difficulty: int, wander := 5.0,
+		scene_path := "res://scenes/enemies/stalker.tscn", parent: Node = null) -> void:
+	var spawn := Marker3D.new()
+	spawn.set_script(load("res://scripts/world/difficulty_spawn.gd"))
+	spawn.set("enemy_scene", load(scene_path))
+	spawn.set("min_difficulty", min_difficulty)
+	spawn.set("wander_radius", wander)
+	spawn.position = pos
+	_add(parent if parent else groups.Enemies, spawn, "ExtraHard" if min_difficulty == 1 else "ExtraInsane")
+
+
+func _difficulty_gate(base_name: String, min_difficulty: int, hide_when_insane := false) -> Node3D:
+	var gate := Node3D.new()
+	gate.set_script(GatedScript)
+	gate.set("use_difficulty", true)
+	gate.set("threshold", min_difficulty)
+	gate.set("mode", 1 if hide_when_insane else 0)
+	return _add(groups.Secrets, gate, base_name)
+
+
+## Más acechadores en la avenida según la dificultad.
+func _street_extras() -> void:
+	_extra_enemy(Vector3(9.0, 0.05, -1.0), 1)
+	_extra_enemy(Vector3(36.0, 0.05, -12.0), 1, 3.0)
+	_extra_enemy(Vector3(45.0, 0.05, 2.0), 2)
+	_extra_enemy(Vector3(60.0, 0.05, 2.5), 2, 3.0)
+	_extra_enemy(Vector3(42.0, 0.05, -31.0), 2, 3.0)
+
+
+# --- Puertas (pedido del usuario: que se note cuáles se pueden cruzar) ---------------
+
+const DOORS := "res://assets/models/doors/"
+
+
+## Modelo de puerta sin colisión (assets/models/doors: origen abajo al centro, frente +Z,
+## 1.02 x 2.1 m) en `pos` (piso, sobre el plano de la pared), con el frente hacia `yaw`.
+## Se estira a `width` x `height`. Con `exact_name` el nodo se llama así (para que una
+## ZoneDoor encuentre su "OpenDoor" / "LockedDoor"); si no, se numera.
+func _door_prop(parent: Node, node_name: String, model: String, pos: Vector3, yaw: float,
+		width := 1.02, height := 2.1, exact_name := false) -> Node3D:
+	var p: Node3D = PropScript.new()
+	p.set("model", load(DOORS + model + ".glb"))
+	p.set("anchor", 3)  # Prop.Anchor.ORIGIN
+	p.set("collision", false)
+	p.set("tint", Color(0.85, 0.82, 0.78))
+	p.position = pos
+	p.rotation_degrees.y = yaw
+	p.scale = Vector3(width / 1.02, height / 2.1, 1.0)
+	if exact_name:
+		p.name = node_name
+		parent.add_child(p)
+		p.owner = scene_root
+		return p
+	return _add(parent, p, node_name)
+
+
+## Las puertas visibles de una ZoneDoor: la entreabierta y, si se traba, la cerrada.
+## `wall_pos` es el pie de la puerta sobre la pared (en coordenadas del nivel).
+func _zone_door_visuals(door: Node3D, wall_pos: Vector3, yaw: float, open_model: String,
+		locked_model := "", width := 1.02, height := 2.1) -> void:
+	_door_prop(door, "OpenDoor", open_model, wall_pos - door.position, yaw, width, height, true)
+	if locked_model != "":
+		_door_prop(door, "LockedDoor", locked_model, wall_pos - door.position, yaw, width, height, true)

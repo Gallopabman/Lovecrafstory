@@ -140,9 +140,11 @@ func _initialize() -> void:
 	_first_floor_rooms()
 	_details()
 	_secrets()
+	_difficulty_secrets()
 	_discovery()
 	_items()
 	_enemies()
+	_difficulty_enemies()
 	_systems()
 
 	var packed := PackedScene.new()
@@ -565,7 +567,7 @@ func _structure() -> void:
 		[_window(3.5, 0.3), _window(10, 0.3), _window(21, 0.3), _window(27, 0.3),
 		_window(3.5, H + 0.3), _window(10, H + 0.3), _window(15, H + 0.3), _window(29.5, H + 0.3)])
 	_wall("z", 0.0, TE / 2, D - TE / 2, hw, eh, TE,
-		[[9.5, DOOR_W, 0.0, -hw + DOOR_H], [9.5, 1.6, H + 1.3, H + 2.6]])
+		[[9.5, DOOR_W, 0.0, -hw + DOOR_H], [16.5, DOOR_W, 0.0, -hw + DOOR_H], [9.5, 1.6, H + 1.3, H + 2.6]])
 	_wall("z", W, TE / 2, D - TE / 2, hw, eh, TE, [[9.5, 1.6, H + 1.3, H + 2.6]])
 
 	# Paredes interiores por planta.
@@ -1195,3 +1197,119 @@ func _stash_visuals(slot: Node3D, rot: float) -> void:
 	_prop("cardboardBoxClosed", Vector3.ZERO, rot, {"parent": _only(slot, 0), "h": 0.55})
 	_prop("wooden_crate_02", Vector3.ZERO, rot, {"parent": _only(slot, 1), "h": 0.75})
 	_prop("locker", Vector3.ZERO, rot, {"parent": _only(slot, 2), "tint": Color(0.55, 0.6, 0.58)})
+
+
+# --- Dificultad (pedido del usuario: más locura = más difícil, con recompensas) ---------
+
+## Un acechador extra que solo aparece desde cierta dificultad (DifficultySpawn).
+func _extra_enemy(pos: Vector3, min_difficulty: int, wander := 4.0,
+		scene_path := "res://scenes/enemies/stalker.tscn", parent: Node = null) -> void:
+	var spawn := Marker3D.new()
+	spawn.set_script(load("res://scripts/world/difficulty_spawn.gd"))
+	spawn.set("enemy_scene", load(scene_path))
+	spawn.set("min_difficulty", min_difficulty)
+	spawn.set("wander_radius", wander)
+	spawn.position = pos
+	_add(parent if parent else groups.Enemies, spawn, "ExtraHard" if min_difficulty == 1 else "ExtraInsane")
+
+
+## Secreto que depende de la dificultad: lo de adentro de `holder` existe solo desde
+## `min_difficulty` (REVEAL) o solo por debajo (HIDE: paredes que "mienten").
+func _difficulty_gate(base_name: String, min_difficulty: int, hide_when_insane := false) -> Node3D:
+	var gate := Node3D.new()
+	gate.set_script(GatedScript)
+	gate.set("use_difficulty", true)
+	gate.set("threshold", min_difficulty)
+	gate.set("mode", 1 if hide_when_insane else 0)
+	return _add(groups.Secrets, gate, base_name)
+
+
+func _difficulty_enemies() -> void:
+	_extra_enemy(Vector3(21.0, 0.05, 9.6), 1, 5.0)
+	_extra_enemy(Vector3(13.0, H + 0.05, 9.6), 1, 5.0)
+	_extra_enemy(Vector3(27.5, 0.05, 15.5), 2, 2.5)
+	_extra_enemy(Vector3(14.0, H + 0.05, 4.0), 2, 3.0)
+	_extra_enemy(Vector3(30.0, H + 0.05, 9.6), 2, 4.0)
+
+
+## La armería de seguridad (desde Difícil): detrás de la pared de Seguridad, al oeste,
+## Ferreyra tapió las armas de los guardias. Hay una escopeta mucho antes del teatro.
+func _difficulty_secrets() -> void:
+	var wall_gate := _difficulty_gate("ArmoryWall", 1, true)
+	var wall: StaticBody3D = GreyBoxScript.new()
+	wall.set("size", Vector3(TE, DOOR_H, DOOR_W))
+	wall.set("material", mats.wall)
+	wall.position = Vector3(0.0, DOOR_H / 2, 16.5)
+	_add(wall_gate, wall, "Wall")
+	# Una pista desde Inquieto (estado de cordura), en la pared de los lockers.
+	var hint := Node3D.new()
+	hint.set_script(GatedScript)
+	hint.set("threshold", 1)
+	_add(groups.Secrets, hint, "ArmoryHint")
+	var label := Label3D.new()
+	label.text = "ACÁ ADENTRO\nESTÁN LAS ARMAS"
+	label.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
+	label.font_size = 32
+	label.pixel_size = 0.007
+	label.modulate = Color(0.55, 0.05, 0.03)
+	label.position = Vector3(0.17, 1.9, 16.5)
+	label.rotation_degrees.y = 90
+	_add(hint, label, "Label3D")
+	# El cuarto (x -3.2..0, z 15..18), afuera del edificio.
+	var room := _difficulty_gate("Armory", 1)
+	_box(room, "ArmoryFloor", Vector3(-1.6, -0.01, 16.5), Vector3(3.2, 0.02, 3.0), "concrete")
+	_box(room, "ArmoryCeiling", Vector3(-1.6, CEIL + 0.01, 16.5), Vector3(3.2, 0.02, 3.0), "ceiling", false)
+	_box(room, "ArmoryWallW", Vector3(-3.3, CEIL / 2, 16.5), Vector3(0.2, CEIL, 3.2), "wall")
+	_box(room, "ArmoryWallN", Vector3(-1.6, CEIL / 2, 14.9), Vector3(3.4, CEIL, 0.2), "wall")
+	_box(room, "ArmoryWallS", Vector3(-1.6, CEIL / 2, 18.1), Vector3(3.4, CEIL, 0.2), "wall")
+	_box(room, "GunRack", Vector3(-3.1, 1.3, 16.5), Vector3(0.15, 1.6, 2.4), "metal", false)
+	_box(room, "Table", Vector3(-1.6, 0.42, 17.6), Vector3(1.6, 0.84, 0.6), "counter")
+	_point_light(Vector3(-1.6, 2.6, 16.5), Color(0.9, 0.85, 0.7), 0.7, 4.5, true, room)
+	var pickup := "res://scenes/world/pickup.tscn"
+	for it: Array in [["ArmoryShotgun", "weapon_shotgun", Vector3(-1.8, 0.9, 17.6), 1],
+			["ArmoryShells", "ammo_shells", Vector3(-1.0, 0.9, 17.6), 6],
+			["ArmoryKit", "medicine_kit", Vector3(-2.6, 0.05, 15.5), 1]]:
+		_instance(pickup, room, it[0], it[2], {"item": load("res://assets/items/%s.tres" % it[1]), "count": it[3]})
+	_inspect(Vector3(-2.9, 1.4, 16.5), ["La armería de los guardias. Alguien la tapió con durlock y pintura del mismo verde.",
+		"Faltan casi todas las armas. Quedó la escopeta, como si alguien hubiera sabido que ibas a venir."], 1.0, room)
+	# Remedios: es un hospital.
+	for it: Array in [["Bandage1", "medicine_bandage", Vector3(12.0, 1.05, 4.0), 2],
+			["Bandage2", "medicine_bandage", Vector3(27.0, H + 0.9, 3.0), 1],
+			["MedKit1", "medicine_kit", Vector3(13.2, H + 0.95, 13.4), 1]]:
+		_instance(pickup, groups.Items, it[0], it[2], {"item": load("res://assets/items/%s.tres" % it[1]), "count": it[3]})
+
+
+# --- Puertas (pedido del usuario: que se note cuáles se pueden cruzar) ---------------
+
+const DOORS := "res://assets/models/doors/"
+
+
+## Modelo de puerta sin colisión (assets/models/doors: origen abajo al centro, frente +Z,
+## 1.02 x 2.1 m) en `pos` (piso, sobre el plano de la pared), con el frente hacia `yaw`.
+## Se estira a `width` x `height`. Con `exact_name` el nodo se llama así (para que una
+## ZoneDoor encuentre su "OpenDoor" / "LockedDoor"); si no, se numera.
+func _door_prop(parent: Node, node_name: String, model: String, pos: Vector3, yaw: float,
+		width := 1.02, height := 2.1, exact_name := false) -> Node3D:
+	var p: Node3D = PropScript.new()
+	p.set("model", load(DOORS + model + ".glb"))
+	p.set("anchor", 3)  # Prop.Anchor.ORIGIN
+	p.set("collision", false)
+	p.set("tint", Color(0.85, 0.82, 0.78))
+	p.position = pos
+	p.rotation_degrees.y = yaw
+	p.scale = Vector3(width / 1.02, height / 2.1, 1.0)
+	if exact_name:
+		p.name = node_name
+		parent.add_child(p)
+		p.owner = scene_root
+		return p
+	return _add(parent, p, node_name)
+
+
+## Las puertas visibles de una ZoneDoor: la entreabierta y, si se traba, la cerrada.
+## `wall_pos` es el pie de la puerta sobre la pared (en coordenadas del nivel).
+func _zone_door_visuals(door: Node3D, wall_pos: Vector3, yaw: float, open_model: String,
+		locked_model := "", width := 1.02, height := 2.1) -> void:
+	_door_prop(door, "OpenDoor", open_model, wall_pos - door.position, yaw, width, height, true)
+	if locked_model != "":
+		_door_prop(door, "LockedDoor", locked_model, wall_pos - door.position, yaw, width, height, true)

@@ -11,6 +11,7 @@ const OUT := "user://test_shots/"
 var sanity: Node
 var inventory: Node
 var game_state: Node
+var health: Node
 var fails := 0
 
 var peaches: ItemData = load("res://assets/items/food_canned_peaches.tres")
@@ -62,7 +63,7 @@ func place(pos: Vector3, yaw: float) -> void:
 
 func set_ratio(r: float) -> void:
 	sanity.restore(sanity.maximum)
-	sanity.take_hit(sanity.maximum * (1.0 - r))
+	sanity._set_current(sanity.maximum * r)
 
 
 func send_action(action: String) -> void:
@@ -117,6 +118,7 @@ func _initialize() -> void:
 	sanity = root.get_node("Sanity")
 	inventory = root.get_node("Inventory")
 	game_state = root.get_node("GameState")
+	health = root.get_node("Health")
 	# En la sala de prueba el refugio es la misma sala.
 	game_state.refuge_scene = "res://scenes/levels/test_room.tscn"
 	change_scene_to_file("res://scenes/levels/test_room.tscn")
@@ -125,21 +127,28 @@ func _initialize() -> void:
 	freeze_stalker(true)
 	var anim: AnimationPlayer = player().anim_player
 
-	print("-- Refugio y goteo")
-	check(sanity.in_refuge() and is_equal_approx(sanity.drain_multiplier(), 0.25), "spawn en refugio, goteo x0.25")
+	print("-- Refugio y locura")
+	check(sanity.in_refuge(), "spawn en refugio")
 	check(anim.current_animation == &"CharacterArmature|Idle", "anim idle: %s vel=%s" % [anim.current_animation, player().velocity])
 	await shot("01_refugio")
+	sanity._set_current(sanity.maximum * 0.8)
+	var in_refuge_before: float = sanity.madness()
+	await seconds(1.0)
+	check(sanity.madness() < in_refuge_before, "en el refugio la locura baja: %.3f -> %.3f" % [in_refuge_before, sanity.madness()])
 	place(Vector3(0, 0.05, 8), 0.0)
 	await frames(10)
-	var before: float = sanity.current
+	var before: float = sanity.madness()
 	await seconds(1.0)
-	check(not sanity.in_refuge() and sanity.current < before, "afuera baja: %.3f -> %.3f" % [before, sanity.current])
+	check(not sanity.in_refuge() and sanity.madness() > before, "afuera la locura sube: %.3f -> %.3f" % [before, sanity.madness()])
+	sanity.restore(1000.0)
 
 	print("-- Golpe")
 	var pre_hit: float = sanity.current
+	var pre_health: float = health.current
 	sanity.take_hit(10.0)
 	await frames(2)
-	check(absf(pre_hit - sanity.current - 10.0) < 0.1, "golpe baja 10")
+	check(absf(pre_health - health.current - 10.0) < 0.1, "golpe baja 10 de vida (Normal)")
+	check(absf(pre_hit - sanity.current) < 0.1, "el golpe no toca la locura")
 	check(anim.current_animation == &"CharacterArmature|HitRecieve", "anim de golpe")
 	await frames(60)
 
@@ -305,7 +314,7 @@ func _initialize() -> void:
 	inventory.clear()
 	inventory.add(peaches)
 	sanity.restore(100.0)
-	sanity.take_hit(50.0)
+	sanity._set_current(50.0)
 	var s0: float = sanity.current
 	inventory.use(peaches, inventory.entries[0])
 	check(absf(sanity.current - s0 - 6.0) < 0.1 and inventory.entries.is_empty(), "comida +6 y se consume")
@@ -391,9 +400,9 @@ func _initialize() -> void:
 	check(sanity.has_seen(&"delgado"), "ver al acechador por primera vez baja cordura")
 	await seconds(0.6)
 	await shot("06_acechador")
-	var pre_attack: float = sanity.current
+	var pre_attack: float = health.current
 	await seconds(3.5)
-	check(pre_attack - sanity.current >= 11.0, "el acechador golpea: -%.1f" % (pre_attack - sanity.current))
+	check(pre_attack - health.current >= 11.0, "el acechador golpea (vida): -%.1f" % (pre_attack - health.current))
 	await shot("07_golpe")
 	# Escapar corriendo: se alejan y termina perdiéndolo.
 	freeze_stalker(true)
@@ -495,7 +504,7 @@ func _initialize() -> void:
 	print("   pos=%s active=%s state=%s ctrl=%s cordura=%.1f" % [player().global_position, sanity.active, sanity.state_name(), player().can_control, sanity.current])
 	check(sanity.in_refuge(), "en el refugio")
 	var old_player: Node3D = player()
-	sanity.take_hit(10000.0)
+	sanity.add_madness(10000.0)
 	await frames(2)
 	check(sanity.lost_in_refuge and old_player.anim_player.current_animation == &"CharacterArmature|Death", "muere en el refugio")
 	await seconds(3.5)
@@ -521,7 +530,7 @@ func _initialize() -> void:
 	print("-- Muerte afuera")
 	place(Vector3(0, 0.05, 8), 0.0)
 	await frames(10)
-	sanity.take_hit(10000.0)
+	sanity.add_madness(10000.0)
 	await frames(2)
 	check(not sanity.lost_in_refuge, "se pierde afuera")
 	await seconds(8.0)
@@ -548,6 +557,49 @@ func _initialize() -> void:
 		check(game_state.lost_ones[0].defeated and sanity.current > sanity_before, "matarlo lo hace descansar y da cordura")
 		var loot: int = current_scene.get_node("WorldPersistence").find_children("*", "Pickup", false, false).size() - pickups_before
 		check(loot == 2, "suelta lo que llevaba (%d)" % loot)
+
+	print("-- Dificultad según la locura")
+	sanity.restore(1000.0)
+	health.reset()
+	check(sanity.difficulty == 0 and sanity.difficulty_name() == "Normal", "lúcido: Normal")
+	var spawn: Marker3D = Marker3D.new()
+	spawn.set_script(load("res://scripts/world/difficulty_spawn.gd"))
+	spawn.set("enemy_scene", load("res://scenes/enemies/stalker.tscn"))
+	spawn.set("min_difficulty", 2)
+	spawn.set("min_spawn_distance", 2.0)
+	spawn.position = player().global_position + Vector3(0, 0, -6)
+	current_scene.add_child(spawn)
+	await frames(3)
+	check(spawn.get_child_count() == 0, "en Normal no hay enemigo extra")
+	sanity._set_current(sanity.maximum * 0.4)
+	check(sanity.difficulty == 1 and is_equal_approx(sanity.player_damage_multiplier(), 0.8), "60 %% de locura: Difícil, pega x0.8")
+	var hp: float = health.current
+	sanity.take_hit(10.0)
+	check(absf(hp - health.current - 13.5) < 0.1, "en Difícil un golpe de 10 saca 13.5")
+	sanity._set_current(sanity.maximum * 0.2)
+	await frames(5)
+	check(sanity.difficulty == 2 and sanity.difficulty_name() == "Insane", "80 %% de locura: Insane")
+	check(spawn.get_child_count() == 1, "en Insane aparece el enemigo extra")
+	await shot("11_insane_hud")
+	spawn.get_child(0).set_physics_process(false)
+
+	print("-- Muerte por daño")
+	sanity.restore(1000.0)
+	place(Vector3(0, 0.05, 6), 0.0)
+	await frames(10)
+	inventory.add(peaches)
+	var corpses_before: int = game_state.corpses.size()
+	var lost_before: int = game_state.lost_ones.size()
+	sanity.take_hit(10000.0)
+	await frames(2)
+	check(not health.alive and not sanity.active, "vida en 0: muere")
+	await seconds(3.5)
+	check(current_scene.get_node("GameUI").lost_label.text.begins_with("Moriste"), "texto de muerte")
+	await seconds(4.5)
+	await frames(30)
+	check(game_state.corpses.size() == corpses_before + 1 and game_state.lost_ones.size() == lost_before,
+		"muerto por daño deja el cuerpo (no un Perdido)")
+	check(health.alive and is_equal_approx(health.current, health.maximum), "el nuevo sobreviviente llega con la vida llena")
 
 	print("RESULT: %d fallas" % fails)
 	quit()

@@ -8,6 +8,10 @@ extends Node3D
 @export_multiline var locked_text := "No abre."
 @export_multiline var open_text := ""
 @export var radius := 1.2
+## Modelo que aparece cuando se abre (p. ej. la puerta entreabierta), en el origen del gate.
+@export var open_model: PackedScene
+@export var open_model_scale := Vector3.ONE
+@export var open_model_yaw := 0.0
 
 var _area: Area3D
 
@@ -40,13 +44,14 @@ func is_open() -> bool:
 func _apply(announce: bool) -> void:
 	var open := is_open()
 	for child in get_children():
-		if child == _area or not child is Node3D:
+		if child == _area or child.name == &"OpenDoor" or not child is Node3D:
 			continue
 		(child as Node3D).visible = not open
 		child.process_mode = Node.PROCESS_MODE_DISABLED if open else Node.PROCESS_MODE_INHERIT
 	_area.process_mode = Node.PROCESS_MODE_DISABLED if open else Node.PROCESS_MODE_INHERIT
 	if open:
 		_area.remove_from_group(&"interactable")
+		_show_open_model()
 		if announce:
 			Audio.play_sfx(&"door_open", global_position)
 			if open_text:
@@ -56,3 +61,16 @@ func _apply(announce: bool) -> void:
 func show_locked() -> void:
 	GameState.post_message(locked_text)
 	Audio.play_sfx(&"door_locked", global_position)
+
+
+func _show_open_model() -> void:
+	if open_model == null or has_node(^"OpenDoor"):
+		return
+	var prop := Prop.new()
+	prop.name = "OpenDoor"
+	prop.anchor = Prop.Anchor.ORIGIN
+	prop.collision = false
+	prop.model = open_model
+	prop.scale = open_model_scale
+	prop.rotation_degrees.y = open_model_yaw
+	add_child(prop)

@@ -39,6 +39,7 @@ func save_game() -> bool:
 		"game_state": GameState.save_data(),
 		"inventory": Inventory.save_data(),
 		"sanity": Sanity.save_data(),
+		"health": Health.save_data(),
 		"shelter": Shelter.save_data(),
 		"date": Time.get_datetime_string_from_system(false, true),
 	}
@@ -82,6 +83,7 @@ func load_game() -> bool:
 	GameState.load_data(data.game_state)
 	Inventory.load_data(data.inventory)
 	Sanity.load_data(data.sanity)
+	Health.load_data(data.get("health", {}))
 	Shelter.load_data(data.shelter)
 	GameState.pending_player = data.player
 	GameState.change_scene(data.scene)
@@ -93,4 +95,5 @@ func new_game() -> void:
 	GameState.new_game()
 	Inventory.clear()
 	Sanity.new_game()
+	Health.reset()
 	Shelter.new_game()

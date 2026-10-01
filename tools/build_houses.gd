@@ -225,6 +225,7 @@ func _house_almacen() -> float:
 		"El libro de fiados. Última anotación: \"Sra. Ríos: leche y pan. Dice que paga mañana.\""], 1.2)
 	_inspect(Vector3(3.3, 1.2, -2.7), ["Las heladeras zumban aunque no hay luz. Adentro, todo está congelado. Hasta las latas."], 1.2)
 	_stalker(Vector3(1.7, 0.05, -4.75), 1.2)
+	_extra_enemy(Vector3(-2.6, 0.05, -4.6), 2, 1.0)
 	return 0.0
 
 
@@ -294,4 +295,5 @@ func _house_pension() -> float:
 	_pickup("Water", "food_water_bottle", Vector3(1.0, 0.05, -1.0))
 	_inspect(Vector3(3.3, 0.8, -4.6), ["La cama está hecha con prolijidad de cuartel. Sobre la almohada, una gorra de policía."], 1.2)
 	_stalker(Vector3(2.2, 0.05, -2.4), 1.5)
+	_extra_enemy(Vector3(-2.4, 0.05, -5.6), 1, 1.0)
 	return -2.4

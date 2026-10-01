@@ -54,6 +54,8 @@ static func draw_icon(canvas: CanvasItem, item: ItemData, rect: Rect2, alpha := 
 				_bullets(canvas, box, Color(0.85, 0.66, 0.3, alpha), outline)
 		ItemData.Kind.KEY:
 			_key(canvas, box, base, outline)
+		ItemData.Kind.MEDICINE:
+			_medicine(canvas, box, item.max_stack > 1, outline, alpha)
 		ItemData.Kind.MATERIAL:
 			if id.contains("wood"):
 				_planks(canvas, box, base, dark, outline)
@@ -215,3 +217,18 @@ static func _key(c: CanvasItem, b: Rect2, base: Color, o: Color) -> void:
 	_framed(c, _r(b, 0.46, 0.45, 0.46, 0.1), base, o)
 	_framed(c, _r(b, 0.74, 0.55, 0.07, 0.14), base, o)
 	_framed(c, _r(b, 0.84, 0.55, 0.07, 0.1), base, o)
+
+
+## Botiquín (caja blanca con cruz roja) o vendas (un rollo).
+static func _medicine(c: CanvasItem, b: Rect2, bandage: bool, o: Color, alpha: float) -> void:
+	var white := Color(0.92, 0.9, 0.86, alpha)
+	var red := Color(0.8, 0.12, 0.1, alpha)
+	if bandage:
+		c.draw_circle(b.get_center(), b.size.x * 0.32, o)
+		c.draw_circle(b.get_center(), b.size.x * 0.28, white)
+		c.draw_circle(b.get_center(), b.size.x * 0.1, Color(0.7, 0.68, 0.62, alpha))
+		return
+	_framed(c, _r(b, 0.1, 0.25, 0.8, 0.55), white, o)
+	c.draw_rect(_r(b, 0.42, 0.33, 0.16, 0.4), red)
+	c.draw_rect(_r(b, 0.3, 0.45, 0.4, 0.16), red)
+	c.draw_rect(_r(b, 0.38, 0.17, 0.24, 0.09), Color(0.5, 0.5, 0.5, alpha))

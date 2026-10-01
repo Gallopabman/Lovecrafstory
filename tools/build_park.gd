@@ -44,6 +44,9 @@ func _initialize() -> void:
 	_park_secrets()
 	_park_places()
 	_park_enemies()
+	_extra_enemy(Vector3(40.0, 0.05, -1.0), 1)
+	_extra_enemy(Vector3(18.0, 0.05, 2.0), 2)
+	_extra_enemy(Vector3(24.0, 0.05, 30.0), 2, 6.0)
 	_park_systems()
 
 	var packed := PackedScene.new()
@@ -249,17 +252,42 @@ func _park() -> void:
 
 
 func _fences() -> void:
-	_fence(Vector3(0.0, 0, WALK + 0.4), Vector3(PARK_END, 0, WALK + 0.4))
+	# La reja del frente tiene un portón en x 29-31 (ver abajo).
+	_fence(Vector3(0.0, 0, WALK + 0.4), Vector3(29.0, 0, WALK + 0.4))
+	_fence(Vector3(31.0, 0, WALK + 0.4), Vector3(PARK_END, 0, WALK + 0.4))
 	_fence(Vector3(0.0, 0, WALK + 0.4), Vector3(0.0, 0, 40.0))
 	_fence(Vector3(PARK_END, 0, WALK + 0.4), Vector3(PARK_END, 0, 40.0))
 	_fence(Vector3(0.0, 0, 40.0), Vector3(PARK_END, 0, 40.0))
 	# Hueco entre la reja y el hospital, tapado.
 	_brick_wall(Vector3(PARK_END, 0, WALK + 0.4), Vector3(62.0, 0, WALK + 0.4))
-	# El portón de la plaza, encadenado.
-	_box(groups.Structure, "GateChain", Vector3(30.0, 1.1, WALK + 0.25), Vector3(0.6, 0.06, 0.06), "metal", false)
-	_box(groups.Structure, "GatePadlock", Vector3(30.0, 1.0, WALK + 0.2), Vector3(0.1, 0.14, 0.06), "metal", false)
-	_inspect(Vector3(30.0, 1.1, WALK - 0.2), ["El portón de la plaza está cerrado con una cadena y un candado nuevo.",
-		"Del otro lado, una hamaca se mueve sola, despacito, como si alguien recién se hubiera bajado."], 1.4)
+	# El portón de la plaza, encadenado... salvo en Insane: entonces no está.
+	var gate := _difficulty_gate("PlazaGate", 2, true)
+	_fence(Vector3(29.0, 0, WALK + 0.4), Vector3(31.0, 0, WALK + 0.4), gate)
+	_box(gate, "GateChain", Vector3(30.0, 1.1, WALK + 0.25), Vector3(0.6, 0.06, 0.06), "metal", false)
+	_box(gate, "GatePadlock", Vector3(30.0, 1.0, WALK + 0.2), Vector3(0.1, 0.14, 0.06), "metal", false)
+	var gate_text := Area3D.new()
+	gate_text.set_script(InspectableScript)
+	gate_text.set("texts", PackedStringArray(["El portón de la plaza está cerrado con una cadena y un candado nuevo.",
+		"Del otro lado, una hamaca se mueve sola, despacito, como si alguien recién se hubiera bajado."]))
+	gate_text.set("radius", 1.4)
+	gate_text.position = Vector3(30.0, 1.1, WALK - 0.2)
+	_add(gate, gate_text, "Inspect")
+	# Lo que espera adentro (Insane): una pistola en el borde de la fuente.
+	var reward := _difficulty_gate("PlazaReward", 2)
+	for it: Array in [["PlazaPistol", "weapon_pistol", Vector3(30.0, 0.65, 17.55), 1],
+			["PlazaAmmo", "ammo_9mm", Vector3(30.8, 0.65, 17.55), 10],
+			["PlazaBandage", "medicine_bandage", Vector3(29.2, 0.65, 17.55), 2]]:
+		_instance("res://scenes/world/pickup.tscn", reward, it[0], it[2],
+			{"item": load("res://assets/items/%s.tres" % it[1]), "count": it[3]})
+	var reward_text := Area3D.new()
+	reward_text.set_script(InspectableScript)
+	reward_text.set("texts", PackedStringArray(["En el borde de la fuente seca, una pistola envuelta en una bolsa de supermercado.",
+		"Alguien la dejó para vos. Alguien que sabía que ibas a estar así de mal para poder entrar."]))
+	reward_text.set("radius", 1.2)
+	reward_text.position = Vector3(30.0, 1.0, 16.6)
+	_add(reward, reward_text, "Inspect")
+
+
 
 
 func _park_street_props() -> void:

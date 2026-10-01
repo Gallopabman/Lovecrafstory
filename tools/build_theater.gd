@@ -561,6 +561,11 @@ func _theater_enemies() -> void:
 	_instance(stalker, groups.Enemies, "StalkerStorage", Vector3(49.5, S + 0.05, 7.0), {"wander_radius": 1.5})
 	# La cantante: el jefe del teatro (duerme hasta que te acercás al escenario).
 	_instance("res://scenes/enemies/boss.tscn", groups.Enemies, "Singer", Vector3(38.0, S + 0.05, 7.5), {"wander_radius": 3.0})
+	# Más público según la dificultad.
+	_extra_enemy(Vector3(22.0, 0.05, 7.0), 1, 4.0)
+	_extra_enemy(Vector3(43.5, S + 0.05, 9.0), 1, 2.0)
+	_extra_enemy(Vector3(5.0, 0.05, 9.0), 2, 3.0)
+	_extra_enemy(Vector3(28.0, 0.05, 14.8), 2, 3.0)
 
 
 func _theater_systems() -> void:

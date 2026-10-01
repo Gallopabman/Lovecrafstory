@@ -1,7 +1,13 @@
 extends Node
-## Autoload "Sanity": la cordura es el recurso central del juego (ver GDD).
-## Baja con el tiempo (más lento en el refugio), con golpes y al ver horrores
-## nuevos. Sube con objetos de esperanza. Al llegar a 0 el personaje se pierde.
+## Autoload "Sanity": la cabeza del sobreviviente. En pantalla es la **locura**
+## (pedido del usuario): `madness()` = 1 - cordura. Por dentro se sigue llevando la
+## cordura (`current`, 0..`maximum`) porque de ella salen los estados del GDD.
+## - Afuera la locura sube de a poco (goteo); en el refugio activo baja (más rápido
+##   cuanto más cómodo es). Ver horrores nuevos y los gritos la suben de golpe.
+## - Los objetos de esperanza la bajan. Al 100 % de locura el personaje se pierde.
+## - La **dificultad** sale de la locura (Normal / Difícil / Insane): el jugador pega
+##   menos, recibe más daño (Health) y aparecen más enemigos (DifficultySpawn).
+## Los golpes físicos bajan la vida (autoload Health): `take_hit` los deriva ahí.
 
 signal changed(current: float, maximum: float)
 signal state_changed(new_state: State, old_state: State)
@@ -9,11 +15,12 @@ signal state_changed(new_state: State, old_state: State)
 signal shocked(strength: float)
 signal hit_taken(amount: float)
 signal horror_seen(horror_id: StringName)
-## Cordura en 0. Ver `lost_in_refuge` para saber cómo terminó.
+## Locura al 100 %. Ver `lost_in_refuge` para saber cómo terminó.
 signal lost
 ## El jugador llegó al refugio / salió de él (para el bono de llegar a casa).
 signal refuge_entered
 signal refuge_exited
+signal difficulty_changed(level: int, previous: int)
 
 ## Rangos en % de la cordura máxima (tabla "Estados de cordura" del GDD).
 enum State { LUCID, UNEASY, BROKEN, BRINK, LOST }
@@ -24,17 +31,32 @@ const STATE_NAMES := {
 	State.BRINK: "Al borde",
 	State.LOST: "Perdido",
 }
+enum Difficulty { NORMAL, HARD, INSANE }
+const DIFFICULTY_NAMES := ["Normal", "Difícil", "Insane"]
 
 @export var base_maximum := 100.0
-## Goteo constante fuera del refugio (100 -> 0 en ~11 minutos).
+## Goteo constante fuera del refugio (la locura llena la barra en ~11 minutos).
 @export var drain_per_second := 0.15
+## Lo que baja la locura por segundo en el refugio activo (x el multiplicador del refugio).
+@export var refuge_recovery_per_second := 0.2
 @export var uneasy_below := 0.7
 @export var broken_below := 0.4
 @export var brink_below := 0.15
 
+@export_group("Dificultad")
+## Locura (0..1) desde la que el juego pasa a Difícil y a Insane.
+@export var hard_from := 0.5
+@export var insane_from := 0.75
+## Daño que hace el jugador según la dificultad.
+@export var player_damage_multipliers: Array[float] = [1.0, 0.8, 0.6]
+## Daño que recibe según la dificultad.
+@export var damage_taken_multipliers: Array[float] = [1.0, 1.35, 1.75]
+
 var maximum := base_maximum
 var current := base_maximum
 var state := State.LUCID
+var difficulty := Difficulty.NORMAL
+## Vivo y en juego (no muerto ni perdido): si no, nada baja ni sube.
 var active := true
 ## Cómo terminó el último sobreviviente: en el refugio muere (ataque cardíaco y
 ## el cuerpo queda en el piso); afuera se convierte en el Perdido.
@@ -45,8 +67,12 @@ var _seen_horrors: Dictionary = {}
 
 
 func _process(delta: float) -> void:
-	if active:
-		_set_current(current - drain_per_second * drain_multiplier() * delta)
+	if not active:
+		return
+	if in_refuge():
+		_set_current(current + refuge_recovery_per_second * recovery_multiplier() * delta)
+	else:
+		_set_current(current - drain_per_second * delta)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -66,6 +92,11 @@ func ratio() -> float:
 	return current / maximum if maximum > 0.0 else 0.0
 
 
+## La locura que se muestra: 0 = lúcido del todo, 1 = perdido.
+func madness() -> float:
+	return 1.0 - ratio()
+
+
 ## 0 mientras se está lúcido, 1 al llegar a 0. Maneja niebla, jitter y post-proceso.
 func insanity() -> float:
 	return clampf(1.0 - ratio() / uneasy_below, 0.0, 1.0)
@@ -73,6 +104,18 @@ func insanity() -> float:
 
 func state_name(s: State = state) -> String:
 	return STATE_NAMES[s]
+
+
+func difficulty_name(d: int = difficulty) -> String:
+	return DIFFICULTY_NAMES[d]
+
+
+func player_damage_multiplier() -> float:
+	return player_damage_multipliers[difficulty]
+
+
+func damage_taken_multiplier() -> float:
+	return damage_taken_multipliers[difficulty]
 
 
 func in_refuge() -> bool:
@@ -83,15 +126,25 @@ func has_electricity() -> bool:
 	return _refuges.any(func(r: RefugeZone) -> bool: return r.current_has_electricity())
 
 
-func drain_multiplier() -> float:
-	var multiplier := 1.0
+## Qué tan rápido baja la locura en el refugio (el mejor de los que se esté pisando).
+func recovery_multiplier() -> float:
+	var multiplier := 0.0
 	for refuge in _refuges:
-		multiplier = minf(multiplier, refuge.current_drain_multiplier())
+		multiplier = maxf(multiplier, refuge.current_recovery_multiplier())
 	return multiplier
 
 
+## Baja la locura (comida, cómics, cartas, el bono de llegar a casa...).
 func restore(amount: float) -> void:
 	_set_current(current + amount)
+
+
+## Sube la locura de golpe (gritos, eventos), con un susto en pantalla.
+func add_madness(amount: float) -> void:
+	if not active:
+		return
+	shocked.emit(clampf(amount / 15.0, 0.2, 1.0))
+	_set_current(current - amount)
 
 
 func fill() -> void:
@@ -103,12 +156,15 @@ func increase_maximum(amount: float) -> void:
 	changed.emit(current, maximum)
 
 
+## Un golpe físico: baja la vida (con el multiplicador de dificultad) y sacude la pantalla.
 func take_hit(amount: float) -> void:
 	if not active:
 		return
-	hit_taken.emit(amount)
-	shocked.emit(clampf(amount / 20.0, 0.2, 1.0))
-	_set_current(current - amount)
+	var dealt := Health.take_damage(amount)
+	if dealt <= 0.0:
+		return
+	hit_taken.emit(dealt)
+	shocked.emit(clampf(dealt / 20.0, 0.2, 1.0))
 
 
 func has_seen(horror_id: StringName) -> bool:
@@ -140,6 +196,12 @@ func exit_refuge(refuge: RefugeZone) -> void:
 	_refuges.erase(refuge)
 	if _refuges.is_empty() and active:
 		refuge_exited.emit()
+
+
+## Murió por daño (Health): deja de correr el tiempo para este sobreviviente.
+func end_life() -> void:
+	active = false
+	lost_in_refuge = in_refuge()
 
 
 ## Nuevo sobreviviente: la cordura máxima vuelve a la base; los horrores
@@ -186,6 +248,7 @@ func _set_current(value: float) -> void:
 
 
 func _update_state() -> void:
+	_update_difficulty()
 	var r := ratio()
 	var new_state := State.LUCID
 	if current <= 0.0:
@@ -205,3 +268,17 @@ func _update_state() -> void:
 		active = false
 		lost_in_refuge = in_refuge()
 		lost.emit()
+
+
+func _update_difficulty() -> void:
+	var m := madness()
+	var level := Difficulty.NORMAL
+	if m >= insane_from:
+		level = Difficulty.INSANE
+	elif m >= hard_from:
+		level = Difficulty.HARD
+	if level == difficulty:
+		return
+	var previous := difficulty
+	difficulty = level
+	difficulty_changed.emit(level, previous)

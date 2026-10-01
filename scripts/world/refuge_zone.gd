@@ -1,6 +1,6 @@
 class_name RefugeZone
 extends Area3D
-## Zona del refugio: mientras el jugador está adentro la cordura baja más lento.
+## Zona del refugio: mientras el jugador está adentro la locura baja.
 ## Con `use_shelter` el goteo y la electricidad salen del blueprint (autoload
 ## Shelter: nivel cozy y generador) y la zona solo cuenta si `refuge_id` es el
 ## refugio activo (hay uno solo; los demás son lugares donde se podría vivir).
@@ -8,8 +8,8 @@ extends Area3D
 
 @export var use_shelter := false
 @export var refuge_id: StringName = &"hospital"
-## Factor aplicado al goteo de cordura (0.25 = baja 4 veces más lento). Sin `use_shelter`.
-@export_range(0.0, 1.0) var drain_multiplier := 0.25
+## Multiplicador de lo rápido que baja la locura adentro. Sin `use_shelter`.
+@export var recovery_multiplier := 1.0
 ## Habilita películas y música. Sin `use_shelter`.
 @export var has_electricity := true
 
@@ -27,8 +27,8 @@ func is_home() -> bool:
 	return not use_shelter or Shelter.is_active(refuge_id)
 
 
-func current_drain_multiplier() -> float:
-	return Shelter.drain_multiplier(refuge_id) if use_shelter else drain_multiplier
+func current_recovery_multiplier() -> float:
+	return Shelter.recovery_multiplier(refuge_id) if use_shelter else recovery_multiplier
 
 
 func current_has_electricity() -> bool:

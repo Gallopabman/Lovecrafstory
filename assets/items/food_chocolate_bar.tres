@@ -10,6 +10,7 @@ display_name = "Barra de chocolate"
 short_name = "CHO"
 description = "Chocolate con maní. Un poco derretido y vuelto a endurecer."
 sanity_restore = 5.0
+health_restore = 12.0
 world_color = Color(0.4, 0.22, 0.12, 1)
 world_scene = ExtResource("2_xsu66")
 world_size = 0.2

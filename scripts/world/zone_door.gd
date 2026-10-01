@@ -3,6 +3,8 @@ extends Area3D
 ## Puerta entre zonas (mundo interconectado del GDD). Con "interact" lleva a otra
 ## escena y aparece en el SpawnPoint `target_spawn`. Puede estar trabada hasta que se
 ## use un objeto (p. ej. forzarla con la barreta); una vez abierta queda abierta.
+## Si tiene hijos "OpenDoor" y "LockedDoor" (modelos de puerta), muestra el que
+## corresponde: la puerta entreabierta se ve atravesable; la trabada, con cadenas o tablas.
 
 @export_file("*.tscn") var target_scene := ""
 @export var target_spawn: StringName = &""
@@ -25,6 +27,7 @@ func _ready() -> void:
 	sphere.radius = radius
 	shape.shape = sphere
 	add_child(shape)
+	_update_visuals()
 
 
 func is_open() -> bool:
@@ -38,7 +41,18 @@ func interact(_player: Player) -> void:
 			Audio.play_sfx(&"door_locked", global_position)
 			return
 		GameState.set_flag(unlock_flag)
+		_update_visuals()
 		if unlock_text:
 			GameState.post_message(unlock_text)
 	Audio.play_ui(&"door_open")
 	GameState.travel(target_scene, target_spawn)
+
+
+func _update_visuals() -> void:
+	var open := is_open()
+	var open_door := get_node_or_null(^"OpenDoor") as Node3D
+	var locked_door := get_node_or_null(^"LockedDoor") as Node3D
+	if open_door:
+		open_door.visible = open or locked_door == null
+	if locked_door:
+		locked_door.visible = not open

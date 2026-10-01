@@ -101,6 +101,8 @@ func _initialize() -> void:
 	var pistol_entry: Dictionary = inventory.entries[1]
 	pistol_entry.loaded = 3
 	inventory.equip(pistol_entry)
+	# Ya visto antes de guardar: así, al cargar, verlo de nuevo no cambia la locura.
+	sanity.register_sighting(&"delgado", 0.0)
 	sanity._set_current(55.0)
 	game_state.set_flag(&"hospital_exit_forced")
 	shelter.stock[&"material_wood"] = 4

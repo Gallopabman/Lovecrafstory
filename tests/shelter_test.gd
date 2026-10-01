@@ -86,7 +86,7 @@ func _initialize() -> void:
 
 	print("-- Refugio pelado")
 	check(sanity.in_refuge() and shelter.cozy() == 0, "arranca en el refugio, cozy 0")
-	check(is_equal_approx(sanity.drain_multiplier(), 0.6), "goteo sin mejoras x0.6: %.2f" % sanity.drain_multiplier())
+	check(is_equal_approx(sanity.recovery_multiplier(), 1.0), "sin mejoras la locura baja x1: %.2f" % sanity.recovery_multiplier())
 	check(not sanity.has_electricity(), "sin electricidad (generador roto)")
 	check(slot_part("SlotBed", "Only0").visible and not slot_part("SlotPower", "From1").visible, "colchón en el piso, luces apagadas")
 	inventory.add(vhs)
@@ -169,7 +169,7 @@ func _initialize() -> void:
 	Input.parse_input_event(ev)
 	await frames(3)
 	check(shelter.level(&"fire") == 1 and shelter.stock[&"material_wood"] == 0, "construyó la fogata (3 madera)")
-	check(shelter.cozy() == 1 and sanity.drain_multiplier() < 0.6, "cozy 1, goteo x%.2f" % sanity.drain_multiplier())
+	check(shelter.cozy() == 1 and sanity.recovery_multiplier() > 1.0, "cozy 1, la locura baja x%.2f" % sanity.recovery_multiplier())
 	menu._select(1)
 	Input.parse_input_event(ev)
 	await frames(3)
@@ -204,7 +204,7 @@ func _initialize() -> void:
 			pass
 	check(shelter.cozy() == shelter.cozy_max(), "refugio completo: cozy %d/%d" % [shelter.cozy(), shelter.cozy_max()])
 	check(shelter.stash_capacity_now() == 28, "el alijo mejorado (armario) tiene 28 lugares")
-	check(is_equal_approx(sanity.drain_multiplier(), 0.1), "goteo con el refugio completo x%.2f" % sanity.drain_multiplier())
+	check(is_equal_approx(sanity.recovery_multiplier(), 3.0), "con el refugio completo la locura baja x%.2f" % sanity.recovery_multiplier())
 	var s2: float = sanity.current
 	check((shelter.rest() as String).begins_with("Dormí") and sanity.current - s2 > 9.0, "descansar en la cama con mantas: +%.1f" % (sanity.current - s2))
 	check((shelter.rest() as String).begins_with("No tengo sueño"), "descansar tiene enfriamiento")

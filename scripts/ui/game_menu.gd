@@ -189,12 +189,12 @@ func _refresh() -> void:
 	if not is_node_ready():
 		return
 	sanity_bar.max_value = Sanity.maximum
-	sanity_bar.value = Sanity.current
+	sanity_bar.value = Sanity.maximum - Sanity.current  # la barra es de locura
 	# La barra crece con las cartas: su ancho es proporcional a la cordura máxima.
 	sanity_bar.size.x = minf(bar_pixels_per_point * Sanity.maximum, bar_max_width)
 	state_label.text = Sanity.state_name()
 	state_label.add_theme_color_override(&"font_color", STATE_COLORS[Sanity.state])
-	sanity_hint.text = STATE_HINTS[Sanity.state]
+	sanity_hint.text = "Vida %d  ·  %s" % [roundi(Health.current), Sanity.difficulty_name()]
 	var scene := get_tree().current_scene
 	var zone: String = ZONE_NAMES.get(scene.name, "") if scene else ""
 	menu_title.text = "SOBREVIVIENTE #%d" % GameState.survivor_number

@@ -5,7 +5,8 @@ extends Resource
 
 ## MATERIAL: para las mejoras del refugio (se descarga solo al llegar a casa).
 ## KEY: abre algo del mundo (ZoneDoor.required_item); no se "usa" desde la mochila.
-enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL, KEY }
+## MEDICINE: vendas, botiquines: curan vida (`health_restore`).
+enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL, KEY, MEDICINE }
 
 @export var id: StringName
 @export var display_name := ""
@@ -19,8 +20,10 @@ enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL, KEY }
 @export var max_stack := 1
 
 @export_group("Cordura")
-## Cuánto sube la cordura al usarlo (no aplica a cartas: llenan la barra).
+## Cuánto baja la locura al usarlo (no aplica a cartas: la vacían).
 @export var sanity_restore := 10.0
+## Cuánta vida cura (comida y remedios).
+@export var health_restore := 0.0
 ## Reutilizables: cada nuevo uso rinde este factor del anterior.
 @export_range(0.0, 1.0) var reuse_falloff := 0.6
 ## Cartas: cuánto aumenta la cordura máxima la primera lectura.

@@ -21,6 +21,7 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 [autoload]
 
 Sanity="*res://scripts/autoload/sanity_manager.gd"
+Health="*res://scripts/autoload/health.gd"
 Inventory="*res://scripts/autoload/inventory.gd"
 GameState="*res://scripts/autoload/game_state.gd"
 Shelter="*res://scripts/autoload/shelter.gd"

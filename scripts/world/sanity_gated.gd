@@ -14,15 +14,19 @@ enum Mode {
 @export var mode := Mode.REVEAL_WHEN_INSANE
 ## Estado a partir del cual se considera "con poca cordura".
 @export_enum("Inquieto:1", "Quebrado:2", "Al borde:3") var threshold := 2
+## Si está activo, `threshold` se compara con la dificultad (1 = Difícil, 2 = Insane)
+## en vez del estado de cordura: cuartos secretos y recompensas por locura.
+@export var use_difficulty := false
 
 
 func _ready() -> void:
 	Sanity.state_changed.connect(func(new_state: int, _old: int) -> void: _apply(new_state))
+	Sanity.difficulty_changed.connect(func(_l: int, _p: int) -> void: _apply(Sanity.state))
 	_apply(Sanity.state)
 
 
 func _apply(state: int) -> void:
-	var insane := state >= threshold
+	var insane := (Sanity.difficulty if use_difficulty else state) >= threshold
 	var present := insane if mode == Mode.REVEAL_WHEN_INSANE else not insane
 	visible = present
 	# Deshabilitar el procesamiento saca a los cuerpos hijos del mundo físico.

@@ -127,7 +127,7 @@ func _attack(delta: float, player: Player, player_valid: bool) -> void:
 		_attack_hit_pending = false
 		Audio.play_sfx(sound_scream, global_position, 3.0)
 		if player_valid and global_position.distance_to(player.global_position) <= scream_range * 1.2:
-			Sanity.take_hit(scream_sanity)
+			Sanity.add_madness(scream_sanity)
 	if _attack_timer >= anim_player.get_animation(_attack_anim).length:
 		_is_scream = false
 		state = State.CHASE

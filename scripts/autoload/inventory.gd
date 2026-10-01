@@ -269,11 +269,20 @@ func use(item: ItemData, entry: Dictionary = {}) -> String:
 		ItemData.Kind.FOOD:
 			# Cocinada en el fuego del refugio rinde más (GDD).
 			var cooked: bool = entry.get("cooked", false)
-			Sanity.restore(item.sanity_restore * (Shelter.cooked_multiplier if cooked else 1.0))
+			var factor := Shelter.cooked_multiplier if cooked else 1.0
+			Sanity.restore(item.sanity_restore * factor)
+			Health.heal(item.health_restore * factor)
 			_consume_one(entry)
 			result = "Caliente. Como en casa." if cooked else "Por un momento, todo parece normal."
+		ItemData.Kind.MEDICINE:
+			if Health.current >= Health.maximum:
+				return "No estoy lastimado."
+			Health.heal(item.health_restore)
+			Sanity.restore(item.sanity_restore)
+			_consume_one(entry)
+			result = "Me curé las heridas."
 		ItemData.Kind.MATERIAL:
-			return "Es para el refugio: se descarga al llegar."
+			return "Es para el refugio: lo dejo en el alijo."
 		ItemData.Kind.KEY:
 			return "Abre algo. Lo pruebo cuando lo encuentre."
 		ItemData.Kind.COMIC, ItemData.Kind.MOVIE:

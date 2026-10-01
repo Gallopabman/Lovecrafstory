@@ -72,17 +72,17 @@
 [ext_resource type="PackedScene" path="res://scenes/enemies/stalker.tscn" id="70_1byd4"]
 [ext_resource type="Script" path="res://scripts/enemies/stalker.gd" id="71_38vkr"]
 [ext_resource type="Texture2D" path="res://assets/models/enemies/thin_zombie/thin_zombie.png" id="72_vaard"]
-[ext_resource type="Script" path="res://scripts/world/atmosphere.gd" id="73_qa85p"]
-[ext_resource type="Script" path="res://scripts/world/discovery_zone.gd" id="74_3alos"]
-[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="75_x1waq"]
-[ext_resource type="Script" path="res://scripts/world/runtime_nav_bake.gd" id="76_21rrb"]
-[ext_resource type="Script" path="res://scripts/world/world_persistence.gd" id="77_nd4ej"]
-[ext_resource type="Script" path="res://scripts/world/level_audio.gd" id="78_xhjgm"]
-[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="79_1rc1v"]
-[ext_resource type="Script" path="res://scripts/player/player.gd" id="80_e8u2q"]
-[ext_resource type="PackedScene" path="res://scenes/effects/ps1_post_process.tscn" id="81_1ai21"]
-[ext_resource type="PackedScene" path="res://scenes/ui/game_ui.tscn" id="82_n5a78"]
-[ext_resource type="Script" path="res://scripts/ui/game_ui.gd" id="83_x40sj"]
+[ext_resource type="Script" path="res://scripts/world/difficulty_spawn.gd" id="73_qa85p"]
+[ext_resource type="Script" path="res://scripts/world/atmosphere.gd" id="74_3alos"]
+[ext_resource type="Script" path="res://scripts/world/discovery_zone.gd" id="75_x1waq"]
+[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="76_21rrb"]
+[ext_resource type="Script" path="res://scripts/world/runtime_nav_bake.gd" id="77_nd4ej"]
+[ext_resource type="Script" path="res://scripts/world/world_persistence.gd" id="78_xhjgm"]
+[ext_resource type="Script" path="res://scripts/world/level_audio.gd" id="79_1rc1v"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="80_e8u2q"]
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="81_1ai21"]
+[ext_resource type="PackedScene" path="res://scenes/effects/ps1_post_process.tscn" id="82_n5a78"]
+[ext_resource type="PackedScene" path="res://scenes/ui/game_ui.tscn" id="83_x40sj"]
 
 [sub_resource type="Environment" id="Environment_tl1na"]
 background_mode = 1
@@ -98,17 +98,17 @@ geometry_source_group_name = &"nav_source"
 agent_height = 2.25
 agent_max_slope = 40.0
 
-[node name="Street" type="Node3D" unique_id=1871463424]
+[node name="Street" type="Node3D" unique_id=2118466850]
 
-[node name="Structure" type="Node3D" parent="." unique_id=1053437412 groups=["nav_source"]]
+[node name="Structure" type="Node3D" parent="." unique_id=660669595 groups=["nav_source"]]
 
-[node name="Ground" type="StaticBody3D" parent="Structure" unique_id=1982938064]
+[node name="Ground" type="StaticBody3D" parent="Structure" unique_id=991119915]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, -0.12, -10)
 script = ExtResource("1_rnbyg")
 size = Vector3(110, 0.2, 70)
 material = ExtResource("2_bie36")
 
-[node name="Street_2Lane" type="Node3D" parent="Structure" unique_id=1362983031]
+[node name="Street_2Lane" type="Node3D" parent="Structure" unique_id=661706227]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -116,7 +116,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Street_2Lane2" type="Node3D" parent="Structure" unique_id=1006728090]
+[node name="Street_2Lane2" type="Node3D" parent="Structure" unique_id=1162685094]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -124,7 +124,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Street_2Lane3" type="Node3D" parent="Structure" unique_id=1644183149]
+[node name="Street_2Lane3" type="Node3D" parent="Structure" unique_id=705983905]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -132,7 +132,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Street_2Lane4" type="Node3D" parent="Structure" unique_id=1379398947]
+[node name="Street_2Lane4" type="Node3D" parent="Structure" unique_id=1870939157]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -140,7 +140,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Street_2Lane5" type="Node3D" parent="Structure" unique_id=1075810466]
+[node name="Street_2Lane5" type="Node3D" parent="Structure" unique_id=335137189]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -148,7 +148,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Street_2Lane6" type="Node3D" parent="Structure" unique_id=95722802]
+[node name="Street_2Lane6" type="Node3D" parent="Structure" unique_id=2143685365]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -156,7 +156,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Street_2Lane7" type="Node3D" parent="Structure" unique_id=2062844493]
+[node name="Street_2Lane7" type="Node3D" parent="Structure" unique_id=1826579303]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -164,7 +164,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Street_2Lane8" type="Node3D" parent="Structure" unique_id=1892020268]
+[node name="Street_2Lane8" type="Node3D" parent="Structure" unique_id=420228610]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -172,7 +172,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Street_2Lane9" type="Node3D" parent="Structure" unique_id=1668063166]
+[node name="Street_2Lane9" type="Node3D" parent="Structure" unique_id=1258610772]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -180,7 +180,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Street_2Lane10" type="Node3D" parent="Structure" unique_id=844712871]
+[node name="Street_2Lane10" type="Node3D" parent="Structure" unique_id=2029660917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -188,7 +188,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Street_2Lane11" type="Node3D" parent="Structure" unique_id=259802858]
+[node name="Street_2Lane11" type="Node3D" parent="Structure" unique_id=1200968569]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("4_w85kq")
@@ -196,7 +196,7 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.62, 1)
 collision = false
 
-[node name="Decal_Crosswalk" type="Node3D" parent="Structure" unique_id=1842500324]
+[node name="Decal_Crosswalk" type="Node3D" parent="Structure" unique_id=1675596934]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8, 0.01, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("5_58u1m")
@@ -204,7 +204,7 @@ anchor = 3
 tint = Color(0.7, 0.7, 0.68, 1)
 collision = false
 
-[node name="Street_Asphalt_6x6" type="Node3D" parent="Structure" unique_id=791218265]
+[node name="Street_Asphalt_6x6" type="Node3D" parent="Structure" unique_id=561664694]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.5, 0, -9)
 script = ExtResource("3_fpkux")
 model = ExtResource("6_6vkha")
@@ -212,7 +212,7 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="Street_Asphalt_6x62" type="Node3D" parent="Structure" unique_id=89367484]
+[node name="Street_Asphalt_6x62" type="Node3D" parent="Structure" unique_id=872900086]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.5, 0, -15)
 script = ExtResource("3_fpkux")
 model = ExtResource("6_6vkha")
@@ -220,7 +220,7 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="Street_Asphalt_6x63" type="Node3D" parent="Structure" unique_id=49486241]
+[node name="Street_Asphalt_6x63" type="Node3D" parent="Structure" unique_id=1829635721]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.5, 0, -21)
 script = ExtResource("3_fpkux")
 model = ExtResource("6_6vkha")
@@ -228,7 +228,7 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="Street_Asphalt_6x64" type="Node3D" parent="Structure" unique_id=95116137]
+[node name="Street_Asphalt_6x64" type="Node3D" parent="Structure" unique_id=661857745]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 0, -27)
 script = ExtResource("3_fpkux")
 model = ExtResource("6_6vkha")
@@ -236,7 +236,7 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="Street_Asphalt_6x65" type="Node3D" parent="Structure" unique_id=1874673464]
+[node name="Street_Asphalt_6x65" type="Node3D" parent="Structure" unique_id=1221912592]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, 0, -27)
 script = ExtResource("3_fpkux")
 model = ExtResource("6_6vkha")
@@ -244,7 +244,7 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="Street_Asphalt_6x66" type="Node3D" parent="Structure" unique_id=818136598]
+[node name="Street_Asphalt_6x66" type="Node3D" parent="Structure" unique_id=1018901218]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0, -27)
 script = ExtResource("3_fpkux")
 model = ExtResource("6_6vkha")
@@ -252,7 +252,7 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="Street_Asphalt_6x67" type="Node3D" parent="Structure" unique_id=274299578]
+[node name="Street_Asphalt_6x67" type="Node3D" parent="Structure" unique_id=275017517]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 0, -33)
 script = ExtResource("3_fpkux")
 model = ExtResource("6_6vkha")
@@ -260,7 +260,7 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="Street_Asphalt_6x68" type="Node3D" parent="Structure" unique_id=2047949148]
+[node name="Street_Asphalt_6x68" type="Node3D" parent="Structure" unique_id=1805530008]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, 0, -33)
 script = ExtResource("3_fpkux")
 model = ExtResource("6_6vkha")
@@ -268,7 +268,7 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="Street_Asphalt_6x69" type="Node3D" parent="Structure" unique_id=1982092685]
+[node name="Street_Asphalt_6x69" type="Node3D" parent="Structure" unique_id=765589198]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0, -33)
 script = ExtResource("3_fpkux")
 model = ExtResource("6_6vkha")
@@ -276,9 +276,9 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="HospitalBack" type="Node3D" parent="Structure" unique_id=831500434]
+[node name="HospitalBack" type="Node3D" parent="Structure" unique_id=797448708]
 
-[node name="Brick_Plain_4" type="Node3D" parent="Structure/HospitalBack" unique_id=562309567]
+[node name="Brick_Plain_4" type="Node3D" parent="Structure/HospitalBack" unique_id=1697252816]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 6.5625)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -286,7 +286,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_42" type="Node3D" parent="Structure/HospitalBack" unique_id=541242642]
+[node name="Brick_Plain_42" type="Node3D" parent="Structure/HospitalBack" unique_id=1762919699]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 4, 6.5625)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -294,7 +294,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_43" type="Node3D" parent="Structure/HospitalBack" unique_id=1481121723]
+[node name="Brick_Plain_43" type="Node3D" parent="Structure/HospitalBack" unique_id=611035797]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 4.6875)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -302,7 +302,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_44" type="Node3D" parent="Structure/HospitalBack" unique_id=1352632850]
+[node name="Brick_Plain_44" type="Node3D" parent="Structure/HospitalBack" unique_id=2110924077]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 4, 4.6875)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -310,7 +310,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_45" type="Node3D" parent="Structure/HospitalBack" unique_id=1799764537]
+[node name="Brick_Plain_45" type="Node3D" parent="Structure/HospitalBack" unique_id=54990258]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 2.8125)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -318,7 +318,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_46" type="Node3D" parent="Structure/HospitalBack" unique_id=411393911]
+[node name="Brick_Plain_46" type="Node3D" parent="Structure/HospitalBack" unique_id=1619603902]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 4, 2.8125)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -326,7 +326,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_47" type="Node3D" parent="Structure/HospitalBack" unique_id=911915394]
+[node name="Brick_Plain_47" type="Node3D" parent="Structure/HospitalBack" unique_id=636221604]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0.9375)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -334,7 +334,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_48" type="Node3D" parent="Structure/HospitalBack" unique_id=189700676]
+[node name="Brick_Plain_48" type="Node3D" parent="Structure/HospitalBack" unique_id=1417014935]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 4, 0.9375)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -342,7 +342,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_49" type="Node3D" parent="Structure/HospitalBack" unique_id=1010016208]
+[node name="Brick_Plain_49" type="Node3D" parent="Structure/HospitalBack" unique_id=1191313034]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, -0.9375)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -350,7 +350,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_410" type="Node3D" parent="Structure/HospitalBack" unique_id=1050706556]
+[node name="Brick_Plain_410" type="Node3D" parent="Structure/HospitalBack" unique_id=881450271]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 4, -0.9375)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -358,7 +358,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_411" type="Node3D" parent="Structure/HospitalBack" unique_id=283117977]
+[node name="Brick_Plain_411" type="Node3D" parent="Structure/HospitalBack" unique_id=98860648]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, -2.8125)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -366,7 +366,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_412" type="Node3D" parent="Structure/HospitalBack" unique_id=1468295154]
+[node name="Brick_Plain_412" type="Node3D" parent="Structure/HospitalBack" unique_id=1891033687]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 4, -2.8125)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -374,7 +374,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_413" type="Node3D" parent="Structure/HospitalBack" unique_id=1259054345]
+[node name="Brick_Plain_413" type="Node3D" parent="Structure/HospitalBack" unique_id=826132270]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, -4.6875)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -382,7 +382,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_414" type="Node3D" parent="Structure/HospitalBack" unique_id=316669564]
+[node name="Brick_Plain_414" type="Node3D" parent="Structure/HospitalBack" unique_id=940045730]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 4, -4.6875)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -390,7 +390,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_415" type="Node3D" parent="Structure/HospitalBack" unique_id=124003543]
+[node name="Brick_Plain_415" type="Node3D" parent="Structure/HospitalBack" unique_id=2077905226]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, -6.5625)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -398,7 +398,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_416" type="Node3D" parent="Structure/HospitalBack" unique_id=1725522770]
+[node name="Brick_Plain_416" type="Node3D" parent="Structure/HospitalBack" unique_id=1942688721]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 4, -6.5625)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -406,21 +406,21 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="WallCollider" type="StaticBody3D" parent="Structure/HospitalBack" unique_id=325925071]
+[node name="WallCollider" type="StaticBody3D" parent="Structure/HospitalBack" unique_id=1993435017]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 4, 4.371139e-09)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.2, 8, 15.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Cornice" type="StaticBody3D" parent="Structure/HospitalBack" unique_id=158525891]
+[node name="Cornice" type="StaticBody3D" parent="Structure/HospitalBack" unique_id=2045790439]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 8.1, 0)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.8, 0.3, 15.6)
 material = ExtResource("9_62g7y")
 collision_enabled = false
 
-[node name="DoorFrame_Metal_Single" type="Node3D" parent="Structure/HospitalBack" unique_id=364559123]
+[node name="DoorFrame_Metal_Single" type="Node3D" parent="Structure/HospitalBack" unique_id=1531873900]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.05, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("10_ynv7d")
@@ -428,7 +428,7 @@ anchor = 3
 tint = Color(0.6, 0.62, 0.6, 1)
 collision = false
 
-[node name="Door_1" type="Node3D" parent="Structure/HospitalBack" unique_id=1923808450]
+[node name="Door_1" type="Node3D" parent="Structure/HospitalBack" unique_id=316144692]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.1, 0, 0.5)
 script = ExtResource("3_fpkux")
 model = ExtResource("11_jjus4")
@@ -436,7 +436,7 @@ anchor = 3
 tint = Color(0.5, 0.55, 0.52, 1)
 collision = false
 
-[node name="Label" type="Label3D" parent="Structure/HospitalBack" unique_id=1570313672]
+[node name="Label" type="Label3D" parent="Structure/HospitalBack" unique_id=941387300]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.12, 3.3, 0)
 visibility_range_end = 16.0
 visibility_range_end_margin = 6.0
@@ -446,7 +446,7 @@ modulate = Color(0.75, 0.75, 0.7, 1)
 text = "HOSPITAL SAN JUDAS"
 font = ExtResource("12_32v1b")
 
-[node name="Label2" type="Label3D" parent="Structure/HospitalBack" unique_id=176246369]
+[node name="Label2" type="Label3D" parent="Structure/HospitalBack" unique_id=1166967770]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.12, 2.55, 0)
 visibility_range_end = 16.0
 visibility_range_end_margin = 6.0
@@ -456,7 +456,7 @@ modulate = Color(0.6, 0.1, 0.08, 1)
 text = "SALIDA DE EMERGENCIA"
 font = ExtResource("12_32v1b")
 
-[node name="Metal_FirstFloor_Window" type="Node3D" parent="Structure/HospitalBack" unique_id=14052918]
+[node name="Metal_FirstFloor_Window" type="Node3D" parent="Structure/HospitalBack" unique_id=245468561]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.05, 4.2, -4.5)
 script = ExtResource("3_fpkux")
 model = ExtResource("13_yw8vj")
@@ -464,7 +464,7 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="Metal_FirstFloor_Window2" type="Node3D" parent="Structure/HospitalBack" unique_id=322643861]
+[node name="Metal_FirstFloor_Window2" type="Node3D" parent="Structure/HospitalBack" unique_id=900764532]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.05, 4.2, 4.5)
 script = ExtResource("3_fpkux")
 model = ExtResource("13_yw8vj")
@@ -472,7 +472,7 @@ anchor = 3
 tint = Color(0.5, 0.5, 0.5, 1)
 collision = false
 
-[node name="Brick_Plain_417" type="Node3D" parent="Structure" unique_id=498733343]
+[node name="Brick_Plain_417" type="Node3D" parent="Structure" unique_id=72927271]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.35, 0, 6)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -480,7 +480,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_418" type="Node3D" parent="Structure" unique_id=1845238952]
+[node name="Brick_Plain_418" type="Node3D" parent="Structure" unique_id=195848652]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 64.35, 0, 5.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -488,7 +488,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_419" type="Node3D" parent="Structure" unique_id=1989245002]
+[node name="Brick_Plain_419" type="Node3D" parent="Structure" unique_id=610516288]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.35, 4, 6)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -496,7 +496,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_420" type="Node3D" parent="Structure" unique_id=291941854]
+[node name="Brick_Plain_420" type="Node3D" parent="Structure" unique_id=1437462247]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 64.35, 4, 5.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -504,21 +504,21 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="WallCollider2" type="StaticBody3D" parent="Structure" unique_id=1288399926]
+[node name="WallCollider2" type="StaticBody3D" parent="Structure" unique_id=144635150]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.35, 4, 5.9)
 script = ExtResource("1_rnbyg")
 size = Vector3(2.4999993, 8, 0.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Blocker" type="StaticBody3D" parent="Structure" unique_id=1198040704]
+[node name="Blocker" type="StaticBody3D" parent="Structure" unique_id=1859767311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.35, 4, 10)
 script = ExtResource("1_rnbyg")
 size = Vector3(2.3, 8, 8)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Brick_Plain_421" type="Node3D" parent="Structure" unique_id=1646318762]
+[node name="Brick_Plain_421" type="Node3D" parent="Structure" unique_id=2064039616]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 38, 0, -19.416666)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -526,7 +526,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_422" type="Node3D" parent="Structure" unique_id=1684474883]
+[node name="Brick_Plain_422" type="Node3D" parent="Structure" unique_id=902964043]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 37.8, 0, -19.416666)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -534,7 +534,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_423" type="Node3D" parent="Structure" unique_id=2037780602]
+[node name="Brick_Plain_423" type="Node3D" parent="Structure" unique_id=1296872109]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 38, 0, -21.25)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -542,7 +542,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_424" type="Node3D" parent="Structure" unique_id=152213194]
+[node name="Brick_Plain_424" type="Node3D" parent="Structure" unique_id=1227817680]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 37.8, 0, -21.25)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -550,7 +550,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_425" type="Node3D" parent="Structure" unique_id=2026647783]
+[node name="Brick_Plain_425" type="Node3D" parent="Structure" unique_id=1129742153]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 38, 0, -23.083334)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -558,7 +558,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_426" type="Node3D" parent="Structure" unique_id=1906464712]
+[node name="Brick_Plain_426" type="Node3D" parent="Structure" unique_id=1087224053]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 37.8, 0, -23.083334)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -566,14 +566,14 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="WallCollider3" type="StaticBody3D" parent="Structure" unique_id=1386596582]
+[node name="WallCollider3" type="StaticBody3D" parent="Structure" unique_id=1405858866]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.9, 2, -21.25)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.2, 4, 5.7)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Brick_Plain_427" type="Node3D" parent="Structure" unique_id=929995969]
+[node name="Brick_Plain_427" type="Node3D" parent="Structure" unique_id=2110901070]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 33.1, 0, -23.15)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -581,7 +581,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_428" type="Node3D" parent="Structure" unique_id=190543890]
+[node name="Brick_Plain_428" type="Node3D" parent="Structure" unique_id=1023418297]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 32.899998, 0, -23.15)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -589,14 +589,14 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="WallCollider4" type="StaticBody3D" parent="Structure" unique_id=711880779]
+[node name="WallCollider4" type="StaticBody3D" parent="Structure" unique_id=1652148320]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 2, -23.15)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.2, 4, 1.9000008)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Brick_Plain_429" type="Node3D" parent="Structure" unique_id=2015010947]
+[node name="Brick_Plain_429" type="Node3D" parent="Structure" unique_id=1053472]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.775, 0, -24)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -604,7 +604,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_430" type="Node3D" parent="Structure" unique_id=581448424]
+[node name="Brick_Plain_430" type="Node3D" parent="Structure" unique_id=1050696654]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 30.775, 0, -24.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -612,7 +612,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_431" type="Node3D" parent="Structure" unique_id=1914918353]
+[node name="Brick_Plain_431" type="Node3D" parent="Structure" unique_id=1211671425]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.324997, 0, -24)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -620,7 +620,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_432" type="Node3D" parent="Structure" unique_id=887211145]
+[node name="Brick_Plain_432" type="Node3D" parent="Structure" unique_id=1325292049]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 32.324997, 0, -24.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -628,14 +628,14 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="WallCollider5" type="StaticBody3D" parent="Structure" unique_id=1828491467]
+[node name="WallCollider5" type="StaticBody3D" parent="Structure" unique_id=1435845306]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.55, 2, -24.1)
 script = ExtResource("1_rnbyg")
 size = Vector3(3.2999985, 4, 0.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Brick_Plain_433" type="Node3D" parent="Structure" unique_id=671210473]
+[node name="Brick_Plain_433" type="Node3D" parent="Structure" unique_id=1990559960]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, 0, -24)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -643,7 +643,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_434" type="Node3D" parent="Structure" unique_id=1049285386]
+[node name="Brick_Plain_434" type="Node3D" parent="Structure" unique_id=1965939700]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 39, 0, -24.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -651,7 +651,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_435" type="Node3D" parent="Structure" unique_id=961046315]
+[node name="Brick_Plain_435" type="Node3D" parent="Structure" unique_id=1261394717]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41, 0, -24)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -659,7 +659,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_436" type="Node3D" parent="Structure" unique_id=1539826942]
+[node name="Brick_Plain_436" type="Node3D" parent="Structure" unique_id=1537179613]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 41, 0, -24.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -667,7 +667,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_437" type="Node3D" parent="Structure" unique_id=1354271240]
+[node name="Brick_Plain_437" type="Node3D" parent="Structure" unique_id=488305362]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43, 0, -24)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -675,7 +675,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_438" type="Node3D" parent="Structure" unique_id=1249970664]
+[node name="Brick_Plain_438" type="Node3D" parent="Structure" unique_id=2143836936]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 43, 0, -24.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -683,7 +683,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_439" type="Node3D" parent="Structure" unique_id=295455573]
+[node name="Brick_Plain_439" type="Node3D" parent="Structure" unique_id=1980731627]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0, -24)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -691,7 +691,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_440" type="Node3D" parent="Structure" unique_id=411681257]
+[node name="Brick_Plain_440" type="Node3D" parent="Structure" unique_id=2022866816]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 45, 0, -24.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -699,14 +699,14 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="WallCollider6" type="StaticBody3D" parent="Structure" unique_id=1600268103]
+[node name="WallCollider6" type="StaticBody3D" parent="Structure" unique_id=1342410076]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 2, -24.1)
 script = ExtResource("1_rnbyg")
 size = Vector3(8.2, 4, 0.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Brick_Plain_441" type="Node3D" parent="Structure" unique_id=2110339747]
+[node name="Brick_Plain_441" type="Node3D" parent="Structure" unique_id=1450131433]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 46, 0, -25)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -714,7 +714,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_442" type="Node3D" parent="Structure" unique_id=226687105]
+[node name="Brick_Plain_442" type="Node3D" parent="Structure" unique_id=1442781220]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 45.8, 0, -25)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -722,7 +722,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_443" type="Node3D" parent="Structure" unique_id=1216017884]
+[node name="Brick_Plain_443" type="Node3D" parent="Structure" unique_id=1297623166]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 46, 0, -27)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -730,7 +730,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_444" type="Node3D" parent="Structure" unique_id=2070484841]
+[node name="Brick_Plain_444" type="Node3D" parent="Structure" unique_id=856441801]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 45.8, 0, -27)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -738,7 +738,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_445" type="Node3D" parent="Structure" unique_id=123768878]
+[node name="Brick_Plain_445" type="Node3D" parent="Structure" unique_id=496587296]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 46, 0, -29)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -746,7 +746,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_446" type="Node3D" parent="Structure" unique_id=522401455]
+[node name="Brick_Plain_446" type="Node3D" parent="Structure" unique_id=1353277822]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 45.8, 0, -29)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -754,7 +754,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_447" type="Node3D" parent="Structure" unique_id=590746400]
+[node name="Brick_Plain_447" type="Node3D" parent="Structure" unique_id=544374602]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 46, 0, -31)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -762,7 +762,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_448" type="Node3D" parent="Structure" unique_id=1478399484]
+[node name="Brick_Plain_448" type="Node3D" parent="Structure" unique_id=313085186]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 45.8, 0, -31)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -770,7 +770,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_449" type="Node3D" parent="Structure" unique_id=2124496124]
+[node name="Brick_Plain_449" type="Node3D" parent="Structure" unique_id=481257892]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 46, 0, -33)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -778,7 +778,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_450" type="Node3D" parent="Structure" unique_id=770885704]
+[node name="Brick_Plain_450" type="Node3D" parent="Structure" unique_id=1609595173]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 45.8, 0, -33)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -786,14 +786,14 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="WallCollider7" type="StaticBody3D" parent="Structure" unique_id=453321673]
+[node name="WallCollider7" type="StaticBody3D" parent="Structure" unique_id=552853878]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.9, 2, -29)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.2, 4, 10.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Brick_Plain_451" type="Node3D" parent="Structure" unique_id=99698116]
+[node name="Brick_Plain_451" type="Node3D" parent="Structure" unique_id=508953613]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 45.125, 0, -34)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -801,7 +801,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_452" type="Node3D" parent="Structure" unique_id=2135127740]
+[node name="Brick_Plain_452" type="Node3D" parent="Structure" unique_id=429752327]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.125, 0, -33.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -809,7 +809,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_453" type="Node3D" parent="Structure" unique_id=569575647]
+[node name="Brick_Plain_453" type="Node3D" parent="Structure" unique_id=1466562058]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 43.375, 0, -34)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -817,7 +817,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_454" type="Node3D" parent="Structure" unique_id=1893371730]
+[node name="Brick_Plain_454" type="Node3D" parent="Structure" unique_id=1904162068]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.375, 0, -33.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -825,7 +825,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_455" type="Node3D" parent="Structure" unique_id=1471793808]
+[node name="Brick_Plain_455" type="Node3D" parent="Structure" unique_id=55849884]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 41.625, 0, -34)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -833,7 +833,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_456" type="Node3D" parent="Structure" unique_id=718192445]
+[node name="Brick_Plain_456" type="Node3D" parent="Structure" unique_id=223972040]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41.625, 0, -33.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -841,7 +841,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_457" type="Node3D" parent="Structure" unique_id=964175991]
+[node name="Brick_Plain_457" type="Node3D" parent="Structure" unique_id=132849470]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 39.875, 0, -34)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -849,7 +849,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_458" type="Node3D" parent="Structure" unique_id=1965487828]
+[node name="Brick_Plain_458" type="Node3D" parent="Structure" unique_id=1372342093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.875, 0, -33.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -857,14 +857,14 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="WallCollider8" type="StaticBody3D" parent="Structure" unique_id=738215617]
+[node name="WallCollider8" type="StaticBody3D" parent="Structure" unique_id=1656189836]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.5, 2, -33.9)
 script = ExtResource("1_rnbyg")
 size = Vector3(7.2, 4, 0.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Brick_Plain_459" type="Node3D" parent="Structure" unique_id=1318426766]
+[node name="Brick_Plain_459" type="Node3D" parent="Structure" unique_id=1920354422]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 36.125, 0, -34)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -872,7 +872,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_460" type="Node3D" parent="Structure" unique_id=33172432]
+[node name="Brick_Plain_460" type="Node3D" parent="Structure" unique_id=1210106021]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.125, 0, -33.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -880,7 +880,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_461" type="Node3D" parent="Structure" unique_id=466281328]
+[node name="Brick_Plain_461" type="Node3D" parent="Structure" unique_id=369191260]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 34.375, 0, -34)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -888,7 +888,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_462" type="Node3D" parent="Structure" unique_id=2062462485]
+[node name="Brick_Plain_462" type="Node3D" parent="Structure" unique_id=1884647341]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.375, 0, -33.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -896,7 +896,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_463" type="Node3D" parent="Structure" unique_id=199422541]
+[node name="Brick_Plain_463" type="Node3D" parent="Structure" unique_id=897753833]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 32.625, 0, -34)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -904,7 +904,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_464" type="Node3D" parent="Structure" unique_id=672522738]
+[node name="Brick_Plain_464" type="Node3D" parent="Structure" unique_id=39425028]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.625, 0, -33.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -912,7 +912,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_465" type="Node3D" parent="Structure" unique_id=117938678]
+[node name="Brick_Plain_465" type="Node3D" parent="Structure" unique_id=1043113181]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 30.875, 0, -34)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -920,7 +920,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_466" type="Node3D" parent="Structure" unique_id=775136595]
+[node name="Brick_Plain_466" type="Node3D" parent="Structure" unique_id=2036133193]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.875, 0, -33.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -928,26 +928,26 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="WallCollider9" type="StaticBody3D" parent="Structure" unique_id=2100671454]
+[node name="WallCollider9" type="StaticBody3D" parent="Structure" unique_id=1853229597]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.5, 2, -33.9)
 script = ExtResource("1_rnbyg")
 size = Vector3(7.2, 4, 0.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="NicheBack" type="StaticBody3D" parent="Structure" unique_id=331428475]
+[node name="NicheBack" type="StaticBody3D" parent="Structure" unique_id=1949314900]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2, -35)
 script = ExtResource("1_rnbyg")
 size = Vector3(2.4, 4, 0.2)
 material = ExtResource("9_62g7y")
 
-[node name="NicheTop" type="StaticBody3D" parent="Structure" unique_id=264839623]
+[node name="NicheTop" type="StaticBody3D" parent="Structure" unique_id=1568453155]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2.6, -34.5)
 script = ExtResource("1_rnbyg")
 size = Vector3(2.4, 2.8, 1)
 material = ExtResource("9_62g7y")
 
-[node name="Brick_Plain_467" type="Node3D" parent="Structure" unique_id=880186795]
+[node name="Brick_Plain_467" type="Node3D" parent="Structure" unique_id=1746057552]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 30, 0, -33)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -955,7 +955,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_468" type="Node3D" parent="Structure" unique_id=1000300731]
+[node name="Brick_Plain_468" type="Node3D" parent="Structure" unique_id=1350779322]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 30.2, 0, -33)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -963,7 +963,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_469" type="Node3D" parent="Structure" unique_id=517931965]
+[node name="Brick_Plain_469" type="Node3D" parent="Structure" unique_id=477565632]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 30, 0, -31)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -971,7 +971,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_470" type="Node3D" parent="Structure" unique_id=1970492413]
+[node name="Brick_Plain_470" type="Node3D" parent="Structure" unique_id=2118492572]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 30.2, 0, -31)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -979,7 +979,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_471" type="Node3D" parent="Structure" unique_id=656508586]
+[node name="Brick_Plain_471" type="Node3D" parent="Structure" unique_id=259365774]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 30, 0, -29)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -987,7 +987,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_472" type="Node3D" parent="Structure" unique_id=194890233]
+[node name="Brick_Plain_472" type="Node3D" parent="Structure" unique_id=701074772]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 30.2, 0, -29)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -995,7 +995,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_473" type="Node3D" parent="Structure" unique_id=1795822661]
+[node name="Brick_Plain_473" type="Node3D" parent="Structure" unique_id=496511571]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 30, 0, -27)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -1003,7 +1003,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_474" type="Node3D" parent="Structure" unique_id=863664943]
+[node name="Brick_Plain_474" type="Node3D" parent="Structure" unique_id=1821512188]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 30.2, 0, -27)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -1011,7 +1011,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_475" type="Node3D" parent="Structure" unique_id=792102631]
+[node name="Brick_Plain_475" type="Node3D" parent="Structure" unique_id=366544372]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 30, 0, -25)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -1019,7 +1019,7 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Brick_Plain_476" type="Node3D" parent="Structure" unique_id=1923791351]
+[node name="Brick_Plain_476" type="Node3D" parent="Structure" unique_id=1690322951]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 30.2, 0, -25)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -1027,191 +1027,191 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="WallCollider10" type="StaticBody3D" parent="Structure" unique_id=863754233]
+[node name="WallCollider10" type="StaticBody3D" parent="Structure" unique_id=794894801]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.1, 2, -29)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.2, 4, 10.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Theater" type="Node3D" parent="Structure" unique_id=484510043]
+[node name="Theater" type="Node3D" parent="Structure" unique_id=871907182]
 
-[node name="Marquee" type="StaticBody3D" parent="Structure/Theater" unique_id=656726118]
+[node name="Marquee" type="StaticBody3D" parent="Structure/Theater" unique_id=640590262]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.6, 4.2, 0)
 script = ExtResource("1_rnbyg")
 size = Vector3(2.2, 0.9, 7)
 material = ExtResource("14_m8206")
 collision_enabled = false
 
-[node name="Bulb" type="StaticBody3D" parent="Structure/Theater" unique_id=1819276187]
+[node name="Bulb" type="StaticBody3D" parent="Structure/Theater" unique_id=1231175875]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, -3.2)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb2" type="StaticBody3D" parent="Structure/Theater" unique_id=714782965]
+[node name="Bulb2" type="StaticBody3D" parent="Structure/Theater" unique_id=1309820886]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, -3.2)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb3" type="StaticBody3D" parent="Structure/Theater" unique_id=1012238945]
+[node name="Bulb3" type="StaticBody3D" parent="Structure/Theater" unique_id=405160178]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, -2.6181817)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb4" type="StaticBody3D" parent="Structure/Theater" unique_id=1358419323]
+[node name="Bulb4" type="StaticBody3D" parent="Structure/Theater" unique_id=918545158]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, -2.6181817)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb5" type="StaticBody3D" parent="Structure/Theater" unique_id=2135756654]
+[node name="Bulb5" type="StaticBody3D" parent="Structure/Theater" unique_id=855734662]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, -2.0363636)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb6" type="StaticBody3D" parent="Structure/Theater" unique_id=524577853]
+[node name="Bulb6" type="StaticBody3D" parent="Structure/Theater" unique_id=724712793]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, -2.0363636)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb7" type="StaticBody3D" parent="Structure/Theater" unique_id=1884306998]
+[node name="Bulb7" type="StaticBody3D" parent="Structure/Theater" unique_id=1512723497]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, -1.4545455)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb8" type="StaticBody3D" parent="Structure/Theater" unique_id=305853037]
+[node name="Bulb8" type="StaticBody3D" parent="Structure/Theater" unique_id=1575244329]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, -1.4545455)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb9" type="StaticBody3D" parent="Structure/Theater" unique_id=1900386863]
+[node name="Bulb9" type="StaticBody3D" parent="Structure/Theater" unique_id=215823628]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, -0.8727273)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb10" type="StaticBody3D" parent="Structure/Theater" unique_id=1826992775]
+[node name="Bulb10" type="StaticBody3D" parent="Structure/Theater" unique_id=1587706609]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, -0.8727273)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb11" type="StaticBody3D" parent="Structure/Theater" unique_id=1627897901]
+[node name="Bulb11" type="StaticBody3D" parent="Structure/Theater" unique_id=32392366]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, -0.29090908)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb12" type="StaticBody3D" parent="Structure/Theater" unique_id=1612519887]
+[node name="Bulb12" type="StaticBody3D" parent="Structure/Theater" unique_id=278297892]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, -0.29090908)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb13" type="StaticBody3D" parent="Structure/Theater" unique_id=2126822394]
+[node name="Bulb13" type="StaticBody3D" parent="Structure/Theater" unique_id=1154253382]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, 0.29090908)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb14" type="StaticBody3D" parent="Structure/Theater" unique_id=1731469823]
+[node name="Bulb14" type="StaticBody3D" parent="Structure/Theater" unique_id=1093974275]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, 0.29090908)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb15" type="StaticBody3D" parent="Structure/Theater" unique_id=686633099]
+[node name="Bulb15" type="StaticBody3D" parent="Structure/Theater" unique_id=1744449843]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, 0.8727273)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb16" type="StaticBody3D" parent="Structure/Theater" unique_id=241342166]
+[node name="Bulb16" type="StaticBody3D" parent="Structure/Theater" unique_id=769802148]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, 0.8727273)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb17" type="StaticBody3D" parent="Structure/Theater" unique_id=1804182824]
+[node name="Bulb17" type="StaticBody3D" parent="Structure/Theater" unique_id=663496120]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, 1.4545455)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb18" type="StaticBody3D" parent="Structure/Theater" unique_id=2084951611]
+[node name="Bulb18" type="StaticBody3D" parent="Structure/Theater" unique_id=1870673806]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, 1.4545455)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb19" type="StaticBody3D" parent="Structure/Theater" unique_id=1667905126]
+[node name="Bulb19" type="StaticBody3D" parent="Structure/Theater" unique_id=499495194]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, 2.0363636)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb20" type="StaticBody3D" parent="Structure/Theater" unique_id=879418785]
+[node name="Bulb20" type="StaticBody3D" parent="Structure/Theater" unique_id=692415094]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, 2.0363636)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb21" type="StaticBody3D" parent="Structure/Theater" unique_id=719170252]
+[node name="Bulb21" type="StaticBody3D" parent="Structure/Theater" unique_id=283307592]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, 2.6181817)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb22" type="StaticBody3D" parent="Structure/Theater" unique_id=386242648]
+[node name="Bulb22" type="StaticBody3D" parent="Structure/Theater" unique_id=1407390816]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, 2.6181817)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb23" type="StaticBody3D" parent="Structure/Theater" unique_id=412530731]
+[node name="Bulb23" type="StaticBody3D" parent="Structure/Theater" unique_id=274075777]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 3.8, 3.2)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Bulb24" type="StaticBody3D" parent="Structure/Theater" unique_id=1661843990]
+[node name="Bulb24" type="StaticBody3D" parent="Structure/Theater" unique_id=196168750]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.48, 4.6, 3.2)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.08, 0.08, 0.08)
 material = ExtResource("15_r8524")
 collision_enabled = false
 
-[node name="Label3" type="Label3D" parent="Structure/Theater" unique_id=1809797028]
+[node name="Label3" type="Label3D" parent="Structure/Theater" unique_id=1277119524]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 63.47, 4.22, 0)
 visibility_range_end = 16.0
 visibility_range_end_margin = 6.0
@@ -1221,7 +1221,7 @@ modulate = Color(1, 0.85, 0.6, 1)
 text = "TEATRO IMPERIO"
 font = ExtResource("12_32v1b")
 
-[node name="Label4" type="Label3D" parent="Structure/Theater" unique_id=244434205]
+[node name="Label4" type="Label3D" parent="Structure/Theater" unique_id=1315078020]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 63.47, 3.42, 0)
 visibility_range_end = 16.0
 visibility_range_end_margin = 6.0
@@ -1230,23 +1230,23 @@ modulate = Color(0.9, 0.8, 0.65, 1)
 text = "HOY: \"LA PALOMA\" - FUNCIÓN ÚNICA"
 font = ExtResource("12_32v1b")
 
-[node name="Chain" type="StaticBody3D" parent="Structure/Theater" unique_id=1106141664]
+[node name="Chain" type="StaticBody3D" parent="Structure/Theater" unique_id=1406144834]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65.25, 1.2, 0)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.06, 0.06, 1.6)
 material = ExtResource("16_rbpxs")
 collision_enabled = false
 
-[node name="Plank" type="StaticBody3D" parent="Structure/Theater" unique_id=796917988]
+[node name="Plank" type="StaticBody3D" parent="Structure/Theater" unique_id=1554995922]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 65.3, 1.6, 0)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.05, 0.25, 2.4)
 material = ExtResource("17_5e1yb")
 collision_enabled = false
 
-[node name="Buildings" type="Node3D" parent="." unique_id=1384320918 groups=["nav_source"]]
+[node name="Buildings" type="Node3D" parent="." unique_id=388948356 groups=["nav_source"]]
 
-[node name="Building_Small_1" type="Node3D" parent="Buildings" unique_id=233588030]
+[node name="Building_Small_1" type="Node3D" parent="Buildings" unique_id=540887971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.23, 0, -6)
 script = ExtResource("3_fpkux")
 model = ExtResource("18_wlowo")
@@ -1254,14 +1254,14 @@ anchor = 3
 tint = Color(0.72, 0.7, 0.7, 1)
 collision = false
 
-[node name="BuildingCollider" type="StaticBody3D" parent="Buildings" unique_id=396080153]
+[node name="BuildingCollider" type="StaticBody3D" parent="Buildings" unique_id=1507073088]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.23, 10, -12.1)
 script = ExtResource("1_rnbyg")
 size = Vector3(12.46, 20, 12.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Building_Large_2" type="Node3D" parent="Buildings" unique_id=1747888553]
+[node name="Building_Large_2" type="Node3D" parent="Buildings" unique_id=646446252]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.72, 0, -6)
 script = ExtResource("3_fpkux")
 model = ExtResource("19_15vxs")
@@ -1269,14 +1269,14 @@ anchor = 3
 tint = Color(0.66, 0.62, 0.6, 1)
 collision = false
 
-[node name="BuildingCollider2" type="StaticBody3D" parent="Buildings" unique_id=1786665977]
+[node name="BuildingCollider2" type="StaticBody3D" parent="Buildings" unique_id=1591630406]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.72, 10, -14.15)
 script = ExtResource("1_rnbyg")
 size = Vector3(20.64, 20, 16.3)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Building_Medium_2_001" type="Node3D" parent="Buildings" unique_id=907369366]
+[node name="Building_Medium_2_001" type="Node3D" parent="Buildings" unique_id=1104015032]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.53, 0, -6)
 script = ExtResource("3_fpkux")
 model = ExtResource("20_0md15")
@@ -1284,14 +1284,14 @@ anchor = 3
 tint = Color(0.72, 0.7, 0.7, 1)
 collision = false
 
-[node name="BuildingCollider3" type="StaticBody3D" parent="Buildings" unique_id=311513699]
+[node name="BuildingCollider3" type="StaticBody3D" parent="Buildings" unique_id=1890192047]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.53, 10, -12.25)
 script = ExtResource("1_rnbyg")
 size = Vector3(15.06, 20, 12.5)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Building_Small_12" type="Node3D" parent="Buildings" unique_id=2118905241]
+[node name="Building_Small_12" type="Node3D" parent="Buildings" unique_id=557760031]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.3, 0, -6)
 script = ExtResource("3_fpkux")
 model = ExtResource("18_wlowo")
@@ -1299,14 +1299,14 @@ anchor = 3
 tint = Color(0.62, 0.64, 0.66, 1)
 collision = false
 
-[node name="BuildingCollider4" type="StaticBody3D" parent="Buildings" unique_id=1965751693]
+[node name="BuildingCollider4" type="StaticBody3D" parent="Buildings" unique_id=1669638129]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59.3, 10, -12.1)
 script = ExtResource("1_rnbyg")
 size = Vector3(12.46, 20, 12.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Building_Large_22" type="Node3D" parent="Buildings" unique_id=145214133]
+[node name="Building_Large_22" type="Node3D" parent="Buildings" unique_id=1111739732]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 11.32, 0, 6)
 script = ExtResource("3_fpkux")
 model = ExtResource("19_15vxs")
@@ -1314,14 +1314,14 @@ anchor = 3
 tint = Color(0.72, 0.7, 0.7, 1)
 collision = false
 
-[node name="BuildingCollider5" type="StaticBody3D" parent="Buildings" unique_id=664178640]
+[node name="BuildingCollider5" type="StaticBody3D" parent="Buildings" unique_id=19760953]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.320001, 10, 14.15)
 script = ExtResource("1_rnbyg")
 size = Vector3(20.640001, 20, 16.299997)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Building_Small_13" type="Node3D" parent="Buildings" unique_id=2077843496]
+[node name="Building_Small_13" type="Node3D" parent="Buildings" unique_id=2072859802]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 25.87, 0, 6)
 script = ExtResource("3_fpkux")
 model = ExtResource("18_wlowo")
@@ -1329,14 +1329,14 @@ anchor = 3
 tint = Color(0.68, 0.64, 0.6, 1)
 collision = false
 
-[node name="BuildingCollider6" type="StaticBody3D" parent="Buildings" unique_id=279552965]
+[node name="BuildingCollider6" type="StaticBody3D" parent="Buildings" unique_id=737647136]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.87, 10, 12.1)
 script = ExtResource("1_rnbyg")
 size = Vector3(12.460001, 20, 12.199999)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Building_Medium_2_0012" type="Node3D" parent="Buildings" unique_id=1299479643]
+[node name="Building_Medium_2_0012" type="Node3D" parent="Buildings" unique_id=1417564889]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 40.63, 0, 6)
 script = ExtResource("3_fpkux")
 model = ExtResource("20_0md15")
@@ -1344,14 +1344,14 @@ anchor = 3
 tint = Color(0.62, 0.62, 0.64, 1)
 collision = false
 
-[node name="BuildingCollider7" type="StaticBody3D" parent="Buildings" unique_id=1648288711]
+[node name="BuildingCollider7" type="StaticBody3D" parent="Buildings" unique_id=1879175660]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.63, 10, 12.25)
 script = ExtResource("1_rnbyg")
 size = Vector3(15.060001, 20, 12.499999)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Building_Medium_2_0013" type="Node3D" parent="Buildings" unique_id=671001290]
+[node name="Building_Medium_2_0013" type="Node3D" parent="Buildings" unique_id=1281415424]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 55.69, 0, 6)
 script = ExtResource("3_fpkux")
 model = ExtResource("20_0md15")
@@ -1359,14 +1359,14 @@ anchor = 3
 tint = Color(0.72, 0.7, 0.7, 1)
 collision = false
 
-[node name="BuildingCollider8" type="StaticBody3D" parent="Buildings" unique_id=1981784540]
+[node name="BuildingCollider8" type="StaticBody3D" parent="Buildings" unique_id=2096930713]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.69, 10, 12.25)
 script = ExtResource("1_rnbyg")
 size = Vector3(15.060001, 20, 12.499999)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Building_Medium_2_0014" type="Node3D" parent="Buildings" unique_id=2014226959]
+[node name="Building_Medium_2_0014" type="Node3D" parent="Buildings" unique_id=252623552]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 66, 0, 0)
 script = ExtResource("3_fpkux")
 model = ExtResource("20_0md15")
@@ -1374,16 +1374,16 @@ anchor = 3
 tint = Color(0.66, 0.58, 0.56, 1)
 collision = false
 
-[node name="BuildingCollider9" type="StaticBody3D" parent="Buildings" unique_id=1957381667]
+[node name="BuildingCollider9" type="StaticBody3D" parent="Buildings" unique_id=1282353875]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 72.25, 10, 2.7319618e-07)
 script = ExtResource("1_rnbyg")
 size = Vector3(12.500001, 20, 15.059999)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Lights" type="Node3D" parent="." unique_id=1239526866]
+[node name="Lights" type="Node3D" parent="." unique_id=1970379430]
 
-[node name="Light" type="OmniLight3D" parent="Lights" unique_id=351844353]
+[node name="Light" type="OmniLight3D" parent="Lights" unique_id=1542185823]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.4, 3.2, -28)
 light_color = Color(0.75, 0.85, 1, 1)
 light_energy = 0.8
@@ -1393,7 +1393,7 @@ script = ExtResource("21_w555a")
 flicker_chance = 0.6
 min_energy_factor = 0.15
 
-[node name="Light2" type="OmniLight3D" parent="Lights" unique_id=1083530733]
+[node name="Light2" type="OmniLight3D" parent="Lights" unique_id=229099882]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.8, 3.6, 0)
 light_color = Color(1, 0.75, 0.45, 1)
 light_energy = 1.6
@@ -1403,7 +1403,7 @@ script = ExtResource("21_w555a")
 flicker_chance = 0.6
 min_energy_factor = 0.15
 
-[node name="Light3" type="OmniLight3D" parent="Lights" unique_id=951793668]
+[node name="Light3" type="OmniLight3D" parent="Lights" unique_id=1804772571]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 4, 4.4)
 light_color = Color(1, 0.82, 0.55, 1)
 light_energy = 1.4
@@ -1413,14 +1413,14 @@ script = ExtResource("21_w555a")
 flicker_chance = 0.6
 min_energy_factor = 0.15
 
-[node name="Light4" type="OmniLight3D" parent="Lights" unique_id=1337272913]
+[node name="Light4" type="OmniLight3D" parent="Lights" unique_id=280382261]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 4, 4.4)
 light_color = Color(0.85, 0.9, 1, 1)
 light_energy = 0.9
 omni_range = 8.0
 omni_attenuation = 1.2
 
-[node name="Light5" type="OmniLight3D" parent="Lights" unique_id=1522181107]
+[node name="Light5" type="OmniLight3D" parent="Lights" unique_id=2115743456]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 2.8, 0)
 light_color = Color(0.9, 0.35, 0.25, 1)
 light_energy = 0.7
@@ -1429,107 +1429,107 @@ script = ExtResource("21_w555a")
 flicker_chance = 0.6
 min_energy_factor = 0.15
 
-[node name="Props" type="Node3D" parent="." unique_id=1841362818 groups=["nav_source"]]
+[node name="Props" type="Node3D" parent="." unique_id=655450669 groups=["nav_source"]]
 
-[node name="Prop_ManholeCover" type="Node3D" parent="Props" unique_id=1511422827]
+[node name="Prop_ManholeCover" type="Node3D" parent="Props" unique_id=1713691908]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0.01, 1.5)
 script = ExtResource("3_fpkux")
 model = ExtResource("22_d7rlr")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Prop_ManholeCover2" type="Node3D" parent="Props" unique_id=1794984502]
+[node name="Prop_ManholeCover2" type="Node3D" parent="Props" unique_id=1630920357]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41, 0.01, -1.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("22_d7rlr")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Prop_ManholeCover3" type="Node3D" parent="Props" unique_id=1465198356]
+[node name="Prop_ManholeCover3" type="Node3D" parent="Props" unique_id=1282739514]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 59, 0.01, 1)
 script = ExtResource("3_fpkux")
 model = ExtResource("22_d7rlr")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="barrel_03" type="Node3D" parent="Props" unique_id=1616206823]
+[node name="barrel_03" type="Node3D" parent="Props" unique_id=1785890924]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 0, -12)
 script = ExtResource("3_fpkux")
 model = ExtResource("23_eep5q")
 fit_height = 1.0
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="Barrel_01" type="Node3D" parent="Props" unique_id=881662448]
+[node name="Barrel_01" type="Node3D" parent="Props" unique_id=1851240194]
 transform = Transform3D(0.76604444, 0, 0.6427876, 0, 1, 0, -0.6427876, 0, 0.76604444, 34.2, 0, -13.1)
 script = ExtResource("3_fpkux")
 model = ExtResource("24_rw71s")
 fit_height = 1.0
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="wooden_crate_02" type="Node3D" parent="Props" unique_id=555425354]
+[node name="wooden_crate_02" type="Node3D" parent="Props" unique_id=779987479]
 transform = Transform3D(0.9659258, 0, 0.25881904, 0, 1, 0, -0.25881904, 0, 0.9659258, 37.2, 0, -16.5)
 script = ExtResource("3_fpkux")
 model = ExtResource("25_rbam7")
 fit_height = 0.8
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="plastic_crate_01" type="Node3D" parent="Props" unique_id=1364038686]
+[node name="plastic_crate_01" type="Node3D" parent="Props" unique_id=1817716379]
 transform = Transform3D(0.34202015, 0, 0.9396926, 0, 1, 0, -0.9396926, 0, 0.34202015, 37.3, 0, -17.6)
 script = ExtResource("3_fpkux")
 model = ExtResource("26_wixk3")
 fit_height = 0.4
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="utility_box_01" type="Node3D" parent="Props" unique_id=1610516192]
+[node name="utility_box_01" type="Node3D" parent="Props" unique_id=1318860983]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 33.5, 0, -20)
 script = ExtResource("3_fpkux")
 model = ExtResource("27_l1gt2")
 fit_height = 1.2
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="wooden_crate_022" type="Node3D" parent="Props" unique_id=1121064558]
+[node name="wooden_crate_022" type="Node3D" parent="Props" unique_id=394429658]
 transform = Transform3D(0.9961947, 0, 0.08715574, 0, 1, 0, -0.08715574, 0, 0.9961947, 44.8, 0, -25.3)
 script = ExtResource("3_fpkux")
 model = ExtResource("25_rbam7")
 fit_height = 0.8
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="wooden_crate_023" type="Node3D" parent="Props" unique_id=2041126062]
+[node name="wooden_crate_023" type="Node3D" parent="Props" unique_id=1737901933]
 transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 44.9, 0, -26.4)
 script = ExtResource("3_fpkux")
 model = ExtResource("25_rbam7")
 fit_height = 0.8
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="barrel_032" type="Node3D" parent="Props" unique_id=296818032]
+[node name="barrel_032" type="Node3D" parent="Props" unique_id=339391850]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.2, 0, -32.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("23_eep5q")
 fit_height = 1.0
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="plastic_crate_012" type="Node3D" parent="Props" unique_id=705970022]
+[node name="plastic_crate_012" type="Node3D" parent="Props" unique_id=736725070]
 transform = Transform3D(0.9848077, 0, 0.17364818, 0, 1, 0, -0.17364818, 0, 0.9848077, 32.3, 0, -33)
 script = ExtResource("3_fpkux")
 model = ExtResource("26_wixk3")
 fit_height = 0.4
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="trashbag" type="Node3D" parent="Props" unique_id=1468801596]
+[node name="trashbag" type="Node3D" parent="Props" unique_id=1714069266]
 transform = Transform3D(0.9396926, 0, 0.34202012, 0, 1, 0, -0.34202012, 0, 0.9396926, 36.9, 0, -9)
 script = ExtResource("3_fpkux")
 model = ExtResource("28_1og68")
 fit_height = 0.6
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="trashbag2" type="Node3D" parent="Props" unique_id=940088675]
+[node name="trashbag2" type="Node3D" parent="Props" unique_id=1674933480]
 transform = Transform3D(0.17364822, 0, 0.9848077, 0, 1, 0, -0.9848077, 0, 0.17364822, 41.5, 0, -33.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("28_1og68")
 fit_height = 0.6
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="debris-tire" type="Node3D" parent="Props" unique_id=657442587]
+[node name="debris-tire" type="Node3D" parent="Props" unique_id=1037693975]
 transform = Transform3D(0.34202015, 0, 0.9396926, 0, 1, 0, -0.9396926, 0, 0.34202015, 40.2, 0, -31.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("29_bo6gg")
@@ -1537,70 +1537,70 @@ model_scale = 1.2
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="metal_trash_can" type="Node3D" parent="Props" unique_id=1681840869]
+[node name="metal_trash_can" type="Node3D" parent="Props" unique_id=2084462250]
 transform = Transform3D(0.9980016, 0, 0.06318869, 0, 1, 0, -0.06318869, 0, 0.9980016, 31, 0, -25)
 script = ExtResource("3_fpkux")
 model = ExtResource("30_vbr8u")
 fit_height = 0.9
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="metal_trash_can2" type="Node3D" parent="Props" unique_id=325794152]
+[node name="metal_trash_can2" type="Node3D" parent="Props" unique_id=1536864450]
 transform = Transform3D(0.5059408, 0, -0.8625682, 0, 1, 0, 0.8625682, 0, 0.5059408, 31.9, 0, -25.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("30_vbr8u")
 fit_height = 0.9
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="metal_trash_can3" type="Node3D" parent="Props" unique_id=1112260649]
+[node name="metal_trash_can3" type="Node3D" parent="Props" unique_id=1559733158]
 transform = Transform3D(-0.9217546, 0, -0.38777375, 0, 1, 0, 0.38777375, 0, -0.9217546, 45.2, 0, -32.9)
 script = ExtResource("3_fpkux")
 model = ExtResource("30_vbr8u")
 fit_height = 0.9
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="wooden_crate_024" type="Node3D" parent="Props" unique_id=1735158774]
+[node name="wooden_crate_024" type="Node3D" parent="Props" unique_id=1406558059]
 transform = Transform3D(0.98255974, 0, 0.18594718, 0, 1, 0, -0.18594718, 0, 0.98255974, 33.5, 0, -28.5)
 script = ExtResource("3_fpkux")
 model = ExtResource("25_rbam7")
 fit_height = 0.8
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="wooden_crate_025" type="Node3D" parent="Props" unique_id=477475134]
+[node name="wooden_crate_025" type="Node3D" parent="Props" unique_id=1521221076]
 transform = Transform3D(-0.23912546, 0, -0.9709887, 0, 1, 0, 0.9709887, 0, -0.23912546, 44.9, 0, -28.4)
 script = ExtResource("3_fpkux")
 model = ExtResource("25_rbam7")
 fit_height = 0.8
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="Mattress" type="StaticBody3D" parent="Props" unique_id=920118592]
+[node name="Mattress" type="StaticBody3D" parent="Props" unique_id=1522504049]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.2, 0.1, -29.6)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.95, 0.2, 1.9)
 material = ExtResource("17_5e1yb")
 collision_enabled = false
 
-[node name="trashbag3" type="Node3D" parent="Props" unique_id=217956404]
+[node name="trashbag3" type="Node3D" parent="Props" unique_id=1595629645]
 transform = Transform3D(0.5649017, 0, 0.8251582, 0, 1, 0, -0.8251582, 0, 0.5649017, 34.5, 0, -32.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("28_1og68")
 fit_height = 0.6
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="trashbag4" type="Node3D" parent="Props" unique_id=1349853383]
+[node name="trashbag4" type="Node3D" parent="Props" unique_id=1618759369]
 transform = Transform3D(-0.48816952, 0, -0.87274885, 0, 1, 0, 0.87274885, 0, -0.48816952, 40.5, 0, -25)
 script = ExtResource("3_fpkux")
 model = ExtResource("28_1og68")
 fit_height = 0.6
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="trashbag5" type="Node3D" parent="Props" unique_id=977457204]
+[node name="trashbag5" type="Node3D" parent="Props" unique_id=722427142]
 transform = Transform3D(-0.6281431, 0, -0.77809787, 0, 1, 0, 0.77809787, 0, -0.6281431, 36.5, 0, -26.1)
 script = ExtResource("3_fpkux")
 model = ExtResource("28_1og68")
 fit_height = 0.6
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="security_light" type="Node3D" parent="Props" unique_id=359635357]
+[node name="security_light" type="Node3D" parent="Props" unique_id=1452721043]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 46, 3.4, -28)
 script = ExtResource("3_fpkux")
 model = ExtResource("31_e6fs6")
@@ -1609,7 +1609,7 @@ anchor = 2
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="exterior_aircon_unit" type="Node3D" parent="Props" unique_id=187262296]
+[node name="exterior_aircon_unit" type="Node3D" parent="Props" unique_id=1475676692]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 38, 2.6, -10)
 script = ExtResource("3_fpkux")
 model = ExtResource("32_ejsrj")
@@ -1618,7 +1618,7 @@ anchor = 2
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="exterior_aircon_unit2" type="Node3D" parent="Props" unique_id=1894999552]
+[node name="exterior_aircon_unit2" type="Node3D" parent="Props" unique_id=1124101022]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 38, 2.6, -19)
 script = ExtResource("3_fpkux")
 model = ExtResource("32_ejsrj")
@@ -1627,7 +1627,7 @@ anchor = 2
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="security_light2" type="Node3D" parent="Props" unique_id=1522274078]
+[node name="security_light2" type="Node3D" parent="Props" unique_id=966038601]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 33.1, 3.2, -14)
 script = ExtResource("3_fpkux")
 model = ExtResource("31_e6fs6")
@@ -1636,7 +1636,7 @@ anchor = 2
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="street_lamp_02" type="Node3D" parent="Props" unique_id=1034015552]
+[node name="street_lamp_02" type="Node3D" parent="Props" unique_id=1987565304]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 65.3, 2.2, -2.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("33_of3sk")
@@ -1645,7 +1645,7 @@ anchor = 2
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="street_lamp_022" type="Node3D" parent="Props" unique_id=1324270712]
+[node name="street_lamp_022" type="Node3D" parent="Props" unique_id=1569060390]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 65.3, 2.2, 2.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("33_of3sk")
@@ -1654,226 +1654,226 @@ anchor = 2
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="cone" type="Node3D" parent="Props" unique_id=400425853]
+[node name="cone" type="Node3D" parent="Props" unique_id=1411589806]
 transform = Transform3D(-0.1602561, 0, 0.98707545, 0, 1, 0, -0.98707545, 0, -0.1602561, 48.583004, 0, -1)
 script = ExtResource("3_fpkux")
 model = ExtResource("34_vek4y")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="cone2" type="Node3D" parent="Props" unique_id=1329415608]
+[node name="cone2" type="Node3D" parent="Props" unique_id=1312470394]
 transform = Transform3D(-0.4295931, 0, 0.9030226, 0, 1, 0, -0.9030226, 0, -0.4295931, 47.566105, 0, 0.3)
 script = ExtResource("3_fpkux")
 model = ExtResource("34_vek4y")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="cone3" type="Node3D" parent="Props" unique_id=865939944]
+[node name="cone3" type="Node3D" parent="Props" unique_id=887324444]
 transform = Transform3D(0.99985975, 0, -0.016746517, 0, 1, 0, 0.016746517, 0, 0.99985975, 48.38575, 0, 1.6)
 script = ExtResource("3_fpkux")
 model = ExtResource("34_vek4y")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="cone4" type="Node3D" parent="Props" unique_id=1885356163]
+[node name="cone4" type="Node3D" parent="Props" unique_id=1545808552]
 transform = Transform3D(-0.3572221, 0, -0.93401945, 0, 1, 0, 0.93401945, 0, -0.3572221, 48.156258, 0, 2.9)
 script = ExtResource("3_fpkux")
 model = ExtResource("34_vek4y")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="cone5" type="Node3D" parent="Props" unique_id=810900382]
+[node name="cone5" type="Node3D" parent="Props" unique_id=1354934037]
 transform = Transform3D(0.19690706, 0, 0.98042214, 0, 1, 0, -0.98042214, 0, 0.19690706, 47.560867, 0, 4.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("34_vek4y")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Barrier" type="StaticBody3D" parent="Props" unique_id=1672667873]
+[node name="Barrier" type="StaticBody3D" parent="Props" unique_id=456117253]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52.8, 0.9, 4.9)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.1, 0.25, 1.8)
 material = ExtResource("35_l3g4g")
 
-[node name="BarrierLeg" type="StaticBody3D" parent="Props" unique_id=510105175]
+[node name="BarrierLeg" type="StaticBody3D" parent="Props" unique_id=1149693693]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52.8, 0.45, 4.1)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.1, 0.9, 0.1)
 material = ExtResource("17_5e1yb")
 collision_enabled = false
 
-[node name="BarrierLeg2" type="StaticBody3D" parent="Props" unique_id=406040029]
+[node name="BarrierLeg2" type="StaticBody3D" parent="Props" unique_id=377351365]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52.8, 0.45, 5.7)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.1, 0.9, 0.1)
 material = ExtResource("17_5e1yb")
 collision_enabled = false
 
-[node name="Barrier2" type="StaticBody3D" parent="Props" unique_id=1474074967]
+[node name="Barrier2" type="StaticBody3D" parent="Props" unique_id=703901017]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52.8, 0.9, -3)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.1, 0.25, 1.8)
 material = ExtResource("35_l3g4g")
 
-[node name="BarrierLeg3" type="StaticBody3D" parent="Props" unique_id=500058569]
+[node name="BarrierLeg3" type="StaticBody3D" parent="Props" unique_id=571488590]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52.8, 0.45, -3.8)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.1, 0.9, 0.1)
 material = ExtResource("17_5e1yb")
 collision_enabled = false
 
-[node name="BarrierLeg4" type="StaticBody3D" parent="Props" unique_id=840175245]
+[node name="BarrierLeg4" type="StaticBody3D" parent="Props" unique_id=60850073]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52.8, 0.45, -2.2)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.1, 0.9, 0.1)
 material = ExtResource("17_5e1yb")
 collision_enabled = false
 
-[node name="Blocker2" type="StaticBody3D" parent="Props" unique_id=64486660]
+[node name="Blocker2" type="StaticBody3D" parent="Props" unique_id=959039628]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.65, 1, 1)
 script = ExtResource("1_rnbyg")
 size = Vector3(3.7, 2, 9.8)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="debris-bumper" type="Node3D" parent="Props" unique_id=287137227]
+[node name="debris-bumper" type="Node3D" parent="Props" unique_id=1439717454]
 transform = Transform3D(0.82939506, 0, -0.55866253, 0, 1, 0, 0.55866253, 0, 0.82939506, 31.6, 0, 1.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("36_8xrmk")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="debris-tire2" type="Node3D" parent="Props" unique_id=1562837032]
+[node name="debris-tire2" type="Node3D" parent="Props" unique_id=1346501059]
 transform = Transform3D(-0.95928395, 0, 0.28244352, 0, 1, 0, -0.28244352, 0, -0.95928395, 29.2, 0, 0.4)
 script = ExtResource("3_fpkux")
 model = ExtResource("29_bo6gg")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="debris-door" type="Node3D" parent="Props" unique_id=215728463]
+[node name="debris-door" type="Node3D" parent="Props" unique_id=1240525930]
 transform = Transform3D(-0.1905511, 0, 0.9816773, 0, 1, 0, -0.9816773, 0, -0.1905511, 13.4, 0, 0.9)
 script = ExtResource("3_fpkux")
 model = ExtResource("37_vk7kb")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Prop_Bollard" type="Node3D" parent="Props" unique_id=1632309454]
+[node name="Prop_Bollard" type="Node3D" parent="Props" unique_id=40608488]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3.3)
 script = ExtResource("3_fpkux")
 model = ExtResource("38_1dtjo")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Prop_Bollard2" type="Node3D" parent="Props" unique_id=1623122783]
+[node name="Prop_Bollard2" type="Node3D" parent="Props" unique_id=1688307862]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0, -3.3)
 script = ExtResource("3_fpkux")
 model = ExtResource("38_1dtjo")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Prop_Bollard3" type="Node3D" parent="Props" unique_id=55145024]
+[node name="Prop_Bollard3" type="Node3D" parent="Props" unique_id=1573522639]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 0, -3.3)
 script = ExtResource("3_fpkux")
 model = ExtResource("38_1dtjo")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Prop_Bollard4" type="Node3D" parent="Props" unique_id=1891646534]
+[node name="Prop_Bollard4" type="Node3D" parent="Props" unique_id=1307189139]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 41, 0, -3.3)
 script = ExtResource("3_fpkux")
 model = ExtResource("38_1dtjo")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Prop_Bollard5" type="Node3D" parent="Props" unique_id=46845844]
+[node name="Prop_Bollard5" type="Node3D" parent="Props" unique_id=365508311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 53, 0, -3.3)
 script = ExtResource("3_fpkux")
 model = ExtResource("38_1dtjo")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Prop_Planter_Single" type="Node3D" parent="Props" unique_id=1810946153]
+[node name="Prop_Planter_Single" type="Node3D" parent="Props" unique_id=1107851341]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 4.6)
 script = ExtResource("3_fpkux")
 model = ExtResource("39_06q7v")
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="Prop_Planter_Single2" type="Node3D" parent="Props" unique_id=232333991]
+[node name="Prop_Planter_Single2" type="Node3D" parent="Props" unique_id=8997091]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.5, 0, 4.6)
 script = ExtResource("3_fpkux")
 model = ExtResource("39_06q7v")
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="Prop_Planter_Single3" type="Node3D" parent="Props" unique_id=821075399]
+[node name="Prop_Planter_Single3" type="Node3D" parent="Props" unique_id=309209489]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 0, 4.6)
 script = ExtResource("3_fpkux")
 model = ExtResource("39_06q7v")
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="Prop_Drain" type="Node3D" parent="Props" unique_id=465288323]
+[node name="Prop_Drain" type="Node3D" parent="Props" unique_id=1320690821]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, -3.1)
 script = ExtResource("3_fpkux")
 model = ExtResource("40_cknb5")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Prop_Drain2" type="Node3D" parent="Props" unique_id=1710646614]
+[node name="Prop_Drain2" type="Node3D" parent="Props" unique_id=540497304]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, 0, 3.1)
 script = ExtResource("3_fpkux")
 model = ExtResource("40_cknb5")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Prop_Drain3" type="Node3D" parent="Props" unique_id=2014063948]
+[node name="Prop_Drain3" type="Node3D" parent="Props" unique_id=2079659358]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47, 0, -3.1)
 script = ExtResource("3_fpkux")
 model = ExtResource("40_cknb5")
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="utility_box_012" type="Node3D" parent="Props" unique_id=1158822210]
+[node name="utility_box_012" type="Node3D" parent="Props" unique_id=1052606322]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 0, -5.4)
 script = ExtResource("3_fpkux")
 model = ExtResource("27_l1gt2")
 fit_height = 1.2
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="utility_box_013" type="Node3D" parent="Props" unique_id=1325719942]
+[node name="utility_box_013" type="Node3D" parent="Props" unique_id=404658903]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 47.5, 0, 5.4)
 script = ExtResource("3_fpkux")
 model = ExtResource("27_l1gt2")
 fit_height = 1.2
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="trashbag6" type="Node3D" parent="Props" unique_id=2057781401]
+[node name="trashbag6" type="Node3D" parent="Props" unique_id=171809629]
 transform = Transform3D(0.77633137, 0, 0.630325, 0, 1, 0, -0.630325, 0, 0.77633137, 3.2, 0, -5.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("28_1og68")
 fit_height = 0.6
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="trashbag7" type="Node3D" parent="Props" unique_id=1007568682]
+[node name="trashbag7" type="Node3D" parent="Props" unique_id=2083014234]
 transform = Transform3D(-0.99922776, 0, 0.039292622, 0, 1, 0, -0.039292622, 0, -0.99922776, 24, 0, 5.3)
 script = ExtResource("3_fpkux")
 model = ExtResource("28_1og68")
 fit_height = 0.6
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="trashbag8" type="Node3D" parent="Props" unique_id=246819816]
+[node name="trashbag8" type="Node3D" parent="Props" unique_id=1466193217]
 transform = Transform3D(0.48273885, 0, -0.87576437, 0, 1, 0, 0.87576437, 0, 0.48273885, 56.5, 0, -5.3)
 script = ExtResource("3_fpkux")
 model = ExtResource("28_1og68")
 fit_height = 0.6
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="barrel_033" type="Node3D" parent="Props" unique_id=885264770]
+[node name="barrel_033" type="Node3D" parent="Props" unique_id=275435196]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.9, 0, 5.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("23_eep5q")
 fit_height = 1.0
 tint = Color(0.8, 0.79, 0.77, 1)
 
-[node name="blood" type="Node3D" parent="Props" unique_id=1790599410]
+[node name="blood" type="Node3D" parent="Props" unique_id=694081789]
 transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 30, 0.02, -2.6)
 script = ExtResource("3_fpkux")
 model = ExtResource("41_wgndh")
@@ -1881,7 +1881,7 @@ fit_largest = 1.6
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="street_lamp_01" type="Node3D" parent="Props" unique_id=2055907537]
+[node name="street_lamp_01" type="Node3D" parent="Props" unique_id=1683177112]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -5.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("42_8l1s6")
@@ -1889,14 +1889,14 @@ fit_height = 4.5
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Blocker3" type="StaticBody3D" parent="Props" unique_id=2126762440]
+[node name="Blocker3" type="StaticBody3D" parent="Props" unique_id=2038690063]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, -5.2)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.3, 3, 0.3)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="street_lamp_012" type="Node3D" parent="Props" unique_id=212947413]
+[node name="street_lamp_012" type="Node3D" parent="Props" unique_id=9501997]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 18, 0, 5.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("42_8l1s6")
@@ -1904,14 +1904,14 @@ fit_height = 4.5
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Blocker4" type="StaticBody3D" parent="Props" unique_id=1738570279]
+[node name="Blocker4" type="StaticBody3D" parent="Props" unique_id=384301265]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.5, 5.2)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.3, 3, 0.3)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="street_lamp_013" type="Node3D" parent="Props" unique_id=1010516995]
+[node name="street_lamp_013" type="Node3D" parent="Props" unique_id=2021766277]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0, -5.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("42_8l1s6")
@@ -1919,14 +1919,14 @@ fit_height = 4.5
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Blocker5" type="StaticBody3D" parent="Props" unique_id=2054811605]
+[node name="Blocker5" type="StaticBody3D" parent="Props" unique_id=531770535]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 1.5, -5.2)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.3, 3, 0.3)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="street_lamp_014" type="Node3D" parent="Props" unique_id=614615574]
+[node name="street_lamp_014" type="Node3D" parent="Props" unique_id=314999439]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 42, 0, 5.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("42_8l1s6")
@@ -1934,14 +1934,14 @@ fit_height = 4.5
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Blocker6" type="StaticBody3D" parent="Props" unique_id=605674641]
+[node name="Blocker6" type="StaticBody3D" parent="Props" unique_id=1546672856]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 1.5, 5.2)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.3, 3, 0.3)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="street_lamp_015" type="Node3D" parent="Props" unique_id=1256071718]
+[node name="street_lamp_015" type="Node3D" parent="Props" unique_id=2135868855]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 0, -5.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("42_8l1s6")
@@ -1949,88 +1949,88 @@ fit_height = 4.5
 tint = Color(0.8, 0.79, 0.77, 1)
 collision = false
 
-[node name="Blocker7" type="StaticBody3D" parent="Props" unique_id=1016471558]
+[node name="Blocker7" type="StaticBody3D" parent="Props" unique_id=1652425623]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 1.5, -5.2)
 script = ExtResource("1_rnbyg")
 size = Vector3(0.3, 3, 0.3)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Cars" type="Node3D" parent="." unique_id=1181932397 groups=["nav_source"]]
+[node name="Cars" type="Node3D" parent="." unique_id=1926756794 groups=["nav_source"]]
 
-[node name="sedan" type="Node3D" parent="Cars" unique_id=1910106352]
+[node name="sedan" type="Node3D" parent="Cars" unique_id=728191011]
 transform = Transform3D(0.9396926, 0, 0.34202012, 0, 1, 0, -0.34202012, 0, 0.9396926, 42, 0, -30.5)
 script = ExtResource("3_fpkux")
 model = ExtResource("43_nk5yc")
 model_scale = 1.5
 tint = Color(0.2, 0.18, 0.17, 1)
 
-[node name="police" type="Node3D" parent="Cars" unique_id=1442226035]
+[node name="police" type="Node3D" parent="Cars" unique_id=1280451348]
 transform = Transform3D(0.25881907, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.25881907, 49.5, 0, 0.8)
 script = ExtResource("3_fpkux")
 model = ExtResource("44_uw48w")
 model_scale = 1.5
 tint = Color(0.75, 0.74, 0.74, 1)
 
-[node name="police2" type="Node3D" parent="Cars" unique_id=1865914379]
+[node name="police2" type="Node3D" parent="Cars" unique_id=652894307]
 transform = Transform3D(-0.34202012, 0, 0.9396926, 0, 1, 0, -0.9396926, 0, -0.34202012, 50.8, 0, 4.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("44_uw48w")
 model_scale = 1.5
 tint = Color(0.7, 0.7, 0.72, 1)
 
-[node name="van" type="Node3D" parent="Cars" unique_id=911567772]
+[node name="van" type="Node3D" parent="Cars" unique_id=1265467587]
 transform = Transform3D(0.34202015, 0, 0.9396926, 0, 1, 0, -0.9396926, 0, 0.34202015, 51, 0, -1.5)
 script = ExtResource("3_fpkux")
 model = ExtResource("45_svohy")
 model_scale = 1.5
 tint = Color(0.62, 0.6, 0.58, 1)
 
-[node name="sedan2" type="Node3D" parent="Cars" unique_id=119775212]
+[node name="sedan2" type="Node3D" parent="Cars" unique_id=239949158]
 transform = Transform3D(-0.034899462, 0, 0.99939084, 0, 1, 0, -0.99939084, 0, -0.034899462, 12, 0, 2.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("43_nk5yc")
 model_scale = 1.5
 tint = Color(0.7, 0.68, 0.66, 1)
 
-[node name="taxi" type="Node3D" parent="Cars" unique_id=1412529533]
+[node name="taxi" type="Node3D" parent="Cars" unique_id=1924858907]
 transform = Transform3D(0.034899496, 0, -0.99939084, 0, 1, 0, 0.99939084, 0, 0.034899496, 21.5, 0, -2.3)
 script = ExtResource("3_fpkux")
 model = ExtResource("46_sc56e")
 model_scale = 1.5
 tint = Color(0.75, 0.72, 0.6, 1)
 
-[node name="suv" type="Node3D" parent="Cars" unique_id=248898875]
+[node name="suv" type="Node3D" parent="Cars" unique_id=293705925]
 transform = Transform3D(0.087155804, 0, 0.9961947, 0, 1, 0, -0.9961947, 0, 0.087155804, 28.5, 0, 2.4)
 script = ExtResource("3_fpkux")
 model = ExtResource("47_jlrcq")
 model_scale = 1.5
 tint = Color(0.6, 0.62, 0.66, 1)
 
-[node name="sedan3" type="Node3D" parent="Cars" unique_id=784976074]
+[node name="sedan3" type="Node3D" parent="Cars" unique_id=1772656280]
 transform = Transform3D(-0.12186929, 0, 0.99254614, 0, 1, 0, -0.99254614, 0, -0.12186929, 39.5, 0, 2.1)
 script = ExtResource("3_fpkux")
 model = ExtResource("43_nk5yc")
 model_scale = 1.5
 tint = Color(0.55, 0.5, 0.5, 1)
 
-[node name="ambulance" type="Node3D" parent="Cars" unique_id=1793816982]
+[node name="ambulance" type="Node3D" parent="Cars" unique_id=1404664004]
 transform = Transform3D(0.4694716, 0, -0.88294756, 0, 1, 0, 0.88294756, 0, 0.4694716, 30.5, 0, -1.2)
 script = ExtResource("3_fpkux")
 model = ExtResource("48_wftol")
 model_scale = 1.5
 tint = Color(0.8, 0.8, 0.8, 1)
 
-[node name="truck" type="Node3D" parent="Cars" unique_id=1172408904]
+[node name="truck" type="Node3D" parent="Cars" unique_id=1470399960]
 transform = Transform3D(0.17364822, 0, 0.9848077, 0, 1, 0, -0.9848077, 0, 0.17364822, 58.5, 0, 3.6)
 script = ExtResource("3_fpkux")
 model = ExtResource("49_plowo")
 model_scale = 1.5
 tint = Color(0.55, 0.55, 0.55, 1)
 
-[node name="Items" type="Node3D" parent="." unique_id=1775523068]
+[node name="Items" type="Node3D" parent="." unique_id=917396896]
 
-[node name="LetterPolice" type="Area3D" parent="Items" unique_id=773980867 instance=ExtResource("50_g223e")]
+[node name="LetterPolice" type="Area3D" parent="Items" unique_id=1370270137 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.2, 0.55, 4.9)
 collision_layer = 4
 collision_mask = 0
@@ -2038,7 +2038,7 @@ monitoring = false
 script = ExtResource("51_ehpbe")
 item = ExtResource("52_gwmm6")
 
-[node name="LetterMarta2" type="Area3D" parent="Items" unique_id=1835768118 instance=ExtResource("50_g223e")]
+[node name="LetterMarta2" type="Area3D" parent="Items" unique_id=79248020 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0.82, -34.3)
 collision_layer = 4
 collision_mask = 0
@@ -2046,7 +2046,7 @@ monitoring = false
 script = ExtResource("51_ehpbe")
 item = ExtResource("53_g1d6p")
 
-[node name="Magazine" type="Area3D" parent="Items" unique_id=593676946 instance=ExtResource("50_g223e")]
+[node name="Magazine" type="Area3D" parent="Items" unique_id=1544369778 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.2, 0.05, 4)
 collision_layer = 4
 collision_mask = 0
@@ -2054,7 +2054,7 @@ monitoring = false
 script = ExtResource("51_ehpbe")
 item = ExtResource("54_gagmh")
 
-[node name="Water1" type="Area3D" parent="Items" unique_id=278099301 instance=ExtResource("50_g223e")]
+[node name="Water1" type="Area3D" parent="Items" unique_id=350530529 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.9, 0.05, 3.3)
 collision_layer = 4
 collision_mask = 0
@@ -2062,7 +2062,7 @@ monitoring = false
 script = ExtResource("51_ehpbe")
 item = ExtResource("55_cfgwp")
 
-[node name="Chocolate1" type="Area3D" parent="Items" unique_id=614286027 instance=ExtResource("50_g223e")]
+[node name="Chocolate1" type="Area3D" parent="Items" unique_id=1735642371 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 0.05, 1.3)
 collision_layer = 4
 collision_mask = 0
@@ -2070,7 +2070,7 @@ monitoring = false
 script = ExtResource("51_ehpbe")
 item = ExtResource("56_bwr8u")
 
-[node name="Peaches1" type="Area3D" parent="Items" unique_id=1982353171 instance=ExtResource("50_g223e")]
+[node name="Peaches1" type="Area3D" parent="Items" unique_id=23046272 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43.5, 0.05, -26.5)
 collision_layer = 4
 collision_mask = 0
@@ -2078,7 +2078,7 @@ monitoring = false
 script = ExtResource("51_ehpbe")
 item = ExtResource("57_aw1vs")
 
-[node name="Ammo1" type="Area3D" parent="Items" unique_id=1240813508 instance=ExtResource("50_g223e")]
+[node name="Ammo1" type="Area3D" parent="Items" unique_id=1954105591 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.4, 0.05, 3.2)
 collision_layer = 4
 collision_mask = 0
@@ -2087,7 +2087,7 @@ script = ExtResource("51_ehpbe")
 item = ExtResource("58_e40w3")
 count = 8
 
-[node name="Shells1" type="Area3D" parent="Items" unique_id=831658066 instance=ExtResource("50_g223e")]
+[node name="Shells1" type="Area3D" parent="Items" unique_id=1697389657 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.2, 0.05, 5.2)
 collision_layer = 4
 collision_mask = 0
@@ -2096,7 +2096,7 @@ script = ExtResource("51_ehpbe")
 item = ExtResource("59_s8xbj")
 count = 4
 
-[node name="Ammo2" type="Area3D" parent="Items" unique_id=1936055122 instance=ExtResource("50_g223e")]
+[node name="Ammo2" type="Area3D" parent="Items" unique_id=1969454715 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.2, 0.22, -29.6)
 collision_layer = 4
 collision_mask = 0
@@ -2105,7 +2105,7 @@ script = ExtResource("51_ehpbe")
 item = ExtResource("58_e40w3")
 count = 6
 
-[node name="Wood1" type="Area3D" parent="Items" unique_id=989914166 instance=ExtResource("50_g223e")]
+[node name="Wood1" type="Area3D" parent="Items" unique_id=387618793 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44.3, 0, -24.8)
 collision_layer = 4
 collision_mask = 0
@@ -2114,7 +2114,7 @@ script = ExtResource("51_ehpbe")
 item = ExtResource("60_qipji")
 count = 3
 
-[node name="Wood2" type="Area3D" parent="Items" unique_id=1873036979 instance=ExtResource("50_g223e")]
+[node name="Wood2" type="Area3D" parent="Items" unique_id=106704617 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.8, 0, -14.8)
 collision_layer = 4
 collision_mask = 0
@@ -2123,7 +2123,7 @@ script = ExtResource("51_ehpbe")
 item = ExtResource("60_qipji")
 count = 2
 
-[node name="Metal1" type="Area3D" parent="Items" unique_id=69125557 instance=ExtResource("50_g223e")]
+[node name="Metal1" type="Area3D" parent="Items" unique_id=2105821143 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.8, 0, 1.9)
 collision_layer = 4
 collision_mask = 0
@@ -2132,7 +2132,7 @@ script = ExtResource("51_ehpbe")
 item = ExtResource("61_wmh7b")
 count = 3
 
-[node name="Metal2" type="Area3D" parent="Items" unique_id=552374225 instance=ExtResource("50_g223e")]
+[node name="Metal2" type="Area3D" parent="Items" unique_id=346937179 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.1, 0, 2.3)
 collision_layer = 4
 collision_mask = 0
@@ -2141,7 +2141,7 @@ script = ExtResource("51_ehpbe")
 item = ExtResource("61_wmh7b")
 count = 2
 
-[node name="Cable1" type="Area3D" parent="Items" unique_id=1879171817 instance=ExtResource("50_g223e")]
+[node name="Cable1" type="Area3D" parent="Items" unique_id=76802403 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.8, 0, -4.7)
 collision_layer = 4
 collision_mask = 0
@@ -2150,7 +2150,7 @@ script = ExtResource("51_ehpbe")
 item = ExtResource("62_6wav1")
 count = 2
 
-[node name="Cable2" type="Area3D" parent="Items" unique_id=414853620 instance=ExtResource("50_g223e")]
+[node name="Cable2" type="Area3D" parent="Items" unique_id=407363461 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.7, 0, -21)
 collision_layer = 4
 collision_mask = 0
@@ -2158,7 +2158,7 @@ monitoring = false
 script = ExtResource("51_ehpbe")
 item = ExtResource("62_6wav1")
 
-[node name="Cloth1" type="Area3D" parent="Items" unique_id=1311722010 instance=ExtResource("50_g223e")]
+[node name="Cloth1" type="Area3D" parent="Items" unique_id=1273566471 instance=ExtResource("50_g223e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, -1.2)
 collision_layer = 4
 collision_mask = 0
@@ -2167,27 +2167,27 @@ script = ExtResource("51_ehpbe")
 item = ExtResource("63_flbg3")
 count = 2
 
-[node name="Inspectables" type="Node3D" parent="." unique_id=503702861]
+[node name="Inspectables" type="Node3D" parent="." unique_id=1643336310]
 
-[node name="HospitalDoor" type="Area3D" parent="Inspectables" unique_id=379844473]
+[node name="HospitalDoor" type="Area3D" parent="Inspectables" unique_id=1123460878]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.2, 0)
 script = ExtResource("64_wjfpn")
 target_scene = "res://scenes/levels/hospital.tscn"
 target_spawn = &"from_street"
 
-[node name="Inspect" type="Area3D" parent="Inspectables" unique_id=2138128231]
+[node name="Inspect" type="Area3D" parent="Inspectables" unique_id=1103639311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.5, 1, -1.2)
 script = ExtResource("65_1y5bn")
 texts = PackedStringArray("La ambulancia del San Judas. El parabrisas está roto desde adentro.", "El cinturón del conductor está cortado. No hay sangre. No hay nadie.")
 radius = 2.2
 
-[node name="Inspect2" type="Area3D" parent="Inspectables" unique_id=1648452972]
+[node name="Inspect2" type="Area3D" parent="Inspectables" unique_id=1567706646]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.5, 1, 0.8)
 script = ExtResource("65_1y5bn")
 texts = PackedStringArray("Barricada de la policía. Nadie la custodia.", "Del lado del teatro, la niebla es más espesa. Casi tibia.")
 radius = 2.0
 
-[node name="TheaterDoor" type="Area3D" parent="Inspectables" unique_id=1942957325]
+[node name="TheaterDoor" type="Area3D" parent="Inspectables" unique_id=1669310911]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.9, 1.2, 0)
 script = ExtResource("64_wjfpn")
 target_scene = "res://scenes/levels/theater.tscn"
@@ -2198,83 +2198,83 @@ locked_text = "Las puertas del Imperio están encadenadas con un candado. Adentr
 unlock_text = "La llave de Sosa entra en el candado. La cadena cae al piso como si pesara una tonelada."
 radius = 1.3
 
-[node name="Inspect3" type="Area3D" parent="Inspectables" unique_id=223428151]
+[node name="Inspect3" type="Area3D" parent="Inspectables" unique_id=1302038826]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1, 2.2)
 script = ExtResource("65_1y5bn")
 texts = PackedStringArray("Las llaves siguen puestas. El motor no hace ni un ruido.", "En el asiento de atrás, una sillita de bebé vacía.")
 radius = 2.0
 
-[node name="Inspect4" type="Area3D" parent="Inspectables" unique_id=1963124508]
+[node name="Inspect4" type="Area3D" parent="Inspectables" unique_id=2022249175]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.5, 1.2, -6.8)
 script = ExtResource("65_1y5bn")
 texts = PackedStringArray("Un callejón. Huele a basura mojada y a algo dulce que no debería estar ahí.")
 radius = 1.5
 
-[node name="Inspect5" type="Area3D" parent="Inspectables" unique_id=1788775836]
+[node name="Inspect5" type="Area3D" parent="Inspectables" unique_id=1156553782]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.2, 1.4, -29)
 script = ExtResource("65_1y5bn")
 texts = PackedStringArray("Alguien escribió en la pared con los dedos.")
 radius = 1.2
 
-[node name="Door_ibarra" type="Area3D" parent="Inspectables" unique_id=7373139]
+[node name="Door_ibarra" type="Area3D" parent="Inspectables" unique_id=28553643]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.23, 1.2, -5.6)
 script = ExtResource("64_wjfpn")
 target_scene = "res://scenes/levels/street_houses/ibarra.tscn"
 target_spawn = &"inside"
 radius = 1.3
 
-[node name="Inspect6" type="Area3D" parent="Inspectables" unique_id=2029785907]
+[node name="Inspect6" type="Area3D" parent="Inspectables" unique_id=1588799306]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.72, 1.2, -5.6)
 script = ExtResource("65_1y5bn")
 texts = PackedStringArray("Cerrada con llave. Del otro lado, una radio encendida sin sintonizar.")
 radius = 1.3
 
-[node name="Door_relojeria" type="Area3D" parent="Inspectables" unique_id=290861316]
+[node name="Door_relojeria" type="Area3D" parent="Inspectables" unique_id=793439632]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.53, 1.2, -5.6)
 script = ExtResource("64_wjfpn")
 target_scene = "res://scenes/levels/street_houses/relojeria.tscn"
 target_spawn = &"inside"
 radius = 1.3
 
-[node name="Inspect7" type="Area3D" parent="Inspectables" unique_id=1643705375]
+[node name="Inspect7" type="Area3D" parent="Inspectables" unique_id=353560648]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.3, 1.2, -5.6)
 script = ExtResource("65_1y5bn")
 texts = PackedStringArray("No abre. Alguien apiló muebles contra la puerta desde adentro.")
 radius = 1.3
 
-[node name="Inspect8" type="Area3D" parent="Inspectables" unique_id=780019524]
+[node name="Inspect8" type="Area3D" parent="Inspectables" unique_id=303285020]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.32, 1.2, 5.6)
 script = ExtResource("65_1y5bn")
 texts = PackedStringArray("Cerrada. En el vidrio esmerilado se dibuja una mano del lado de adentro.")
 radius = 1.3
 
-[node name="Door_almacen" type="Area3D" parent="Inspectables" unique_id=1639713228]
+[node name="Door_almacen" type="Area3D" parent="Inspectables" unique_id=1364715892]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.87, 1.2, 5.6)
 script = ExtResource("64_wjfpn")
 target_scene = "res://scenes/levels/street_houses/almacen.tscn"
 target_spawn = &"inside"
 radius = 1.3
 
-[node name="Inspect9" type="Area3D" parent="Inspectables" unique_id=1507705805]
+[node name="Inspect9" type="Area3D" parent="Inspectables" unique_id=327904558]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.63, 1.2, 5.6)
 script = ExtResource("65_1y5bn")
 texts = PackedStringArray("Cerrada con llave. El picaporte está tibio.")
 radius = 1.3
 
-[node name="Door_pension" type="Area3D" parent="Inspectables" unique_id=150159407]
+[node name="Door_pension" type="Area3D" parent="Inspectables" unique_id=7741311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.69, 1.2, 5.6)
 script = ExtResource("64_wjfpn")
 target_scene = "res://scenes/levels/street_houses/pension.tscn"
 target_spawn = &"inside"
 radius = 1.3
 
-[node name="Secrets" type="Node3D" parent="." unique_id=296831992]
+[node name="Secrets" type="Node3D" parent="." unique_id=600971253]
 
-[node name="WallSymbol" type="Node3D" parent="Secrets" unique_id=1189167028]
+[node name="WallSymbol" type="Node3D" parent="Secrets" unique_id=1907164467]
 script = ExtResource("67_bq5i7")
 threshold = 1
 
-[node name="Label5" type="Label3D" parent="Secrets/WallSymbol" unique_id=457156176]
+[node name="Label5" type="Label3D" parent="Secrets/WallSymbol" unique_id=343786668]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 45.88, 2, -29)
 visibility_range_end = 16.0
 visibility_range_end_margin = 6.0
@@ -2285,11 +2285,11 @@ text = "ELLA TE ESPERA
 EN EL IMPERIO"
 font = ExtResource("12_32v1b")
 
-[node name="LyingWall" type="Node3D" parent="Secrets" unique_id=292527506]
+[node name="LyingWall" type="Node3D" parent="Secrets" unique_id=443699913]
 script = ExtResource("67_bq5i7")
 mode = 1
 
-[node name="Brick_Plain_477" type="Node3D" parent="Secrets/LyingWall" unique_id=792599519]
+[node name="Brick_Plain_477" type="Node3D" parent="Secrets/LyingWall" unique_id=120143454]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0, -33.6)
 script = ExtResource("3_fpkux")
 model = ExtResource("7_cqww8")
@@ -2297,33 +2297,33 @@ anchor = 3
 tint = Color(0.8, 0.79, 0.78, 1)
 collision = false
 
-[node name="Collider" type="StaticBody3D" parent="Secrets/LyingWall" unique_id=1470376681]
+[node name="Collider" type="StaticBody3D" parent="Secrets/LyingWall" unique_id=2068088240]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 1, -33.7)
 script = ExtResource("1_rnbyg")
 size = Vector3(2, 2, 0.2)
 material = ExtResource("8_quwty")
 mesh_visible = false
 
-[node name="Niche" type="StaticBody3D" parent="Secrets" unique_id=165901694]
+[node name="Niche" type="StaticBody3D" parent="Secrets" unique_id=1289904210]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 0.4, -34.3)
 script = ExtResource("1_rnbyg")
 size = Vector3(1.6, 0.8, 0.6)
 material = ExtResource("9_62g7y")
 collision_enabled = false
 
-[node name="Hallucination" type="Node3D" parent="Secrets" unique_id=623717734]
+[node name="Hallucination" type="Node3D" parent="Secrets" unique_id=1123721448]
 script = ExtResource("67_bq5i7")
 threshold = 1
 
-[node name="Figure" type="Node3D" parent="Secrets/Hallucination" unique_id=1904933184 instance=ExtResource("68_7jbsn")]
+[node name="Figure" type="Node3D" parent="Secrets/Hallucination" unique_id=1975316446 instance=ExtResource("68_7jbsn")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.5, 0, 1.5)
 script = ExtResource("69_gg4k7")
 horror_id = &"silueta_alta"
 eye_height = 2.3
 
-[node name="Enemies" type="Node3D" parent="." unique_id=1100028560]
+[node name="Enemies" type="Node3D" parent="." unique_id=464887922]
 
-[node name="StalkerStreet" type="CharacterBody3D" parent="Enemies" unique_id=2095482847 instance=ExtResource("70_1byd4")]
+[node name="StalkerStreet" type="CharacterBody3D" parent="Enemies" unique_id=158960296 instance=ExtResource("70_1byd4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0.05, 0.5)
 collision_layer = 2
 collision_mask = 3
@@ -2333,7 +2333,7 @@ albedo_texture = ExtResource("72_vaard")
 wander_radius = 7.0
 attack_hit_time = 0.75
 
-[node name="StalkerAlley" type="CharacterBody3D" parent="Enemies" unique_id=1514204350 instance=ExtResource("70_1byd4")]
+[node name="StalkerAlley" type="CharacterBody3D" parent="Enemies" unique_id=773748118 instance=ExtResource("70_1byd4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.5, 0.05, -18)
 collision_layer = 2
 collision_mask = 3
@@ -2343,7 +2343,7 @@ albedo_texture = ExtResource("72_vaard")
 wander_radius = 3.0
 attack_hit_time = 0.75
 
-[node name="StalkerYard" type="CharacterBody3D" parent="Enemies" unique_id=1253715182 instance=ExtResource("70_1byd4")]
+[node name="StalkerYard" type="CharacterBody3D" parent="Enemies" unique_id=1051835078 instance=ExtResource("70_1byd4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0.05, -29)
 collision_layer = 2
 collision_mask = 3
@@ -2353,7 +2353,7 @@ albedo_texture = ExtResource("72_vaard")
 wander_radius = 4.0
 attack_hit_time = 0.75
 
-[node name="StalkerBarricade" type="CharacterBody3D" parent="Enemies" unique_id=1948098255 instance=ExtResource("70_1byd4")]
+[node name="StalkerBarricade" type="CharacterBody3D" parent="Enemies" unique_id=2011424383 instance=ExtResource("70_1byd4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57, 0.05, -2)
 collision_layer = 2
 collision_mask = 3
@@ -2363,105 +2363,137 @@ albedo_texture = ExtResource("72_vaard")
 wander_radius = 5.0
 attack_hit_time = 0.75
 
-[node name="Atmosphere" type="WorldEnvironment" parent="." unique_id=1840860052]
-environment = SubResource("Environment_tl1na")
+[node name="ExtraHard" type="Marker3D" parent="Enemies" unique_id=1568195489]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0.05, -1)
 script = ExtResource("73_qa85p")
+enemy_scene = ExtResource("70_1byd4")
+wander_radius = 5.0
+
+[node name="ExtraHard2" type="Marker3D" parent="Enemies" unique_id=684654788]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 0.05, -12)
+script = ExtResource("73_qa85p")
+enemy_scene = ExtResource("70_1byd4")
+wander_radius = 3.0
+
+[node name="ExtraInsane" type="Marker3D" parent="Enemies" unique_id=1608269197]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 0.05, 2)
+script = ExtResource("73_qa85p")
+enemy_scene = ExtResource("70_1byd4")
+min_difficulty = 2
+wander_radius = 5.0
+
+[node name="ExtraInsane2" type="Marker3D" parent="Enemies" unique_id=2003993655]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60, 0.05, 2.5)
+script = ExtResource("73_qa85p")
+enemy_scene = ExtResource("70_1byd4")
+min_difficulty = 2
+wander_radius = 3.0
+
+[node name="ExtraInsane3" type="Marker3D" parent="Enemies" unique_id=1242951604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 0.05, -31)
+script = ExtResource("73_qa85p")
+enemy_scene = ExtResource("70_1byd4")
+min_difficulty = 2
+wander_radius = 3.0
+
+[node name="Atmosphere" type="WorldEnvironment" parent="." unique_id=1093520981]
+environment = SubResource("Environment_tl1na")
+script = ExtResource("74_3alos")
 fog_color = Color(0.5, 0.51, 0.53, 1)
 fog_start = 1.5
 fog_end = 20.0
 insane_fog_color = Color(0.12, 0.08, 0.07, 1)
 insane_fog_end = 7.0
 
-[node name="Overcast" type="DirectionalLight3D" parent="." unique_id=383595083]
+[node name="Overcast" type="DirectionalLight3D" parent="." unique_id=1698237676]
 transform = Transform3D(0.8660254, -0.4531539, 0.21130912, 0, 0.42261824, 0.9063078, -0.5, -0.7848856, 0.36599812, 0, 0, 0)
 light_color = Color(0.8, 0.82, 0.86, 1)
 light_energy = 0.35
 
-[node name="Places" type="Node3D" parent="." unique_id=610174868]
+[node name="Places" type="Node3D" parent="." unique_id=1451884389]
 
-[node name="street_hospital" type="Area3D" parent="Places" unique_id=2103425565]
+[node name="street_hospital" type="Area3D" parent="Places" unique_id=1039040349]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.5, 0)
-script = ExtResource("74_3alos")
+script = ExtResource("75_x1waq")
 place_id = &"street_hospital"
 size = Vector3(19.6, 3, 11.6)
 
-[node name="street_middle" type="Area3D" parent="Places" unique_id=441089480]
+[node name="street_middle" type="Area3D" parent="Places" unique_id=911740743]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 1.5, 0)
-script = ExtResource("74_3alos")
+script = ExtResource("75_x1waq")
 place_id = &"street_middle"
 size = Vector3(27.6, 3, 11.6)
 
-[node name="street_barricade" type="Area3D" parent="Places" unique_id=1970998481]
+[node name="street_barricade" type="Area3D" parent="Places" unique_id=386931315]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.5, 1.5, 0)
-script = ExtResource("74_3alos")
+script = ExtResource("75_x1waq")
 place_id = &"street_barricade"
 size = Vector3(16.6, 3, 11.6)
 
-[node name="street_alley" type="Area3D" parent="Places" unique_id=714173518]
+[node name="street_alley" type="Area3D" parent="Places" unique_id=33668854]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.5, 1.5, -15)
-script = ExtResource("74_3alos")
+script = ExtResource("75_x1waq")
 place_id = &"street_alley"
 size = Vector3(4.6, 3, 17.6)
 
-[node name="street_yard" type="Area3D" parent="Places" unique_id=1464726925]
+[node name="street_yard" type="Area3D" parent="Places" unique_id=583588877]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 1.5, -29)
-script = ExtResource("74_3alos")
+script = ExtResource("75_x1waq")
 place_id = &"street_yard"
 size = Vector3(15.6, 3, 9.6)
 
-[node name="SpawnFromTheater" type="Marker3D" parent="." unique_id=92338142]
+[node name="SpawnFromTheater" type="Marker3D" parent="." unique_id=776506314]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 62.8, 0.05, 0)
-script = ExtResource("75_x1waq")
+script = ExtResource("76_21rrb")
 spawn_id = &"from_theater"
 
-[node name="SpawnHouse_ibarra" type="Marker3D" parent="." unique_id=154476899]
+[node name="SpawnHouse_ibarra" type="Marker3D" parent="." unique_id=646098212]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 7.23, 0.05, -3.2)
-script = ExtResource("75_x1waq")
+script = ExtResource("76_21rrb")
 spawn_id = &"house_ibarra"
 
-[node name="SpawnHouse_relojeria" type="Marker3D" parent="." unique_id=1063892464]
+[node name="SpawnHouse_relojeria" type="Marker3D" parent="." unique_id=2043773006]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 45.53, 0.05, -4.6)
-script = ExtResource("75_x1waq")
+script = ExtResource("76_21rrb")
 spawn_id = &"house_relojeria"
 
-[node name="SpawnHouse_almacen" type="Marker3D" parent="." unique_id=600393368]
+[node name="SpawnHouse_almacen" type="Marker3D" parent="." unique_id=1721923950]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.87, 0.05, 3.2)
-script = ExtResource("75_x1waq")
+script = ExtResource("76_21rrb")
 spawn_id = &"house_almacen"
 
-[node name="SpawnHouse_pension" type="Marker3D" parent="." unique_id=398156853]
+[node name="SpawnHouse_pension" type="Marker3D" parent="." unique_id=1532218139]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.69, 0.05, 4.6)
-script = ExtResource("75_x1waq")
+script = ExtResource("76_21rrb")
 spawn_id = &"house_pension"
 
-[node name="Navigation" type="NavigationRegion3D" parent="." unique_id=2061819356]
+[node name="Navigation" type="NavigationRegion3D" parent="." unique_id=827130268]
 navigation_mesh = SubResource("NavigationMesh_sxt8o")
-script = ExtResource("76_21rrb")
-
-[node name="WorldPersistence" type="Node3D" parent="." unique_id=179599576]
 script = ExtResource("77_nd4ej")
 
-[node name="LevelAudio" type="Node" parent="." unique_id=919621351]
+[node name="WorldPersistence" type="Node3D" parent="." unique_id=48016292]
 script = ExtResource("78_xhjgm")
+
+[node name="LevelAudio" type="Node" parent="." unique_id=1082437429]
+script = ExtResource("79_1rc1v")
 ambience = &"street"
 ambience_db = -4.0
 
-[node name="SpawnFromHospital" type="Marker3D" parent="." unique_id=2055725434]
+[node name="SpawnFromHospital" type="Marker3D" parent="." unique_id=404676995]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.6, 0.05, 0)
-script = ExtResource("75_x1waq")
+script = ExtResource("76_21rrb")
 spawn_id = &"from_hospital"
 
-[node name="Player" type="CharacterBody3D" parent="." unique_id=78262753 instance=ExtResource("79_1rc1v")]
+[node name="Player" type="CharacterBody3D" parent="." unique_id=405038263 instance=ExtResource("80_e8u2q")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.05, 0)
 collision_mask = 3
-script = ExtResource("80_e8u2q")
+script = ExtResource("81_1ai21")
 
-[node name="PS1PostProcess" type="CanvasLayer" parent="." unique_id=857251458 instance=ExtResource("81_1ai21")]
+[node name="PS1PostProcess" type="CanvasLayer" parent="." unique_id=1699754636 instance=ExtResource("82_n5a78")]
 layer = 100
 
-[node name="GameUI" type="CanvasLayer" parent="." unique_id=758353667 instance=ExtResource("82_n5a78")]
+[node name="GameUI" type="CanvasLayer" parent="." unique_id=1551032219 instance=ExtResource("83_x40sj")]
 process_mode = 3
 layer = 50
 scale = Vector2(2, 2)
 transform = Transform2D(2, 0, 0, 2, 0, 0)
-script = ExtResource("83_x40sj")

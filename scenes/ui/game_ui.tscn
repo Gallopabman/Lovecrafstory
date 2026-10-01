@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/game_ui.gd" id="1_ui"]
 [ext_resource type="Script" path="res://scripts/ui/game_menu.gd" id="2_menu"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="6_pause"]
 [ext_resource type="PackedScene" path="res://scenes/ui/options_panel.tscn" id="7_options"]
 [ext_resource type="Script" path="res://scripts/ui/stash_menu.gd" id="8_stash"]
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="9_hud"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_paper"]
 bg_color = Color(0.8, 0.78, 0.7, 1)
@@ -44,9 +45,75 @@ autowrap_mode = 3
 [node name="DebugLabel" type="Label" parent="."]
 unique_name_in_owner = true
 offset_left = 4.0
-offset_top = 4.0
+offset_top = 36.0
 offset_right = 316.0
-offset_bottom = 26.0
+offset_bottom = 58.0
+
+[node name="Hud" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 320.0
+offset_bottom = 240.0
+mouse_filter = 2
+script = ExtResource("9_hud")
+
+[node name="HudBack" type="ColorRect" parent="Hud"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 128.0
+offset_bottom = 25.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0.35)
+
+[node name="HealthTitle" type="Label" parent="Hud"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 46.0
+offset_bottom = 14.0
+theme_override_colors/font_color = Color(0.85, 0.75, 0.68, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+text = "VIDA"
+
+[node name="HealthBar" type="ProgressBar" parent="Hud"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 54.0
+offset_top = 6.0
+offset_right = 124.0
+offset_bottom = 12.0
+mouse_filter = 2
+show_percentage = false
+
+[node name="MadnessTitle" type="Label" parent="Hud"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 14.0
+offset_right = 46.0
+offset_bottom = 24.0
+theme_override_colors/font_color = Color(0.78, 0.68, 0.85, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+text = "LOCURA"
+
+[node name="MadnessBar" type="ProgressBar" parent="Hud"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 54.0
+offset_top = 16.0
+offset_right = 124.0
+offset_bottom = 22.0
+mouse_filter = 2
+show_percentage = false
+
+[node name="DifficultyLabel" type="Label" parent="Hud"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 54.0
+offset_top = 24.0
+offset_right = 168.0
+offset_bottom = 34.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
 
 [node name="GameMenu" type="Control" parent="."]
 process_mode = 3
@@ -194,7 +261,7 @@ offset_top = 33.0
 offset_right = 240.0
 offset_bottom = 43.0
 theme_override_colors/font_color = Color(0.85, 0.62, 0.45, 1)
-text = "CORDURA"
+text = "LOCURA"
 
 [node name="StateLabel" type="Label" parent="GameMenu"]
 unique_name_in_owner = true

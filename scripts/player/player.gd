@@ -105,6 +105,7 @@ func _ready() -> void:
 
 	Sanity.hit_taken.connect(_on_hit_taken)
 	Sanity.lost.connect(_on_lost)
+	Health.died.connect(_on_lost)
 
 
 func _unhandled_input(event: InputEvent) -> void:

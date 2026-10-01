@@ -61,14 +61,16 @@ const SLOTS := {
 }
 const SLOT_ORDER: Array[StringName] = [&"fire", &"power", &"bed", &"windows", &"decor", &"stash"]
 
-@export_group("Goteo en el refugio")
-## Multiplicador del goteo de cordura sin mejoras y con el refugio completo.
-@export var drain_multiplier_bare := 0.6
-@export var drain_multiplier_full := 0.1
+@export_group("Locura en el refugio")
+## Multiplicador de lo rápido que baja la locura en el refugio: pelado y completo.
+@export var recovery_multiplier_bare := 1.0
+@export var recovery_multiplier_full := 3.0
 
 @export_group("Estaciones")
 @export var cooked_multiplier := 1.8
 @export var rest_amount := [6.0, 10.0]
+## Vida que se recupera al descansar, según la cama.
+@export var rest_health := [30.0, 60.0]
 @export var rest_cooldown := 180.0
 @export var radio_amount := 5.0
 @export var radio_cooldown := 120.0
@@ -262,9 +264,9 @@ func cozy_max() -> int:
 	return total
 
 
-## Cuánto se frena el goteo de cordura en el refugio según el nivel cozy.
-func drain_multiplier(refuge: StringName = &"") -> float:
-	return lerpf(drain_multiplier_bare, drain_multiplier_full, float(cozy(refuge)) / cozy_max())
+## Qué tan rápido baja la locura en el refugio según el nivel cozy.
+func recovery_multiplier(refuge: StringName = &"") -> float:
+	return lerpf(recovery_multiplier_bare, recovery_multiplier_full, float(cozy(refuge)) / cozy_max())
 
 
 func has_electricity(refuge: StringName = &"") -> bool:
@@ -367,7 +369,9 @@ func rest(refuge: StringName = &"") -> String:
 		return "En este colchón no se descansa. Hay que armar una cama."
 	if not _cooldown_ready(&"rest"):
 		return "No tengo sueño. Todavía no."
-	Sanity.restore(rest_amount[mini(level(&"bed", refuge), rest_amount.size()) - 1])
+	var bed := mini(level(&"bed", refuge), rest_amount.size()) - 1
+	Sanity.restore(rest_amount[bed])
+	Health.heal(rest_health[mini(bed, rest_health.size() - 1)])
 	_start_cooldown(&"rest", rest_cooldown)
 	return "Dormí un rato. Soñé con una casa con ventanas."
 

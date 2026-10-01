@@ -4,7 +4,8 @@ extends Node
 ## enemigo más cercano frente a la cámara, estilo Silent Hill) y "attack" para
 ## disparar; "reload" recarga con munición de la mochila. Cuerpo a cuerpo (o a
 ## mano limpia sin arma): "attack" golpea en arco hacia adelante.
-## La cordura baja empeora la puntería: la dispersión crece con la locura.
+## La locura empeora la puntería (la dispersión crece) y, según la dificultad,
+## el jugador pega menos (`Sanity.player_damage_multiplier`).
 
 const ANIM_AIM := SurvivorRig.AIM
 const ANIM_SHOOT := SurvivorRig.SHOOT
@@ -154,7 +155,7 @@ func _shoot(weapon: ItemData) -> void:
 		if not hit.is_empty() and hit.collider.has_method(&"take_damage"):
 			damage_by_target[hit.collider] = damage_by_target.get(hit.collider, 0.0) + weapon.damage
 	for enemy: Node in damage_by_target:
-		enemy.take_damage(damage_by_target[enemy])
+		enemy.take_damage(damage_by_target[enemy] * Sanity.player_damage_multiplier())
 
 
 func _melee(damage: float, reach: float, cooldown: float, anim: StringName, anim_speed := 1.0) -> void:
@@ -173,7 +174,7 @@ func _melee(damage: float, reach: float, cooldown: float, anim: StringName, anim
 	if not enemies.is_empty():
 		Audio.play_sfx(&"melee_hit", player.global_position)
 	for enemy in enemies:
-		enemy.take_damage(damage)
+		enemy.take_damage(damage * Sanity.player_damage_multiplier())
 
 
 func _find_target() -> Node3D:
