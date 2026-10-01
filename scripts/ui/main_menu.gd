@@ -2,7 +2,7 @@ extends Control
 ## Menú de inicio: Continuar (si hay partida guardada), Jugar (partida nueva),
 ## Opciones (volumen general) y Salir. Teclado, gamepad o mouse.
 
-@export_file("*.tscn") var first_scene := "res://scenes/levels/hospital.tscn"
+@export_file("*.tscn") var first_scene := "res://scenes/levels/home.tscn"
 @export var fade_time := 1.2
 ## El título titila de vez en cuando, como un tubo fluorescente.
 @export var flicker_chance := 0.35

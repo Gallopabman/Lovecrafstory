@@ -34,7 +34,8 @@ en vez de inventarlo.
 - **Refugio**: blueprints de slots fijos (fuego, electricidad, cama, decoración, ventanas,
   estaciones). Un solo refugio activo; mudarse es una decisión. Bono de llegada según logros de la salida.
 - **Mundo interconectado** ("lineal abierto", atajos estilo RE2/Dark Souls). Primer tramo:
-  refugio → edificio → calle → teatro. Cada zona tiene un secreto visible solo con poca cordura.
+  refugio → edificio → calle → teatro. Hoy: **casa** (refugio inicial) → calle de la plaza → hospital →
+  avenida → teatro. Cada zona tiene un secreto visible solo con poca cordura.
 - **Cámaras**: fijas en interiores, libre en exteriores (pendiente).
 - **Sin HUD**: la cordura solo se ve en el menú de estado/inventario (Tab).
 
@@ -77,7 +78,7 @@ en vez de inventarlo.
     `store_materials()`. Los materiales van al depósito de construcción (`stock`), no ocupan lugar. Espacio
     `stash` del plano: caja de cartón (8) → baúl (16) → armario con candado (28) (`stash_capacity`, no suma
     cozy). Hay uno solo: se usa en el refugio activo, viaja al mudarse y sobrevive a la muerte.
-    **Varios refugios** (`REFUGES`: `hospital`, `theater`), uno solo `active`: cada uno tiene sus mejoras
+    **Varios refugios** (`REFUGES`: `home` (el inicial), `hospital`, `theater`), uno solo `active`: cada uno tiene sus mejoras
     (`refuge_levels`; casi todas las funciones aceptan `refuge`, vacío = el activo). `move_to()` = mudarse
     (se decide desde el plano de un refugio que no es el activo; los materiales viajan). `RefugeZone`,
     `ShelterSlot` y `ShelterStation` tienen `refuge_id`; la zona solo cuenta como refugio si es el activo.
@@ -181,9 +182,30 @@ en vez de inventarlo.
 - Assets de terceros: registrar siempre en [CREDITS.md](CREDITS.md) (preferir CC0; los CC-BY
   necesitan atribución en los créditos del juego).
 
+## Zona 0: la casa y la calle de la plaza (el comienzo)
+
+**Historia** (del usuario): el protagonista era adicto a las drogas por una depresión severa y está en
+recuperación. Su madre es médica (en el juego, "Dra. M. Ibáñez", guardia del San Judas: el nombre lo
+inventé yo, confirmarlo con el usuario) y guardó sus insumos médicos bajo llave en el ático para que él no
+recaiga. La nota de mamá dice que la llamaron del San Judas por la niebla: eso lleva al hospital.
+- **Casa** ([scenes/levels/home.tscn](scenes/levels/home.tscn), [tools/build_home.gd](tools/build_home.gd)): refugio
+  inicial `home` (13 x 10 m): pieza (cama y alijo), baño (la cajita azul), living (hogar = fuego, tele, radio,
+  ventanas), cocina (plano en el corcho, la nota de mamá) y la escalera al ático. El ático (x 0-7.5, piso a
+  2.9 m) está cerrado: `FlagGate` con el flag `attic_open`, que nadie marca todavía. Mensaje (texto del
+  usuario, ajustado): "No puedo entrar ahí. Mi madre se llevó la llave cuando guardó sus estúpidos
+  medicamentos. Piensa que voy a recaer." Adentro: cajas, sueros, oxígeno, jeringas, una cama de hospital y
+  el **jefe del ático** (`Enemies/AtticThing`, [scenes/enemies/attic_boss.tscn](scenes/enemies/attic_boss.tscn),
+  dormido, flag de muerte `attic_boss_dead`).
+- **Calle de la plaza** ([scenes/levels/park_street.tscn](scenes/levels/park_street.tscn),
+  [tools/build_park.gd](tools/build_park.gd), extiende build_street.gd): la casa en la vereda norte; la plaza al
+  sur, rodeada de rejas (barrotes combinados en una sola malla: el shader PS1 no lee MultiMesh), con fuente,
+  árboles (Kenney Nature Kit), hamacas y un acechador encerrado; al oeste la calle termina en un camión
+  volcado; al este, la fachada oeste del hospital con la **puerta de guardia** (la única salida).
+  Secretos: una figura en las hamacas (Inquieto) y la "Carta a mí mismo" debajo del banco (Quebrado).
+
 ## Zona 1: Hospital San Judas
 
-[scenes/levels/hospital.tscn](scenes/levels/hospital.tscn) es la primera zona y el refugio (la sala de
+[scenes/levels/hospital.tscn](scenes/levels/hospital.tscn) es la segunda zona (se entra por la puerta de guardia, al oeste del pasillo, desde la calle de la plaza; la sala de
 prueba queda para los tests). La generó [tools/build_hospital.gd](tools/build_hospital.gd), un andamio
 de **una sola pasada**: si ya se editó la escena en el editor, no volver a correrlo (pisa los cambios);
 modificar la escena a mano o actualizar el script y avisar.
@@ -197,7 +219,7 @@ modificar la escena a mano o actualizar el script y avisar.
   invisible + `NavigationLink3D`. Ambiente `hospital`; el fuego y el generador del refugio suenan.
 - Lore: el hospital se aisló el día 9 de la niebla; Ferreyra soldó las rejas "para que nadie salga".
   Los `Inspectable` (E) cuentan la historia con textos cortos.
-- **Refugio** (sala del personal, PB NE): arranca pelado (colchón en el piso, generador roto, una
+- **Refugio opcional** (sala del personal, PB NE; ya no es el inicial, se puede mudar acá): arranca pelado (colchón en el piso, generador roto, una
   vela). El plano en la pared (`ShelterStation` BLUEPRINT) abre `ShelterMenu`. Cada espacio es un
   `ShelterSlot` cuyos hijos `Only<n>` / `From<n>` se muestran según el nivel (props, luces y estaciones
   COOK / REST / RADIO adentro). Materiales repartidos por el hospital (madera 8, chatarra 5, sábanas 6,
@@ -292,7 +314,9 @@ Godot **4.7.2** (no está en el PATH):
 - **Test del guardado**: `<godot> --path . -s res://tests/save_test.gd` (pausa, opciones, guardar,
   cargar y comparar todo, guardado automático al cambiar de zona, volver al menú).
 - Regenerar el hospital / la calle / las casas: `<godot> --headless --path . -s res://tools/build_hospital.gd`
-  (o `build_street.gd`, `build_houses.gd`, `build_theater.gd`).
+  (o `build_street.gd`, `build_houses.gd`, `build_theater.gd`, `build_home.gd`, `build_park.gd`).
+- **Test del comienzo**: `<godot> --path . -s res://tests/home_test.gd` (casa, ático, rejas, calle cortada, puerta
+  de guardia, el sobreviviente nuevo llega a casa). Los tests del refugio del hospital hacen `move_to(&"hospital")`.
 - **Test del teatro**: `<godot> --path . -s res://tests/theater_test.gd` (llave, escopeta, jefe, camarín,
   mudarse, el sobreviviente nuevo llega al teatro).
 - Una `class_name` nueva no existe para los tests hasta correr `--import` (refresca la caché de clases).

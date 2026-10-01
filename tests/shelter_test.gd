@@ -78,6 +78,8 @@ func _initialize() -> void:
 	sanity = root.get_node("Sanity")
 	inventory = root.get_node("Inventory")
 	shelter = root.get_node("Shelter")
+	# Este test prueba el refugio del hospital (el inicial ahora es la casa).
+	shelter.move_to(&"hospital")
 	change_scene_to_file("res://scenes/levels/hospital.tscn")
 	await frames(90)
 	isolate()

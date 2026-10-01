@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_notebook.glb" id="2_note"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_self_01"
+display_name = "Carta a mí mismo"
+short_name = "CARTA"
+description = "Una hoja de cuaderno doblada en ocho, debajo del banco de la plaza. Es tu letra."
+kind = 3
+max_sanity_bonus = 15.0
+letter_text = "Ejercicio de la semana 3. \"Escribile al vos de dentro de un año.\"\n\nHola. No sé si vas a leer esto. La psicóloga dice que sí.\n\nHoy no tomé nada. Ayer tampoco. Me duele todo, pero es un dolor que se va a ir, no como el otro, el de adentro, el que no tiene nombre y que tapaba con lo que fuera.\n\nMamá viene los domingos. No llora delante mío. Llora en el auto, la vi desde la ventana.\n\nSi estás leyendo esto y estás bien: acordate de que hubo un día en que no sabías si ibas a llegar.\n\nSi estás leyendo esto y no estás bien: acordate de que ya saliste una vez.\n\nLa plaza de enfrente sigue igual. Las hamacas siguen chirriando. Eso me gusta."
+world_color = Color(0.9, 0.9, 0.85, 1)
+world_scene = ExtResource("2_note")
+world_size = 0.24
+world_tint = Color(0.95, 0.95, 0.9, 1)

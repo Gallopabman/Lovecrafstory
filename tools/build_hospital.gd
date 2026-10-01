@@ -565,7 +565,7 @@ func _structure() -> void:
 		[_window(3.5, 0.3), _window(10, 0.3), _window(21, 0.3), _window(27, 0.3),
 		_window(3.5, H + 0.3), _window(10, H + 0.3), _window(15, H + 0.3), _window(29.5, H + 0.3)])
 	_wall("z", 0.0, TE / 2, D - TE / 2, hw, eh, TE,
-		[[9.5, 1.6, 1.3, 2.6], [9.5, 1.6, H + 1.3, H + 2.6]])
+		[[9.5, DOOR_W, 0.0, -hw + DOOR_H], [9.5, 1.6, H + 1.3, H + 2.6]])
 	_wall("z", W, TE / 2, D - TE / 2, hw, eh, TE, [[9.5, 1.6, H + 1.3, H + 2.6]])
 
 	# Paredes interiores por planta.
@@ -876,7 +876,23 @@ func _ground_floor_rooms() -> void:
 	exit.set("unlock_text", "Metí la barreta en la traba y empujé. Cedió con un chillido.")
 	exit.position = Vector3(35.6, 1.2, 9.5)
 	_add(groups.Inspectables, exit, "EmergencyExit")
-	_inspect(Vector3(0.4, 1.6, 9.5), ["Rejas soldadas. La niebla se pega al vidrio como si quisiera entrar."])
+	# Puerta de guardia (oeste del pasillo): por acá se entra desde la calle de la plaza, la de casa.
+	_closed_door(Vector3(0.02, 0, 9.5), -90.0, 1.4, 2.3)
+	var guard := Area3D.new()
+	guard.set_script(load("res://scripts/world/zone_door.gd"))
+	guard.set("target_scene", "res://scenes/levels/park_street.tscn")
+	guard.set("target_spawn", &"from_hospital")
+	guard.position = Vector3(0.6, 1.2, 9.5)
+	_add(groups.Inspectables, guard, "GuardDoor")
+	var guard_sign := Label3D.new()
+	guard_sign.text = "GUARDIA - AMBULANCIAS"
+	guard_sign.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
+	guard_sign.font_size = 16
+	guard_sign.pixel_size = 0.0075
+	guard_sign.modulate = Color(0.8, 0.2, 0.15)
+	guard_sign.position = Vector3(0.18, 2.7, 9.5)
+	guard_sign.rotation_degrees.y = 90.0
+	_add(groups.Structure, guard_sign, "GuardSign")
 
 
 func _first_floor_rooms() -> void:
@@ -1155,6 +1171,12 @@ func _systems() -> void:
 	spawn.position = Vector3(34.6, 0.05, 9.5)
 	spawn.rotation_degrees.y = 90.0
 	_add(scene_root, spawn, "SpawnFromStreet")
+	var park_spawn := Marker3D.new()
+	park_spawn.set_script(load("res://scripts/world/spawn_point.gd"))
+	park_spawn.set("spawn_id", &"from_park")
+	park_spawn.position = Vector3(1.5, 0.05, 9.5)
+	park_spawn.rotation_degrees.y = -90.0
+	_add(scene_root, park_spawn, "SpawnFromPark")
 	# Donde llega cada sobreviviente nuevo mientras este sea el refugio activo.
 	var refuge_spawn := Marker3D.new()
 	refuge_spawn.set_script(load("res://scripts/world/spawn_point.gd"))

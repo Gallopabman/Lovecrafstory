@@ -88,6 +88,7 @@ const SLOT_ORDER: Array[StringName] = [&"fire", &"power", &"bed", &"windows", &"
 ## Los lugares que pueden ser refugio (GDD: uno solo activo; mudarse es una decisión).
 ## Cada uno tiene sus propias mejoras; los materiales del depósito se llevan al mudarse.
 const REFUGES := {
+	&"home": {"name": "Casa", "scene": "res://scenes/levels/home.tscn", "spawn": &"refuge"},
 	&"hospital": {"name": "Refugio del San Judas", "scene": "res://scenes/levels/hospital.tscn",
 		"spawn": &"refuge"},
 	&"theater": {"name": "Camarín del Imperio", "scene": "res://scenes/levels/theater.tscn",
@@ -95,7 +96,7 @@ const REFUGES := {
 }
 
 ## Refugio activo: ahí llegan los sobrevivientes nuevos y solo ahí baja lento la cordura.
-var active: StringName = &"hospital"
+var active: StringName = &"home"
 ## Mejoras de cada refugio: { refugio: { espacio: nivel } }. Se conservan al mudarse.
 var refuge_levels: Dictionary = {}
 ## Mejoras del refugio activo (atajo).
@@ -117,8 +118,12 @@ var _trip_letters := 0
 var _cooldowns: Dictionary = {}
 
 
-func _ready() -> void:
+## El estado arranca en _init (no en _ready) para que nada que corra antes lo pise.
+func _init() -> void:
 	new_game()
+
+
+func _ready() -> void:
 	Sanity.refuge_entered.connect(_on_refuge_entered)
 	Sanity.refuge_exited.connect(_on_refuge_exited)
 	Sanity.lost.connect(func() -> void: _trip_active = false)
@@ -126,7 +131,7 @@ func _ready() -> void:
 
 
 func new_game() -> void:
-	active = &"hospital"
+	active = &"home"
 	refuge_levels.clear()
 	for refuge in REFUGES:
 		var slots := {}

@@ -128,3 +128,9 @@ suelto como asset. Si el repositorio se vuelve público como paquete de assets, 
 | Cables (rollo) | Rope | J-Toastie | **CC-BY 3.0** | [poly.pizza/m/dkNzi6oDQj](https://poly.pizza/m/dkNzi6oDQj) |
 | VHS | VHS | Guillaume Brette | **CC-BY 3.0** | [poly.pizza/m/8vBswoRHx8o](https://poly.pizza/m/8vBswoRHx8o) |
 | Informes, parte, cuaderno, programa | Notebook | jeremy | **CC-BY 3.0** | [poly.pizza/m/9Ptsg_xZt6B](https://poly.pizza/m/9Ptsg_xZt6B) |
+
+## La plaza
+
+| Asset | Autor | Licencia | Fuente | Ubicación |
+| --- | --- | --- | --- | --- |
+| Nature Kit (árboles, arbustos, piedras, tocón) | Kenney | CC0 | [kenney.nl/assets/nature-kit](https://kenney.nl/assets/nature-kit) | `assets/models/nature/` |

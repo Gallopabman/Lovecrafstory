@@ -75,9 +75,9 @@ func _initialize() -> void:
 	menu.play_button.pressed.emit()
 	await create_timer(2.0).timeout
 	await frames(30)
-	check(current_scene.name == "Hospital", "Jugar carga el hospital")
+	check(current_scene.name == "Home", "Jugar arranca en casa")
 	check(root.get_node("GameState").survivor_number == 1, "partida nueva: sobreviviente #1")
-	check(FileAccess.file_exists(SAVE), "al arrancar en el refugio se guarda solo")
+	check(FileAccess.file_exists(SAVE), "al arrancar en casa (el refugio) se guarda solo")
 
 	print("-- Continuar")
 	menu = await open_menu()
@@ -87,7 +87,7 @@ func _initialize() -> void:
 	menu.continue_button.pressed.emit()
 	await create_timer(2.5).timeout
 	await frames(30)
-	check(current_scene.name == "Hospital", "Continuar carga la partida")
+	check(current_scene.name == "Home", "Continuar carga la partida (en casa)")
 
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE))
 	print("RESULT: %d fallas" % fails)

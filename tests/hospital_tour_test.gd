@@ -50,6 +50,8 @@ func _initialize() -> void:
 	# Los tests guardan en otro archivo para no pisar la partida del jugador.
 	root.get_node("SaveGame").path = "user://test_save.dat"
 	var sanity := root.get_node("Sanity")
+	# El refugio del hospital (el inicial ahora es la casa).
+	root.get_node("Shelter").move_to(&"hospital")
 	change_scene_to_file("res://scenes/levels/hospital.tscn")
 	await frames(90)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
