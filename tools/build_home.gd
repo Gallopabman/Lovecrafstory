@@ -186,12 +186,12 @@ func _rooms() -> void:
 	_prop("loungeSofa", Vector3(3.8, 0, 5.2), 0)
 	_prop("tableCoffee", Vector3(3.8, 0, 6.6), 0)
 	_prop("loungeChair", Vector3(6.6, 0, 6.8), -90)
-	_prop("cabinetTelevision", Vector3(3.8, 0, 9.55), 180)
-	_prop("televisionVintage", Vector3(3.8, 0.55, 9.55), 180)
+	_prop("cabinetTelevision", Vector3(4.67, 0, 9.55), 180)  # posición elegida por el usuario en el editor
+	_prop("televisionVintage", Vector3(4.61, 0.55, 9.55), 180)
 	_prop("bookcaseClosed", Vector3(7.1, 0, 9.0), -90)
 	_prop("lampRoundFloor", Vector3(0.5, 0, 9.4))
 	_bulb(Vector3(3.8, HC - 0.55, 7.0), 0.8, false, null, false)
-	_inspect(Vector3(3.8, 0.9, 9.4), ["La tele vieja de la abuela. Mamá nunca quiso tirarla."])
+	_inspect(Vector3(4.61, 0.9, 9.4), ["La tele vieja de la abuela. Mamá nunca quiso tirarla."])
 	# Cocina (x 7.5-13, z 2-10).
 	for p in [[Vector3(12.6, 0, 3.0), -90], [Vector3(12.6, 0, 3.9), -90]]:
 		_prop("kitchenCabinet", p[0], p[1])
@@ -381,7 +381,7 @@ func _home_items() -> void:
 	_pickup("Water", "food_water_bottle", Vector3(10.2, 0.8, 6.8))
 	_pickup("Chocolate", "food_chocolate_bar", Vector3(3.8, 0.47, 6.6))
 	_pickup("Comic", "comic_lighthouse", Vector3(3.4, 0.78, 0.5))
-	_pickup("VHS", "movie_coast_vhs", Vector3(3.8, 0.58, 9.3))
+	_pickup("VHS", "movie_coast_vhs", Vector3(4.61, 0.58, 9.3))
 	_pickup("Wood", "material_wood", Vector3(1.0, 0.0, 9.3), 2)
 	_pickup("Cloth", "material_cloth", Vector3(6.5, 0.0, 3.6), 1)
 

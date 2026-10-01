@@ -4,7 +4,8 @@ extends Area3D
 ## Silent Hill). No da objetos ni cambia nada; cuenta la historia del lugar.
 ## Si tiene varios textos, cada vez que se examina muestra el siguiente.
 
-@export_multiline var texts: PackedStringArray = []
+## (Sin @export_multiline: el editor de Godot 4.7 no conserva ese hint en listas y borraba los textos al guardar.)
+@export var texts: PackedStringArray = []
 ## Radio del área en la que el jugador puede examinarlo.
 @export var radius := 0.8:
 	set(value):
