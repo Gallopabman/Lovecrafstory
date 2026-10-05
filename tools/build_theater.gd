@@ -327,7 +327,7 @@ func _upper_floor() -> void:
 	_railing("z", 16.0, -4.0, 20.0, UP)
 	_railing("z", 16.0, 24.0, 28.0, UP)
 	for z in [-2.0, 4.0, 10.0, 16.0]:
-		_box(groups.Structure, "Column", Vector3(16.3, UP / 2, z), Vector3(0.5, UP, 0.5), "gold")
+		_box(groups.Structure, "Column", Vector3(16.3, (UP - 0.3) / 2, z), Vector3(0.5, UP - 0.3, 0.5), "gold")
 	# La administración, arriba del salón de los espejos (x 0-24, z -24..-4).
 	_slab(groups.Structure, "AdminFloor", 0, -24, 24, -4, UP, 0.3, "wood")
 	_wall("x", -14.0, 0.0, 24.0, UP, 4.2, T, [_door(5.0), _door(17.0)], "theater_wall2", false)
@@ -452,8 +452,8 @@ func _hall() -> void:
 			var z := (block.x + block.y) / 2
 			_box(groups.Props, "SeatRow", Vector3(x, 0.22, z), Vector3(0.5, 0.44, width), "velvet")
 			_box(groups.Props, "SeatBack", Vector3(x - 0.3, 0.55, z), Vector3(0.1, 1.1, width), "velvet")
-			_box(groups.Props, "SeatEnd", Vector3(x - 0.05, 0.4, block.x + 0.03), Vector3(0.62, 0.8, 0.06), "gold", false)
-			_box(groups.Props, "SeatEnd", Vector3(x - 0.05, 0.4, block.y - 0.03), Vector3(0.62, 0.8, 0.06), "gold", false)
+			_box(groups.Props, "SeatEnd", Vector3(x - 0.05, 0.4, block.x - 0.01), Vector3(0.72, 0.8, 0.06), "gold", false)
+			_box(groups.Props, "SeatEnd", Vector3(x - 0.05, 0.4, block.y + 0.01), Vector3(0.72, 0.8, 0.06), "gold", false)
 	_label(groups.Props, "FILA 7", Vector3(30.0 + 6 * 1.15 - 0.36, 1.05, 3.2), -90, Color(0.8, 0.7, 0.45), 0.005)
 	_inspect(Vector3(30.0 + 6 * 1.15, 0.8, 3.5), ["Fila 7, butaca 13. Está tibia. El resto de la sala está helada."], 1.2)
 	# Luces de pasillo, apliques, carteles de salida.
@@ -475,7 +475,8 @@ func _hall() -> void:
 		for block: Vector2 in [Vector2(-7.5, 6.8), Vector2(9.2, 23.5)]:
 			var z := (block.x + block.y) / 2
 			_box(groups.Props, "BalconySeat", Vector3(x, UP + h + 0.22, z), Vector3(0.5, 0.44, block.y - block.x), "velvet")
-			_box(groups.Props, "BalconyRiser", Vector3(x + 0.1, UP + h / 2, z), Vector3(1.3, maxf(h, 0.02), block.y - block.x), "carpet", false)
+			if row > 0:
+				_box(groups.Props, "BalconyRiser", Vector3(x + 0.1, UP + h / 2, z), Vector3(1.3, h, block.y - block.x), "carpet", false)
 	_railing("z", 36.0, -7.5, 23.5, UP)
 	# La galería de palcos: un balcón angosto a los dos lados, hasta el escenario.
 	for side: Vector2 in [Vector2(-10.0, -7.5), Vector2(23.5, 26.0)]:
@@ -517,7 +518,7 @@ func _stage() -> void:
 	_wall("z", 76.0, -10.0, 26.0, 0.0, SALA_H, T, [[-6.0, DOOR_W, S, S + DOOR_H], [22.0, DOOR_W, S, S + DOOR_H]], "theater_wall2", false)
 	_box(groups.Structure, "Backdrop", Vector3(75.6, S + 4.0, 8.0), Vector3(0.05, 8.0, 18.0), "velvet", false)
 	# Las trampas del piso del escenario (solo visuales).
-	for p in [Vector3(66.0, S + 0.01, 8.0), Vector3(70.0, S + 0.01, 0.0), Vector3(70.0, S + 0.01, 16.0)]:
+	for p in [Vector3(66.0, S + 0.04, 8.0), Vector3(70.0, S + 0.04, 0.0), Vector3(70.0, S + 0.04, 16.0)]:
 		_box(groups.Props, "Trapdoor", p, Vector3(1.6, 0.02, 1.6), "planks", false)
 	# El piano de cola.
 	var piano := Vector3(66.0, S, 2.5)
@@ -728,7 +729,7 @@ func _camarin_refuge() -> void:
 	var d1 := _from(decor, 1)
 	for pic in [[Vector3(49.0 + CAM_DX, S + 1.7, 9.12 + CAM_DZ), "photo"], [Vector3(50.0 + CAM_DX, S + 1.55, 9.12 + CAM_DZ), "photo2"], [Vector3(51.0 + CAM_DX, S + 1.8, 9.12 + CAM_DZ), "photo"]]:
 		_box(d1, "Frame", pic[0], Vector3(0.42, 0.5, 0.03), "gold", false)
-		_box(d1, "Photo", pic[0] + Vector3(0, 0, 0.02), Vector3(0.3, 0.38, 0.01), pic[1], false)
+		_box(d1, "Photo", pic[0] + Vector3(0, 0, 0.04), Vector3(0.3, 0.38, 0.01), pic[1], false)
 	var d2 := _from(decor, 2)
 	_prop("rugRectangle", Vector3(49.8 + CAM_DX, S + 0.005, 12.5 + CAM_DZ), 90, {"parent": d2, "tint": Color(0.6, 0.3, 0.25)})
 	_prop("pottedPlant", Vector3(53.3 + CAM_DX, S, 15.3 + CAM_DZ), 0, {"parent": d2})
@@ -759,7 +760,7 @@ func _machinery_pit() -> void:
 	# La escalera desde el hombro (x 77-80, de z 28 a z 38).
 	_ramp_z(28.0, S, 38.0, PIT, 78.5, 2.6, 14, "concrete")
 	for x in [76.95, 80.05]:
-		_box(groups.Structure, "PitStairWall", Vector3(x, (PIT + S) / 2, 33.0), Vector3(0.1, S - PIT, 10.0), "theater_wall2")
+		_box(groups.Structure, "PitStairWall", Vector3(x, (PIT + S - 0.3) / 2, 33.0), Vector3(0.1, S - 0.3 - PIT, 10.0), "theater_wall2")
 	# Debajo del escenario: los mecanismos de las trampas, ruedas, cuerdas.
 	for p in [Vector3(66.0, y, 8.0), Vector3(70.0, y, 0.0), Vector3(70.0, y, 16.0)]:
 		_box(groups.Props, "TrapLift", p + Vector3.UP * (h / 2), Vector3(1.4, h, 1.4), "metal")
@@ -805,9 +806,9 @@ func _secrets_theater() -> void:
 	lying.set("mode", 1)
 	_add(groups.Secrets, lying, "LyingWall")
 	var wall: StaticBody3D = GreyBoxScript.new()
-	wall.set("size", Vector3(2.0, DOOR_H, TE))
+	wall.set("size", Vector3(2.0 - 0.16, DOOR_H - 0.08, TE))
 	wall.set("material", mats.theater_wall)
-	wall.position = Vector3(7.0, DOOR_H / 2, 40.0)
+	wall.position = Vector3(7.0, (DOOR_H - 0.08) / 2, 40.0)
 	_add(lying, wall, "Wall")
 	# La sala de ensayo (x 4-10, z 40-44).
 	_floor(4, 40, 10, 44, 0.0, "stage")
@@ -835,9 +836,9 @@ func _secrets_theater() -> void:
 	cam13.set("mode", 1)
 	_add(groups.Secrets, cam13, "Camarin13Wall")
 	var w13: StaticBody3D = GreyBoxScript.new()
-	w13.set("size", Vector3(T + 0.04, DOOR_H, DOOR_W))
+	w13.set("size", Vector3(T + 0.04, DOOR_H - 0.08, DOOR_W - 0.16))
 	w13.set("material", mats.theater_wall2)
-	w13.position = Vector3(89.0, PIT + DOOR_H / 2, 36.0)
+	w13.position = Vector3(89.0, PIT + (DOOR_H - 0.08) / 2, 36.0)
 	_add(cam13, w13, "Wall")
 	_wall("z", 89.0, 28.0, 40.0, PIT, S - 0.3 - PIT, T, [[36.0, DOOR_W, 0.0, DOOR_H]], "theater_wall2", false)
 	_label(groups.Structure, "13", Vector3(88.88, PIT + 2.6, 36.0), -90, Color(0.75, 0.6, 0.35), 0.01)

@@ -134,8 +134,9 @@ func _shell_home() -> void:
 	_floor(0, 0, 5, 4.5, 0.0, "wood")
 	_floor(5, 0, 7.5, 4.5, 0.0, "floor")
 	_floor(0, 4.5, 7.5, 10, 0.0, "wood")
-	_floor(7.5, 0, 13, 10, 0.0, "kitchen_tile")
-	_box(groups.Structure, "Ground", Vector3(6.5, -0.15, 5), Vector3(14, 0.3, 11), "concrete")
+	_floor(7.5, 2, 13, 10, 0.0, "kitchen_tile")
+	# El terreno, bien por debajo de los pisos (a la misma altura parpadeaban).
+	_box(groups.Structure, "Ground", Vector3(6.5, -0.27, 5), Vector3(14, 0.3, 11), "concrete")
 	# Techo de la planta baja (= piso del ático) y de la cocina; techo de la casa.
 	_slab(0, 0, 7.5, 10, AF, AF - HC, "attic_wood")
 	_slab(7.5, 2, 13, 10, HC + 0.02, 0.02, "home_wall", false)
@@ -172,7 +173,7 @@ func _shell_home() -> void:
 		var h := AF * (i + 1) / 10.0
 		var x := 12.8 - run * (i + 0.5) / 10.0
 		_box(groups.Structure, "Step", Vector3(x, h / 2, 1.0), Vector3(run / 10.0, h, 1.5), "wood", false)
-	_slab(7.6, 0.15, 8.7, 1.85, AF, 0.1, "wood")
+	_slab(7.6, 0.15, 8.6, 1.85, AF, 0.1, "wood")
 	_box(groups.Structure, "Handrail", Vector3(10.6, 1.9, 1.75), Vector3(4.6, 0.05, 0.05), "rail", false)
 	_bulb(Vector3(9.5, 4.6, 1.0), 0.6, true)
 	_inspect(Vector3(12.3, 1.2, 1.4), ["La escalera al ático. Arriba algo se arrastra sobre las cajas.",
@@ -239,7 +240,7 @@ func _home_refuge() -> void:
 
 	# El plano, en un corcho de la cocina.
 	_box(groups.Refuge, "BlueprintBoard", Vector3(12.88, 1.6, 8.7), Vector3(0.03, 0.7, 1.0), "cork", false)
-	_box(groups.Refuge, "BlueprintPaper", Vector3(12.86, 1.62, 8.7), Vector3(0.01, 0.5, 0.8), "paper", false)
+	_box(groups.Refuge, "BlueprintPaper", Vector3(12.84, 1.62, 8.7), Vector3(0.01, 0.5, 0.8), "paper", false)
 	var title := Label3D.new()
 	title.text = "PLANO"
 	title.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
@@ -309,7 +310,7 @@ func _home_refuge() -> void:
 	var d1 := _from(decor, 1)
 	for pic in [[Vector3(7.38, 1.7, 5.6), "photo"], [Vector3(7.38, 1.55, 8.0), "photo2"]]:
 		_box(d1, "Frame", pic[0], Vector3(0.03, 0.5, 0.42), "planks", false)
-		_box(d1, "Photo", pic[0] - Vector3(0.02, 0, 0), Vector3(0.01, 0.38, 0.3), pic[1], false)
+		_box(d1, "Photo", pic[0] - Vector3(0.04, 0, 0), Vector3(0.01, 0.38, 0.3), pic[1], false)
 	var d2 := _from(decor, 2)
 	_prop("pottedPlant", Vector3(0.6, 0, 5.0), 0, {"parent": d2})
 	_prop("pottedPlant", Vector3(8.0, 0, 2.6), 0, {"parent": d2})

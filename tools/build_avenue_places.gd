@@ -219,12 +219,13 @@ func _police_station() -> Array:
 func _police_structure() -> void:
 	var y2 := P1Y + PC
 	# Pisos: PB entero; P1 con el hueco de la escalera (x 20.8-23.2, z 12-18).
-	_floor(0, 0, PW, PD, 0.0, "police_floor")
-	_floor(34, 0, PW, 18, 0.0, "cell_floor")
-	_floor(12, 0, 24, 8, 0.0, "cell_floor")
+	# Pisos de PB sin superponerse (el de los calabozos y el del garaje son otro material).
+	for r in [[0, 0, 12, PD, "police_floor"], [12, 0, 24, 8, "cell_floor"], [12, 8, 24, PD, "police_floor"],
+			[24, 0, 34, PD, "police_floor"], [34, 0, PW, 18, "cell_floor"], [34, 18, PW, PD, "police_floor"]]:
+		_floor(r[0], r[1], r[2], r[3], 0.0, r[4])
 	for s in [[0, 0, PW, 12], [0, 18, PW, PD], [0, 12, 20.8, 18], [23.2, 12, PW, 18]]:
-		_box(groups.Structure, "Slab", Vector3((s[0] + s[2]) / 2.0, P1Y - 0.2, (s[1] + s[3]) / 2.0),
-			Vector3(s[2] - s[0], 0.4, s[3] - s[1]), "concrete")
+		_box(groups.Structure, "Slab", Vector3((s[0] + s[2]) / 2.0, P1Y - 0.175, (s[1] + s[3]) / 2.0),
+			Vector3(s[2] - s[0], 0.15, s[3] - s[1]), "concrete")
 		_ceiling(s[0], s[1], s[2], s[3], PC)
 		_floor(s[0], s[1], s[2], s[3], P1Y, "police_floor")
 	_ceiling(0, 0, PW, PD, y2)
@@ -444,7 +445,7 @@ func _police_upper_rooms() -> void:
 		_prop("chairDesk", p + Vector3(0, 0, 0.9), 180)
 	_box(groups.Props, "CaseBoard", Vector3(22.0, y + 1.6, 31.82), Vector3(4.0, 1.6, 0.04), "cork")
 	for k in 9:
-		_box(groups.Props, "CasePhoto", Vector3(20.4 + (k % 3) * 1.6, y + 1.1 + (k / 3) * 0.5, 31.78), Vector3(0.35, 0.28, 0.01), "paper", false)
+		_box(groups.Props, "CasePhoto", Vector3(20.4 + (k % 3) * 1.6, y + 1.1 + (k / 3) * 0.5, 31.75), Vector3(0.35, 0.28, 0.01), "paper", false)
 	_box(groups.Props, "RedString", Vector3(22.0, y + 1.6, 31.77), Vector3(3.4, 0.02, 0.01), "glass_red", false)
 	_inspect(Vector3(22.0, y + 1.4, 31.2), ["El pizarrón del caso. En el centro, la foto de la soprano Elena M. de Sosa. Hilos rojos hacia todos lados:",
 		"el Teatro Imperio, el relojero Kaufmann, la parroquia, el San Judas. Y una foto nueva, de esta semana: el agente Sosa.",
@@ -502,9 +503,9 @@ func _police_secrets() -> void:
 	# Difícil: el depósito de evidencias (x 24-34, z 0-8) estaba tapiado detrás de la guardia.
 	var lying := _difficulty_gate("EvidenceWall", 1, true)
 	var wall: StaticBody3D = GreyBoxScript.new()
-	wall.set("size", Vector3(DOOR_W, DOOR_H, T + 0.04))
+	wall.set("size", Vector3(DOOR_W - 0.16, DOOR_H - 0.08, T + 0.04))
 	wall.set("material", mats.police_wall)
-	wall.position = Vector3(29.0, DOOR_H / 2, 8.0)
+	wall.position = Vector3(29.0, (DOOR_H - 0.08) / 2, 8.0)
 	_add(lying, wall, "Wall")
 	_wall("x", 8.0, 24.0, 34.0, 0.0, PC, T, [[29.0, DOOR_W, 0.0, DOOR_H]], "police_wall", false)
 	var room := _difficulty_gate("Evidence", 1)
@@ -590,9 +591,9 @@ func _church() -> Array:
 		_box(groups.Structure, "AltarStep", Vector3(8.0, (i + 1) * ALTAR_Y / 6, 6.0 - i * 0.4),
 			Vector3(4.0, (i + 1) * ALTAR_Y / 3, 0.4), "stone", false)
 	_box(groups.Props, "Altar", Vector3(8.0, ALTAR_Y + 0.5, 2.0), Vector3(2.6, 1.0, 1.0), "stone")
-	_box(groups.Props, "AltarCloth", Vector3(8.0, ALTAR_Y + 1.01, 2.0), Vector3(2.7, 0.02, 1.1), "cloth", false)
+	_box(groups.Props, "AltarCloth", Vector3(8.0, ALTAR_Y + 1.03, 2.0), Vector3(2.7, 0.02, 1.1), "cloth", false)
 	_box(groups.Structure, "CrossV", Vector3(8.0, 4.0, 0.2), Vector3(0.3, 4.0, 0.15), "pew", false)
-	_box(groups.Structure, "CrossH", Vector3(8.0, 4.8, 0.2), Vector3(2.0, 0.3, 0.15), "pew", false)
+	_box(groups.Structure, "CrossH", Vector3(8.0, 4.8, 0.2), Vector3(2.0, 0.3, 0.1), "pew", false)
 	for x in [6.9, 9.1]:
 		_box(groups.Props, "Candle", Vector3(x, ALTAR_Y + 1.15, 2.0), Vector3(0.06, 0.25, 0.06), "candle", false)
 		_point_light(Vector3(x, ALTAR_Y + 1.5, 2.2), Color(1.0, 0.7, 0.4), 0.8, 6.0, true)
@@ -625,7 +626,7 @@ func _church() -> Array:
 	# La trampa de la cripta: tapada (tablas) salvo en Insane.
 	var cover := _difficulty_gate("CryptCover", 2, true)
 	_box(cover, "HoleCover", Vector3(8.0, -0.15, 9.25), Vector3(2.0, 0.3, 5.5), "church_floor")
-	_box(cover, "Trapdoor", Vector3(8.0, 0.01, 7.5), Vector3(1.8, 0.03, 1.8), "planks", false)
+	_box(cover, "Trapdoor", Vector3(8.0, 0.03, 7.5), Vector3(1.8, 0.03, 1.8), "planks", false)
 	_inspect(Vector3(8.0, 0.5, 7.5), ["Una trampa en el piso, clavada. Debajo, el aire es frío y huele a flores viejas."], 1.0)
 	var crypt := _difficulty_gate("Crypt", 2)
 	# Rampa invisible hacia abajo (de z 8.5 a z 12, de 0 a -3), con escalones visuales.
@@ -634,8 +635,8 @@ func _church() -> Array:
 	for i in 8:
 		var h := CRYPT_Y * (i + 1) / 8.0
 		_box(crypt, "CryptStep", Vector3(8.0, h + 0.1, 6.9 + i * 0.55), Vector3(1.8, 0.2, 0.55), "stone", false)
-	_box(crypt, "CryptStairWallW", Vector3(6.95, -1.5, 9.25), Vector3(0.1, 3.0, 5.5), "stone")
-	_box(crypt, "CryptStairWallE", Vector3(9.05, -1.5, 9.25), Vector3(0.1, 3.0, 5.5), "stone")
+	_box(crypt, "CryptStairWallW", Vector3(6.95, -1.65, 9.2), Vector3(0.1, 2.7, 5.4), "stone")
+	_box(crypt, "CryptStairWallE", Vector3(9.05, -1.65, 9.2), Vector3(0.1, 2.7, 5.4), "stone")
 	# La cripta (x 3-13, z 12-20, a -3 m).
 	_box(crypt, "CryptFloor", Vector3(8.0, CRYPT_Y - 0.1, 15.4), Vector3(10.0, 0.2, 9.2), "stone")
 	_box(crypt, "CryptCeiling", Vector3(8.0, CRYPT_Y + 2.6, 16.0), Vector3(10.0, 0.1, 8.0), "stone", false)

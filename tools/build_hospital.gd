@@ -27,6 +27,7 @@ const TE := 0.3  # paredes exteriores
 const DOOR_W := 1.6  # ancho suficiente para el acechador (radio de navegación 0.5)
 const DOOR_H := 2.4
 const WIN_W := 2.0
+const DECALS := ["blood", "rugRectangle", "rugDoormat"]
 
 var scene_root: Node3D
 var mats := {}
@@ -265,23 +266,45 @@ func _ceiling(x0: float, z0: float, x1: float, z1: float, y: float) -> void:
 ## `bars` pone rejas en las aberturas que no llegan al piso (ventanas).
 func _wall(axis: String, c: float, a0: float, a1: float, y0: float, height: float, thickness: float,
 		openings: Array = [], mat := "wall", bars := true) -> void:
-	openings.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
-	var cursor := a0
+	# La pared se corta en franjas verticales en los bordes de las aberturas (así las ventanas
+	# de distintos pisos pueden solaparse en planta sin que queden tramos superpuestos, que
+	# parpadean); las franjas vecinas con los mismos huecos se juntan.
+	var cuts := [a0, a1]
+	for op: Array in openings:
+		for e in [op[0] - op[1] / 2.0, op[0] + op[1] / 2.0]:
+			if e > a0 + 0.001 and e < a1 - 0.001:
+				cuts.append(e)
+	cuts.sort()
+	var strips := []
+	for i in cuts.size() - 1:
+		var s: float = cuts[i]
+		var e: float = cuts[i + 1]
+		if e - s < 0.001:
+			continue
+		var mid := (s + e) / 2.0
+		var holes := []
+		for op: Array in openings:
+			if absf(mid - op[0]) < op[1] / 2.0:
+				holes.append([maxf(op[2], 0.0), minf(op[3], height)])
+		holes.sort_custom(func(p: Array, q: Array) -> bool: return p[0] < q[0])
+		if not strips.is_empty() and strips[-1][2] == holes and is_equal_approx(strips[-1][1], s):
+			strips[-1][1] = e
+		else:
+			strips.append([s, e, holes])
+	for st: Array in strips:
+		var y_cursor := 0.0
+		for h: Array in st[2]:
+			if h[0] > y_cursor + 0.001:
+				_wall_segment(axis, c, st[0], st[1], y0, y_cursor, h[0], thickness, mat)
+			y_cursor = maxf(y_cursor, h[1])
+		if y_cursor < height - 0.001:
+			_wall_segment(axis, c, st[0], st[1], y0, y_cursor, height, thickness, mat)
 	for op: Array in openings:
 		var left: float = op[0] - op[1] / 2.0
 		var right: float = op[0] + op[1] / 2.0
-		if left > cursor:
-			_wall_segment(axis, c, cursor, left, y0, 0.0, height, thickness, mat)
-		if op[2] > 0.0:
-			_wall_segment(axis, c, left, right, y0, 0.0, op[2], thickness, mat)
-		if op[3] < height:
-			_wall_segment(axis, c, left, right, y0, op[3], height, thickness, mat)
 		if bars and op[2] > 0.0:
 			_window_bars(axis, c, left, right, y0 + op[2], y0 + op[3])
 		_opening_trim(axis, c, left, right, y0 + op[2], y0 + op[3], thickness, op[2] <= 0.0)
-		cursor = right
-	if cursor < a1:
-		_wall_segment(axis, c, cursor, a1, y0, 0.0, height, thickness, mat)
 
 
 ## Marco de puerta (dos jambas + dintel) o alféizar de ventana. Solo visual.
@@ -289,13 +312,14 @@ func _opening_trim(axis: String, c: float, a: float, b: float, y_lo: float, y_hi
 		is_door: bool) -> void:
 	var depth := thickness + 0.06
 	var pieces := []
+	# Adentro del hueco (no en el mismo plano que el canto de la pared: parpadearía).
 	if is_door:
-		var h := y_hi - y_lo
-		pieces.append([a - 0.04, y_lo + h / 2, 0.08, h + 0.08])
-		pieces.append([b + 0.04, y_lo + h / 2, 0.08, h + 0.08])
-		pieces.append([(a + b) / 2, y_hi + 0.04, b - a + 0.16, 0.08])
+		var h := y_hi - y_lo - 0.08
+		pieces.append([a + 0.04, y_lo + h / 2, 0.08, h])
+		pieces.append([b - 0.04, y_lo + h / 2, 0.08, h])
+		pieces.append([(a + b) / 2, y_hi - 0.04, b - a, 0.08])
 	else:
-		pieces.append([(a + b) / 2, y_lo - 0.03, b - a + 0.1, 0.06])
+		pieces.append([(a + b) / 2, y_lo + 0.03, b - a, 0.06])
 	for p: Array in pieces:
 		var center := Vector3(p[0], p[1], c) if axis == "x" else Vector3(c, p[1], p[0])
 		var size := Vector3(p[2], p[3], depth) if axis == "x" else Vector3(depth, p[3], p[2])
@@ -325,7 +349,7 @@ func _counter(x0: float, x1: float, z: float, y0: float) -> void:
 	var mid := (x0 + x1) / 2.0
 	_box(groups.Props, "Counter", Vector3(mid, y0 + 0.5, z), Vector3(x1 - x0, 1.0, 0.6), "counter")
 	_box(groups.Props, "CounterTop", Vector3(mid, y0 + 1.02, z - 0.03), Vector3(x1 - x0 + 0.06, 0.04, 0.7), "counter_top", false)
-	_box(groups.Props, "CounterKick", Vector3(mid, y0 + 0.05, z - 0.31), Vector3(x1 - x0, 0.1, 0.02), "soot", false)
+	_box(groups.Props, "CounterKick", Vector3(mid, y0 + 0.05, z - 0.34), Vector3(x1 - x0, 0.1, 0.02), "soot", false)
 
 
 ## Cartel con el nombre del ambiente sobre una puerta (del lado del pasillo).
@@ -381,6 +405,9 @@ func _closed_door(pos: Vector3, facing_deg: float, width := 1.3, height := 2.3) 
 
 
 func _prop(model_name: String, pos: Vector3, rot_y := 0.0, extra := {}) -> Node3D:
+	# Los calcos del piso (manchas, alfombras) van un poco más arriba: pegados al piso parpadean.
+	if DECALS.has(model_name):
+		pos += Vector3.UP * 0.025
 	var preset: Dictionary = presets.get(model_name, {})
 	var path: String = preset.get("dir", KENNEY) + model_name + ".glb"
 	var from_polyhaven := upgrades.has(model_name)
@@ -542,15 +569,17 @@ func _structure() -> void:
 	# Terreno de afuera (se ve por las ventanas).
 	_box(groups.Structure, "Ground", Vector3(W / 2, -0.45, D / 2), Vector3(W + 60, 0.3, D + 60), "ground")
 	# Losa de PB y superficies de piso por ambiente.
-	_box(groups.Structure, "Slab", Vector3(W / 2, -0.16, D / 2), Vector3(W, 0.28, D), "concrete")
+	# Losas: 10 cm debajo de la superficie del piso y 5 cm arriba del cielorraso de abajo
+	# (si quedan pegadas, con el temblor de vértices PS1 parpadean).
+	_box(groups.Structure, "Slab", Vector3(W / 2, -0.175, D / 2), Vector3(W, 0.15, D), "concrete")
 	for r in [[0, 0, 9, 8, "concrete"], [9, 0, 17, 8, "floor"], [17, 0, 25, 8, "floor"],
 			[25, 0, W, 8, "wood"], [0, 8, W, 11, "floor"], [0, 11, 7, D, "floor"],
 			[7, 11, 24, D, "floor"], [24, 11, 30, D, "floor"], [30, 11, W, D, "floor_dirty"]]:
 		_floor(r[0], r[1], r[2], r[3], 0.0, r[4])
 	# Losa de P1 con el hueco de la escalera (x 0-2.8, z 2.1-7.9).
 	for s in [[0, 0, W, 2.1], [0, 7.9, W, D], [2.8, 2.1, W, 7.9]]:
-		_box(groups.Structure, "Slab", Vector3((s[0] + s[2]) / 2, H - 0.16, (s[1] + s[3]) / 2),
-			Vector3(s[2] - s[0], 0.28, s[3] - s[1]), "concrete")
+		_box(groups.Structure, "Slab", Vector3((s[0] + s[2]) / 2, H - 0.175, (s[1] + s[3]) / 2),
+			Vector3(s[2] - s[0], 0.15, s[3] - s[1]), "concrete")
 		_ceiling(s[0], s[1], s[2], s[3], CEIL - 0.02)
 	for r in [[2.8, 0, 9, 8, "concrete"], [0, 0, 2.8, 2.1, "concrete"], [9, 0, 24, 8, "floor"],
 			[24, 0, W, 8, "floor_dirty"], [0, 8, W, 11, "floor"], [0, 11, 7, D, "wood"],
@@ -560,8 +589,8 @@ func _structure() -> void:
 		_floor(r[0], r[1], r[2], r[3], H, r[4])
 	# Losa de P2 con el hueco de la segunda escalera (en el hueco del ascensor: x 6-9, z 2.1-7.9).
 	for s in [[0, 0, W, 2.1], [0, 7.9, W, D], [0, 2.1, 6, 7.9], [9, 2.1, W, 7.9]]:
-		_box(groups.Structure, "Slab", Vector3((s[0] + s[2]) / 2, 2 * H - 0.16, (s[1] + s[3]) / 2),
-			Vector3(s[2] - s[0], 0.28, s[3] - s[1]), "concrete")
+		_box(groups.Structure, "Slab", Vector3((s[0] + s[2]) / 2, 2 * H - 0.175, (s[1] + s[3]) / 2),
+			Vector3(s[2] - s[0], 0.15, s[3] - s[1]), "concrete")
 		_ceiling(s[0], s[1], s[2], s[3], H + CEIL - 0.02)
 	for r in [[0, 0, 6, 8, "concrete"], [6, 0, 9, 2.1, "concrete"], [9, 0, 21, 8, "floor"], [21, 0, 27, 8, "wood"],
 			[27, 0, W, 8, "floor"], [0, 8, W, 11, "floor"], [0, 11, 7, D, "wood"], [7, 11, 16, D, "floor"],
@@ -734,14 +763,14 @@ func _refuge() -> void:
 
 	# El plano en la pared: abre el menú de mejoras.
 	_box(groups.Refuge, "BlueprintBoard", Vector3(33.0, 1.6, 7.88), Vector3(1.0, 0.7, 0.03), "cork", false)
-	_box(groups.Refuge, "BlueprintPaper", Vector3(33.0, 1.62, 7.86), Vector3(0.8, 0.5, 0.01), "paper", false)
+	_box(groups.Refuge, "BlueprintPaper", Vector3(33.0, 1.62, 7.84), Vector3(0.8, 0.5, 0.01), "paper", false)
 	var title := Label3D.new()
 	title.text = "PLANO"
 	title.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
 	title.font_size = 16
 	title.pixel_size = 0.008
 	title.modulate = Color(0.25, 0.2, 0.3)
-	title.position = Vector3(33.0, 1.78, 7.84)
+	title.position = Vector3(33.0, 1.78, 7.815)
 	title.rotation_degrees.y = 180
 	_add(groups.Refuge, title, "BlueprintTitle")
 	_station(Vector3(33.0, 1.2, 7.3), groups.Refuge, "BlueprintStation", 0, 1.1)
@@ -804,7 +833,7 @@ func _refuge() -> void:
 	var d1 := _from(decor, 1)
 	for pic in [[Vector3(25.12, 1.7, 4.4), "photo"], [Vector3(25.12, 1.55, 5.4), "photo2"], [Vector3(25.12, 1.8, 6.2), "photo"]]:
 		_box(d1, "Frame", pic[0], Vector3(0.03, 0.5, 0.42), "planks", false)
-		_box(d1, "Photo", pic[0] + Vector3(0.02, 0, 0), Vector3(0.01, 0.38, 0.3), pic[1], false)
+		_box(d1, "Photo", pic[0] + Vector3(0.04, 0, 0), Vector3(0.01, 0.38, 0.3), pic[1], false)
 	_prop("books", Vector3(28.3, 0.8, 0.45), 20, {"parent": d1})
 	var d2 := _from(decor, 2)
 	_prop("rugRectangle", Vector3(31, 0.005, 4.8), 0, {"parent": d2})
@@ -1263,9 +1292,9 @@ func _secrets() -> void:
 	lying.set("mode", 1)
 	_add(groups.Secrets, lying, "LyingWall")
 	var wall: StaticBody3D = GreyBoxScript.new()
-	wall.set("size", Vector3(T, DOOR_H, DOOR_W))
+	wall.set("size", Vector3(T, DOOR_H - 0.08, DOOR_W - 0.16))
 	wall.set("material", mats.wall)
-	wall.position = Vector3(33.0, y + DOOR_H / 2, 15.5)
+	wall.position = Vector3(33.0, y + (DOOR_H - 0.08) / 2, 15.5)
 	_add(lying, wall, "Wall")
 
 	# El cuarto tapiado donde se escondió Marta.
@@ -1483,9 +1512,9 @@ func _difficulty_enemies() -> void:
 func _difficulty_secrets() -> void:
 	var wall_gate := _difficulty_gate("ArmoryWall", 1, true)
 	var wall: StaticBody3D = GreyBoxScript.new()
-	wall.set("size", Vector3(TE, DOOR_H, DOOR_W))
+	wall.set("size", Vector3(TE, DOOR_H - 0.08, DOOR_W - 0.16))
 	wall.set("material", mats.wall)
-	wall.position = Vector3(0.0, DOOR_H / 2, 16.5)
+	wall.position = Vector3(0.0, (DOOR_H - 0.08) / 2, 16.5)
 	_add(wall_gate, wall, "Wall")
 	# Una pista desde Inquieto (estado de cordura), en la pared de los lockers.
 	var hint := Node3D.new()
@@ -1563,7 +1592,7 @@ func _zone_door_visuals(door: Node3D, wall_pos: Vector3, yaw: float, open_model:
 		open_yaw = yaw + 180.0
 		var front := Basis(Vector3.UP, deg_to_rad(yaw)) * Vector3.FORWARD * -1.0
 		var size := Basis(Vector3.UP, deg_to_rad(yaw)) * Vector3(width * 0.92, height * 0.97, 0.02)
-		var gap := _box(door, "DoorGap", rel + front * 0.012 + Vector3.UP * height * 0.485,
+		var gap := _box(door, "DoorGap", rel + front * 0.04 + Vector3.UP * height * 0.485,
 			Vector3(absf(size.x), absf(size.y), absf(size.z)), "door_gap", false)
 		gap.name = "DoorGap"
 	_door_prop(door, "OpenDoor", open_model, rel, open_yaw, width, height, true)

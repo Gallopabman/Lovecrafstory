@@ -27,6 +27,10 @@ const FENCE_H := 2.3
 const WALK := 6.0      # borde exterior de las veredas de una calle de dos manos (|z|)
 const AVE := 9.0       # lo mismo para la avenida de cuatro carriles
 const CAR_SCALE := 1.5  # el Car Kit de Kenney viene chico
+const TILE_LIFT := 0.05  # ver _piece
+## Arriba del terreno (-0.02): asfalto de cruces, callejones, patios (tope a 0.03).
+const OVERLAY_Y := 0.01
+const OVERLAY_H := 0.04
 
 const AVE_END := 216.0
 const NORTH_X := [48.0, 120.0]
@@ -53,6 +57,7 @@ const TINTS := [Color(0.6, 0.6, 0.62), Color(0.66, 0.62, 0.6), Color(0.68, 0.64,
 var scene_root: Node3D
 var mats := {}
 var counters := {}
+var fence_posts := {}
 var groups := {}
 
 var GreyBoxScript: Script
@@ -229,6 +234,13 @@ func _blocker(x0: float, z0: float, x1: float, z1: float, height := 6.0, parent:
 ## Pieza del kit en su propio origen (sin centrar) y sin colisión propia.
 func _piece(path: String, pos: Vector3, rot_y := 0.0, parent: Node = null, tint := Color(0.8, 0.79, 0.78),
 		scale := 1.0) -> Node3D:
+	# Capas del piso (si dos superficies quedan a 1-2 cm, el temblor PS1 las hace parpadear): el
+	# terreno está a -0.02; las veredas de los tramos de calle, a +0.05 (su asfalto queda tapado);
+	# los cruces peatonales (planos a -0.15 en el modelo), a +0.08.
+	if path.get_file().begins_with("Street_"):
+		pos.y += TILE_LIFT
+	elif path.get_file().begins_with("Decal_"):
+		pos.y += 0.22
 	var p: Node3D = PropScript.new()
 	p.set("model", load(path))
 	p.set("anchor", 3)  # Prop.Anchor.ORIGIN
@@ -242,6 +254,9 @@ func _piece(path: String, pos: Vector3, rot_y := 0.0, parent: Node = null, tint 
 
 ## Prop apoyado en el piso con su caja de colisión. `h` = alto real en metros.
 func _prop(path: String, pos: Vector3, rot_y := 0.0, extra := {}) -> Node3D:
+	# Las tapas de alcantarilla, apenas arriba de cualquier piso (ver _piece).
+	if path.ends_with("Prop_ManholeCover.gltf"):
+		pos.y = 0.06
 	var p: Node3D = PropScript.new()
 	p.set("model", load(path))
 	if extra.has("h"):
@@ -380,6 +395,11 @@ func _fence(a: Vector3, b: Vector3, parent: Node = null) -> void:
 	var posts := maxi(int(length / 3.0), 1)
 	for i in posts + 1:
 		var p := a + dir * (float(i) / posts)
+		# Donde se juntan dos tramos va un solo poste (dos en el mismo lugar parpadean).
+		var key := "%.2f_%.2f_%.2f" % [p.x, p.y, p.z]
+		if fence_posts.has(key):
+			continue
+		fence_posts[key] = true
 		_box(holder, "FencePost", p + Vector3.UP * (FENCE_H + 0.15) / 2, Vector3(0.1, FENCE_H + 0.15, 0.1), "iron", false)
 	_box(holder, "FenceCollider", mid + Vector3.UP * 1.5, Vector3(length + 0.2, 3.0, 0.25) if along_x
 		else Vector3(0.25, 3.0, length + 0.2), "collider", true, false)
@@ -538,9 +558,10 @@ func _ground() -> void:
 		x += 6.0
 	for cx: float in NORTH_X + SOUTH_X:
 		var north: bool = NORTH_X.has(cx)
-		_box(groups.Structure, "Crossing", Vector3(cx, -0.03, 0), Vector3(12.0, 0.04, 2 * AVE), "asphalt", false)
-		# La vereda del lado sin calle sigue de largo.
-		_box(groups.Structure, "SidewalkStrip", Vector3(cx, -0.01, (AVE - 1.5) * (1.0 if north else -1.0)),
+		# El cruce, sin la franja de vereda del lado sin calle (que sigue de largo, a la altura de las veredas).
+		var band := 1.0 if north else -1.0
+		_box(groups.Structure, "Crossing", Vector3(cx, OVERLAY_Y, -band * 1.5), Vector3(12.0, OVERLAY_H, 2 * AVE - 3.0), "asphalt", false)
+		_box(groups.Structure, "SidewalkStrip", Vector3(cx, TILE_LIFT - 0.01, (AVE - 1.5) * band),
 			Vector3(12.0, 0.02, 3.0), "sidewalk", false)
 		for arm in [-1.0, 1.0]:
 			_piece(CITY + "Decal_Crosswalk.gltf", Vector3(cx + arm * 7.5, 0.01, 0), 90.0, groups.Structure, Color(0.7, 0.7, 0.68))
@@ -553,10 +574,10 @@ func _ground() -> void:
 			z += sign_z * 6.0
 		var par_z := LAVALLE_Z if north else TUCUMAN_Z
 		var box_z0 := z - sign_z * 3.0
-		var box_z1 := par_z + sign_z * WALK
-		_box(groups.Structure, "Crossing", Vector3(cx, -0.03, (box_z0 + box_z1) / 2), Vector3(12.0, 0.04, absf(box_z1 - box_z0)),
+		var box_z1 := par_z + sign_z * (WALK - 3.0)
+		_box(groups.Structure, "Crossing", Vector3(cx, OVERLAY_Y, (box_z0 + box_z1) / 2), Vector3(12.0, OVERLAY_H, absf(box_z1 - box_z0)),
 			"asphalt", false)
-		_box(groups.Structure, "SidewalkStrip", Vector3(cx, -0.01, par_z + sign_z * (WALK - 1.5)), Vector3(12.0, 0.02, 3.0),
+		_box(groups.Structure, "SidewalkStrip", Vector3(cx, TILE_LIFT - 0.01, par_z + sign_z * (WALK - 1.5)), Vector3(12.0, 0.02, 3.0),
 			"sidewalk", false)
 		_piece(CITY + "Decal_Crosswalk.gltf", Vector3(cx, 0.01, sign_z * (AVE + 1.5)), 0.0, groups.Structure, Color(0.7, 0.7, 0.68))
 	# Lavalle y Tucumán.
@@ -568,10 +589,10 @@ func _ground() -> void:
 				_piece(CITY + "Street_2Lane.gltf", Vector3(x, 0.0, par[0]), 0.0, groups.Structure, gray)
 			x += 6.0
 	# Callejón y patio: asfalto gastado.
-	_box(groups.Structure, "AlleyFloor", Vector3((ALLEY_X.x + ALLEY_X.y) / 2, -0.01, (PATIO.end.y + LAVALLE_Z - WALK) / 2),
-		Vector3(ALLEY_X.y - ALLEY_X.x, 0.02, absf(PATIO.end.y - (LAVALLE_Z - WALK))), "asphalt", false)
-	_box(groups.Structure, "PatioFloor", Vector3(PATIO.get_center().x, -0.01, PATIO.get_center().y),
-		Vector3(PATIO.size.x, 0.02, PATIO.size.y), "asphalt", false)
+	_box(groups.Structure, "AlleyFloor", Vector3((ALLEY_X.x + ALLEY_X.y) / 2, OVERLAY_Y, (PATIO.end.y + LAVALLE_Z - WALK) / 2),
+		Vector3(ALLEY_X.y - ALLEY_X.x, OVERLAY_H, absf(PATIO.end.y - (LAVALLE_Z - WALK))), "asphalt", false)
+	_box(groups.Structure, "PatioFloor", Vector3(PATIO.get_center().x, OVERLAY_Y, PATIO.get_center().y),
+		Vector3(PATIO.size.x, OVERLAY_H, PATIO.size.y), "asphalt", false)
 	for p in [Vector3(14, 0.01, 1.5), Vector3(70, 0.01, -2.4), Vector3(150, 0.01, 2.0), Vector3(48, 0.01, -40.0),
 			Vector3(100, 0.01, LAVALLE_Z + 1.0), Vector3(84, 0.01, 35.0), Vector3(150, 0.01, TUCUMAN_Z - 1.0)]:
 		_prop(CITY + "Prop_ManholeCover.gltf", p, 0, {"col": false})
@@ -1072,7 +1093,7 @@ func _zone_door_visuals(door: Node3D, wall_pos: Vector3, yaw: float, open_model:
 		open_yaw = yaw + 180.0
 		var front := Basis(Vector3.UP, deg_to_rad(yaw)) * Vector3.FORWARD * -1.0
 		var size := Basis(Vector3.UP, deg_to_rad(yaw)) * Vector3(width * 0.92, height * 0.97, 0.02)
-		var gap := _box(door, "DoorGap", rel + front * 0.012 + Vector3.UP * height * 0.485,
+		var gap := _box(door, "DoorGap", rel + front * 0.04 + Vector3.UP * height * 0.485,
 			Vector3(absf(size.x), absf(size.y), absf(size.z)), "door_gap", false)
 		gap.name = "DoorGap"
 	_door_prop(door, "OpenDoor", open_model, rel, open_yaw, width, height, true)

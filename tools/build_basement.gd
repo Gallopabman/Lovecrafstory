@@ -125,7 +125,7 @@ func _bwall(axis: String, c: float, a0: float, a1: float, openings: Array = [], 
 
 
 func _basement_structure() -> void:
-	_box(groups.Structure, "Slab", Vector3(BW / 2, -0.16, BD / 2), Vector3(BW, 0.28, BD), "concrete")
+	_box(groups.Structure, "Slab", Vector3(BW / 2, -0.175, BD / 2), Vector3(BW, 0.15, BD), "concrete")
 	# Pisos por ambiente.
 	for r in [[0, 0, BW, 6, "concrete"], [0, 6, BW, 9, "floor_dirty"], [0, 9, 13, 22, "tile_cold"],
 			[13, 9, 26, 22, "tile_cold"], [0, 22, 26, 31, "floor_dirty"], [26, 9, 29, 31, "floor_dirty"],
@@ -316,7 +316,7 @@ func _chapel() -> void:
 			_prop("bench", Vector3(19.5 + side * 2.2, 0, 25.0 + row * 1.6), 180)
 	_box(groups.Props, "Altar", Vector3(19.5, 0.5, 30.2), Vector3(2.0, 1.0, 0.8), "counter")
 	_box(groups.Props, "CrossV", Vector3(19.5, 2.2, 30.82), Vector3(0.12, 1.2, 0.06), "rail", false)
-	_box(groups.Props, "CrossH", Vector3(19.5, 2.5, 30.82), Vector3(0.6, 0.12, 0.06), "rail", false)
+	_box(groups.Props, "CrossH", Vector3(19.5, 2.5, 30.82), Vector3(0.6, 0.12, 0.03), "rail", false)
 	for dx in [-0.7, -0.3, 0.4, 0.8]:
 		_box(groups.Props, "Candle", Vector3(19.5 + dx, 1.08, 30.1), Vector3(0.05, 0.16, 0.05), "candle", false)
 	_point_light(Vector3(19.5, 1.5, 29.6), Color(1.0, 0.7, 0.4), 0.7, 5.0, true)

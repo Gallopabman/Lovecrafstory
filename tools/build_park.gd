@@ -113,11 +113,13 @@ func _park_ground() -> void:
 			_piece(tile, Vector3(cx, 0.0, z), 90.0, groups.Structure, gray)
 			z -= 6.0
 		for cz in [0.0, B_Z]:
-			_box(groups.Structure, "Crossing", Vector3(cx, -0.03, cz), Vector3(12.0, 0.04, 12.0), "asphalt", false)
-			# La vereda del lado sin calle sigue de largo.
+			# La vereda del lado sin calle sigue de largo (el asfalto del cruce no pasa por abajo).
 			var side := 1.0 if cz == 0.0 else -1.0
 			if not (cx == PARK_ROAD_X and cz == 0.0):
-				_box(groups.Structure, "SidewalkStrip", Vector3(cx, -0.01, cz + side * 4.5), Vector3(12.0, 0.02, 3.0), "sidewalk", false)
+				_box(groups.Structure, "Crossing", Vector3(cx, OVERLAY_Y, cz - side * 1.5), Vector3(12.0, OVERLAY_H, 9.0), "asphalt", false)
+				_box(groups.Structure, "SidewalkStrip", Vector3(cx, TILE_LIFT - 0.01, cz + side * 4.5), Vector3(12.0, 0.02, 3.0), "sidewalk", false)
+			else:
+				_box(groups.Structure, "Crossing", Vector3(cx, OVERLAY_Y, cz), Vector3(12.0, OVERLAY_H, 12.0), "asphalt", false)
 			for arm in [-1.0, 1.0]:
 				_piece(CITY + "Decal_Crosswalk.gltf", Vector3(cx + arm * 7.5, 0.01, cz), 90.0, groups.Structure,
 					Color(0.7, 0.7, 0.68))
@@ -229,7 +231,7 @@ func _sinkhole() -> void:
 	var holder := _add(groups.Props, Node3D.new(), "Sinkhole")
 	var cx := (HOLE_X0 + HOLE_X1) / 2
 	var w := HOLE_X1 - HOLE_X0
-	_box(holder, "Pit", Vector3(cx, -0.005, 0), Vector3(w - 1.2, 0.02, 2.0 * WALK - 0.6), "pit", false)
+	_box(holder, "Pit", Vector3(cx, OVERLAY_Y, 0), Vector3(w - 1.2, OVERLAY_H, 2.0 * WALK - 0.6), "pit", false)
 	# Bordes de asfalto partidos, hundiéndose hacia el pozo.
 	for i in 18:
 		var edge := i % 4
@@ -278,9 +280,9 @@ func _parking_lot() -> void:
 	var x1 := LOT.end.x
 	var z0 := LOT.position.y
 	var z1 := LOT.end.y
-	_box(holder, "LotFloor", Vector3((x0 + x1) / 2, -0.01, (z0 + z1) / 2), Vector3(x1 - x0, 0.02, z1 - z0), "asphalt", false)
+	_box(holder, "LotFloor", Vector3((x0 + x1) / 2, OVERLAY_Y, (z0 + z1) / 2), Vector3(x1 - x0, OVERLAY_H, z1 - z0), "asphalt", false)
 	for i in 6:
-		_box(holder, "LotLine", Vector3(x0 + 3.0 + i * 3.6, 0.005, z0 + 5.5), Vector3(0.1, 0.01, 4.5), "tape", false)
+		_box(holder, "LotLine", Vector3(x0 + 3.0 + i * 3.6, 0.075, z0 + 5.5), Vector3(0.1, 0.01, 4.5), "tape", false)
 	_brick_facing(Vector3(x0, 0, z1), Vector3(x0, 0, z0), Vector3.RIGHT, 1, holder)
 	_brick_facing(Vector3(x1, 0, z0), Vector3(x1, 0, z1), Vector3.LEFT, 1, holder)
 	_building("Building_Large_2", Vector3((x0 + x1) / 2 + 1.0, 0, z0), 0, Color(0.6, 0.6, 0.58))
@@ -311,8 +313,8 @@ func _parking_lot() -> void:
 func _pasaje() -> void:
 	var holder := _add(groups.Props, Node3D.new(), "Pasaje")
 	var x0 := 96.0 + WALK
-	_box(holder, "PasajeFloor", Vector3((x0 + PASAJE_END) / 2, -0.01, (PASAJE_Z0 + PASAJE_Z1) / 2),
-		Vector3(PASAJE_END - x0, 0.02, PASAJE_Z1 - PASAJE_Z0), "asphalt", false)
+	_box(holder, "PasajeFloor", Vector3((x0 + PASAJE_END) / 2, OVERLAY_Y, (PASAJE_Z0 + PASAJE_Z1) / 2),
+		Vector3(PASAJE_END - x0, OVERLAY_H, PASAJE_Z1 - PASAJE_Z0), "asphalt", false)
 	_brick_facing(Vector3(x0, 0, PASAJE_Z1), Vector3(PASAJE_END, 0, PASAJE_Z1), Vector3.FORWARD, 2, holder)
 	_brick_facing(Vector3(x0, 0, PASAJE_Z0), Vector3(PASAJE_END, 0, PASAJE_Z0), Vector3.BACK, 2, holder)
 	_brick_facing(Vector3(PASAJE_END, 0, PASAJE_Z0), Vector3(PASAJE_END, 0, PASAJE_Z1), Vector3.LEFT, 2, holder)
@@ -350,7 +352,7 @@ func _storefronts() -> void:
 	# La cruz verde, que titila sola aunque no haya luz en ningún lado.
 	var cross := Vector3(108.5, 3.6, B_Z - WALK + 0.6)
 	_box(groups.Props, "GreenCrossV", cross, Vector3(0.3, 1.0, 0.12), "pharma_green", false)
-	_box(groups.Props, "GreenCrossH", cross, Vector3(1.0, 0.3, 0.12), "pharma_green", false)
+	_box(groups.Props, "GreenCrossH", cross, Vector3(1.0, 0.3, 0.07), "pharma_green", false)
 	_light(cross + Vector3(0, 0, 0.6), Color(0.3, 1.0, 0.45), 0.8, 7.0, true)
 	_inspect(pharmacy + Vector3(0, 1.2, 0.6), ["La farmacia de Don Aldo. Rompieron la vidriera y se llevaron todo, hasta los termómetros.",
 		"Acá venía con recetas que no eran mías. Él sabía y me vendía igual, hasta que mamá vino a hablar con él.",
@@ -386,9 +388,9 @@ func _hospital_court() -> void:
 	var holder := _add(groups.Buildings, Node3D.new(), "HospitalCourt")
 	var cz := 0.0
 	# Piso del patio de ambulancias, con la franja amarilla y "AMBULANCIAS" pintado.
-	_box(holder, "CourtFloor", Vector3((COURT_X + HOSP_X) / 2, -0.01, cz), Vector3(HOSP_X - COURT_X, 0.02, 2 * COURT_Z), "court", false)
+	_box(holder, "CourtFloor", Vector3((COURT_X + HOSP_X) / 2, OVERLAY_Y, cz), Vector3(HOSP_X - COURT_X, OVERLAY_H, 2 * COURT_Z), "court", false)
 	for i in 7:
-		var hatch := _box(holder, "Hatch", Vector3(193.0, 0.005, -5.0 + i * 1.6), Vector3(0.25, 0.01, 2.2), "tape", false)
+		var hatch := _box(holder, "Hatch", Vector3(193.0, 0.075, -5.0 + i * 1.6), Vector3(0.25, 0.01, 2.2), "tape", false)
 		hatch.rotation_degrees.y = 45.0
 	var floor_text := _label(holder, "SOLO AMBULANCIAS", Vector3(186.5, 0.02, cz), -90, Color(0.75, 0.65, 0.2), 0.012)
 	floor_text.rotation_degrees = Vector3(-90, -90, 0)
@@ -413,7 +415,7 @@ func _hospital_court() -> void:
 	# La cruz roja, prendida.
 	var red := Vector3(HOSP_X - 0.12, 7.2, 0)
 	_box(holder, "RedCrossV", red, Vector3(0.12, 2.0, 0.6), "cross_red", false)
-	_box(holder, "RedCrossH", red, Vector3(0.12, 0.6, 2.0), "cross_red", false)
+	_box(holder, "RedCrossH", red, Vector3(0.07, 0.6, 2.0), "cross_red", false)
 	_light(red + Vector3(-1.0, 0, 0), Color(1.0, 0.25, 0.2), 1.0, 9.0, false)
 	_court_platform(holder)
 	_court_canopy(holder)
@@ -426,7 +428,7 @@ func _court_platform(holder: Node) -> void:
 	var h := 0.45
 	var x0 := 197.0
 	_box(holder, "Platform", Vector3((x0 + HOSP_X) / 2, h / 2, 0), Vector3(HOSP_X - x0, h, 18.0), "path")
-	_box(holder, "PlatformCurb", Vector3(x0 + 0.05, h / 2, 0), Vector3(0.12, h + 0.02, 18.0), "tape", false)
+	_box(holder, "PlatformCurb", Vector3(x0 + 0.05, h / 2 + 0.02, 0), Vector3(0.14, h + 0.04, 18.0), "tape", false)
 	for side in [-1.0, 1.0]:
 		var ramp := _box(holder, "Ramp", Vector3((x0 + HOSP_X) / 2 + 0.5, h / 2 - 0.08, side * 11.2), Vector3(HOSP_X - x0 - 1.0, 0.2, 4.6), "path")
 		ramp.rotation_degrees.x = 5.6 * side
@@ -452,7 +454,7 @@ func _court_canopy(holder: Node) -> void:
 	_box(holder, "Canopy", Vector3((x0 + HOSP_X) / 2, 4.3, 0), Vector3(HOSP_X - x0, 0.35, 14.0), "cap")
 	for z in [-6.4, 6.4]:
 		_box(holder, "CanopyColumn", Vector3(x0 + 0.8, 2.1, z), Vector3(0.45, 4.2, 0.45), "plaster")
-		_box(holder, "ColumnStripe", Vector3(x0 + 0.8, 0.5, z), Vector3(0.47, 0.25, 0.47), "tape", false)
+		_box(holder, "ColumnStripe", Vector3(x0 + 0.8, 0.5, z), Vector3(0.52, 0.25, 0.52), "tape", false)
 	_box(holder, "CanopyFascia", Vector3(x0 - 0.05, 4.3, 0), Vector3(0.12, 1.0, 14.0), "guard_red", false)
 	_label(holder, "GUARDIA", Vector3(x0 - 0.13, 4.38, 0), -90, Color(1.0, 0.95, 0.9), 0.022)
 	_label(holder, "EMERGENCIAS · AMBULANCIAS", Vector3(x0 - 0.13, 3.98, 0), -90, Color(1.0, 0.85, 0.8), 0.006)
@@ -472,7 +474,7 @@ func _court_entrance(holder: Node) -> void:
 	_box(holder, "VestibuleRoof", Vector3((vx + HOSP_X) / 2, top + 0.12, 0), Vector3(HOSP_X - vx + 0.3, 0.25, 2 * half + 0.3), "cap", false)
 	# Adentro está oscuro: el fondo del vestíbulo (las puertas de adentro, abiertas) es negro.
 	_box(holder, "InnerDark", Vector3(HOSP_X - 0.05, h + 1.5, 0), Vector3(0.04, 3.0, 2 * half - 0.1), "door_gap", false)
-	_box(holder, "VestibuleFloor", Vector3((vx + HOSP_X) / 2, h + 0.01, 0), Vector3(HOSP_X - vx, 0.02, 2 * half), "tarp", false)
+	_box(holder, "VestibuleFloor", Vector3((vx + HOSP_X) / 2, h + 0.04, 0), Vector3(HOSP_X - vx, 0.02, 2 * half - 0.1), "tarp", false)
 	for z in [-half, half]:
 		_box(holder, "VestibuleSide", Vector3((vx + HOSP_X) / 2, h + 1.5, z), Vector3(HOSP_X - vx, 3.0, 0.04), "glass")
 		_box(holder, "SideFrame", Vector3(vx, h + 1.5, z), Vector3(0.12, 3.0, 0.12), "iron", false)
@@ -488,9 +490,9 @@ func _court_entrance(holder: Node) -> void:
 	_box(holder, "SlidingRight", Vector3(vx - 0.07, h + 1.25, 1.9), Vector3(0.04, 2.5, 1.6), "glass", false)
 	for z in [-1.6, 0.0, 1.1, 2.7]:
 		if absf(z) <= half:
-			_box(holder, "Mullion", Vector3(vx - 0.05, h + 1.25, z), Vector3(0.07, 2.5, 0.07), "iron", false)
+			_box(holder, "Mullion", Vector3(vx - 0.04, h + 1.25, z), Vector3(0.18, 2.5, 0.07), "iron", false)
 	for y in [h + 0.05, h + 2.5]:
-		_box(holder, "DoorRail", Vector3(vx - 0.04, y, 0), Vector3(0.08, 0.1, 2 * half), "iron", false)
+		_box(holder, "DoorRail", Vector3(vx - 0.04, y, 0), Vector3(0.18, 0.1, 2 * half), "iron", false)
 	# Las calcomanías de las hojas y la luz de emergencia de adentro.
 	for z in [-0.8, 1.9]:
 		_box(holder, "DoorStripe", Vector3(vx - 0.1, h + 1.4, z), Vector3(0.01, 0.08, 1.2), "tarp", false)
@@ -513,7 +515,7 @@ func _court_props(holder: Node) -> void:
 		"Adentro, una camilla vacía y un estetoscopio. En el piso, un gafete: \"Dra. M. Ibáñez\". Mamá."], 2.4)
 	# En el andén: una camilla, sillas de ruedas, un pie de suero, los residuos patogénicos.
 	_prop(HOSP + "bed_metal.glb", Vector3(199.5, h, -6.0), 75, {"L": 2.0, "tint": Color(0.75, 0.75, 0.72)})
-	_prop(HOSP + "blood.glb", Vector3(199.3, h + 0.02, -5.0), 10, {"col": false, "L": 1.4})
+	_prop(HOSP + "blood.glb", Vector3(199.3, h + 0.04, -5.0), 10, {"col": false, "L": 1.4})
 	_prop(HOSP + "wheelchair.glb", Vector3(201.5, h, 6.2), 200, {"h": 0.95})
 	_prop(HOSP + "wheelchair.glb", Vector3(204.8, h, -7.4), 120, {"h": 0.95})
 	_prop(HOSP + "iv_stand.glb", Vector3(202.4, h, -5.2), 0, {"h": 1.8, "col": false})
@@ -558,9 +560,11 @@ func _court_props(holder: Node) -> void:
 func _park() -> void:
 	var holder := _add(groups.Props, Node3D.new(), "Park")
 	var pz0 := WALK + 0.4
-	_box(holder, "Grass", Vector3(PLAZA_X / 2, -0.005, (pz0 + PLAZA_Z) / 2), Vector3(PLAZA_X, 0.03, PLAZA_Z - pz0), "grass", false)
-	_box(holder, "PathX", Vector3(PLAZA_X / 2, 0.015, FOUNTAIN.z), Vector3(PLAZA_X - 1.0, 0.02, 2.4), "path", false)
-	_box(holder, "PathZ", Vector3(FOUNTAIN.x, 0.015, (pz0 + PLAZA_Z) / 2), Vector3(2.4, 0.02, PLAZA_Z - pz0 - 0.5), "path", false)
+	_box(holder, "Grass", Vector3(PLAZA_X / 2, OVERLAY_Y, (pz0 + PLAZA_Z) / 2), Vector3(PLAZA_X, OVERLAY_H, PLAZA_Z - pz0), "grass", false)
+	# Los senderos, 5 cm arriba del pasto; el que va de norte a sur, cortado donde cruza el otro.
+	_box(holder, "PathX", Vector3(PLAZA_X / 2, 0.07, FOUNTAIN.z), Vector3(PLAZA_X - 1.0, 0.02, 2.4), "path", false)
+	for seg: Vector2 in [Vector2(pz0 + 0.25, FOUNTAIN.z - 1.2), Vector2(FOUNTAIN.z + 1.2, PLAZA_Z - 0.25)]:
+		_box(holder, "PathZ", Vector3(FOUNTAIN.x, 0.07, (seg.x + seg.y) / 2), Vector3(2.4, 0.02, seg.y - seg.x), "path", false)
 	# La fuente seca.
 	_box(holder, "FountainBasin", FOUNTAIN + Vector3(0, 0.3, 0), Vector3(4.6, 0.6, 4.6), "path")
 	_box(holder, "FountainWater", FOUNTAIN + Vector3(0, 0.5, 0), Vector3(4.0, 0.05, 4.0), "water", false)

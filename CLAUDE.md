@@ -442,6 +442,15 @@ Godot **4.7.2** (no está en el PATH):
 - **Test del teatro**: `<godot> --path . -s res://tests/theater_test.gd` (llave, escopeta, jefe, camarín,
   mudarse, el sobreviviente nuevo llega al teatro).
 - Una `class_name` nueva no existe para los tests hasta correr `--import` (refresca la caché de clases).
+- **Parpadeo (z-fighting)**: con el temblor de vértices PS1, dos superficies a 1-2 cm parpadean. Reglas:
+  ninguna superficie visible a menos de ~4 cm de otra paralela; las losas van 10 cm debajo del piso y 5 cm arriba
+  del cielorraso (`[y-0.25, y-0.10]`); el terreno de las calles a -0.02, los tramos de calle subidos 5 cm
+  (`TILE_LIFT`, lo hace `_piece`), los asfaltos encima del terreno con tope a 0.03 (`OVERLAY_Y`/`OVERLAY_H`), las
+  líneas y sendas a 0.07-0.08; los calcos (`DECALS`: manchas, alfombras) los sube `_prop`; los marcos de puertas
+  van adentro del hueco (`_opening_trim`); `_wall` corta en franjas sin superponer (ventanas de distintos pisos);
+  las paredes secretas que tapan un hueco, 8 cm más chicas por lado. Detector: `<godot> --headless --path . -s
+  res://tools/find_zfight.gd [-- escena.tscn]` (lista pares superpuestos; lo que queda son caras que no se ven:
+  esquinas exteriores, arriba de los cielorrasos, nodos que nunca están visibles a la vez).
 - No usar `@export_multiline` en listas (`PackedStringArray`): el editor de Godot 4.7 no lo conserva y borra
   los valores al guardar la escena (pasó con los textos de los `Inspectable`).
 - **Al empaquetar un nivel, Godot guarda todas las propiedades de cada escena instanciada** (enemigos,
