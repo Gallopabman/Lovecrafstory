@@ -17,6 +17,7 @@ const HOUSES := {
 	"almacen": "HouseAlmacen",
 	"relojeria": "HouseRelojeria",
 	"pension": "HousePension",
+	"ferreyra": "HouseFerreyra",
 }
 
 var house_id := ""
@@ -296,3 +297,69 @@ func _house_pension() -> float:
 	_stalker(Vector3(2.2, 0.05, -2.4), 1.5)
 	_extra_enemy(Vector3(-2.4, 0.05, -5.6), 1, 1.0)
 	return -2.4
+
+
+## La casa del Dr. Ferreyra, el director del San Judas (pedido del usuario): living,
+## escritorio y dormitorio. Se llevó la llave del sótano del hospital y no pudo tirarla.
+func _house_ferreyra() -> float:
+	_shell(10.0, 9.0, "wood", "house_wall2", -2.5, [-3.5, 2.5])
+	# Pared del fondo del living (z -4.5), con dos puertas; y la que separa escritorio y dormitorio.
+	_wall("x", -4.5, -5.0, 5.0, 0.0, CEIL, T, [_door(-2.5), _door(2.5)], "house_wall3", false)
+	_wall("z", 0.0, -9.0, -4.5, 0.0, CEIL, T, [], "house_wall3", false)
+	_bulb(-1.0, -2.2, 0.8)
+	_bulb(-2.5, -6.8, 0.7, true)
+	_bulb(2.5, -6.8, 0.4)
+	# Living: buen gusto, polvo, y todo en su lugar.
+	_prop("rugRectangle", Vector3(1.8, 0.005, -2.3), 90)
+	_prop("loungeSofa", Vector3(2.0, 0, -3.8), 0)
+	_prop("loungeChair", Vector3(3.9, 0, -2.0), -90)
+	_prop("tableCoffee", Vector3(2.0, 0, -2.4))
+	_prop("bookcaseClosedWide", Vector3(4.6, 0, -0.8), -90)
+	_prop("lampRoundFloor", Vector3(0.4, 0, -4.0))
+	_prop("coatRackStanding", Vector3(-4.3, 0, -0.8))
+	_prop("pottedPlant", Vector3(-4.3, 0, -3.9), 0, {"tint": Color(0.45, 0.4, 0.3)})
+	_box(groups.Props, "Portrait", Vector3(2.0, 1.8, -4.38), Vector3(1.0, 0.7, 0.04), "photo", false)
+	_inspect(Vector3(2.0, 1.6, -3.9), ["Un retrato de Ferreyra joven, con el guardapolvo recién estrenado, el día que se recibió.",
+		"Alguien le tachó los ojos con un bisturí. Con cuidado, como quien opera."], 1.2)
+	_inspect(Vector3(-4.3, 1.4, -0.8), ["Un sobretodo y un paraguas. Las mangas del sobretodo tienen manchas marrones hasta el codo."], 0.9)
+	# Escritorio (x -5..0, z -9..-4.5): el diario y la llave.
+	_prop("desk", Vector3(-2.5, 0, -8.2))
+	_prop("chairDesk", Vector3(-2.5, 0, -7.3), 180)
+	_prop("lampRoundTable", Vector3(-1.7, 0.76, -8.3))
+	for z in [-5.6, -7.0]:
+		_prop("bookcaseClosed", Vector3(-4.6, 0, z), 90)
+	_prop("file_cabinet", Vector3(-0.5, 0, -8.5))
+	_prop("cardboardBoxOpen", Vector3(-1.0, 0, -5.2), 30)
+	_pickup("LetterFerreyra2", "letter_ferreyra_02", Vector3(-2.8, 0.78, -8.2))
+	_pickup("KeyBasement", "key_basement", Vector3(-2.5, 0.5, -7.25))
+	_inspect(Vector3(-2.5, 1.0, -7.6), ["Sobre la silla, el saco de Ferreyra, doblado. En el bolsillo hay algo duro, frío y largo."], 1.0)
+	_inspect(Vector3(-4.2, 1.3, -6.3), ["Tratados de psiquiatría, de neurología, de anatomía patológica. Un estante entero sobre el sueño.",
+		"Los lomos de los últimos están marcados con la misma palabra, a mano: \"NIEBLA\"."], 1.1)
+	# Dormitorio (x 0..5, z -9..-4.5): Ferreyra no salió nunca de acá.
+	_prop("bedSingle", Vector3(3.2, 0, -7.7), 90)
+	_prop("cabinetBedDrawerTable", Vector3(4.6, 0, -5.2), -90)
+	_prop("chair", Vector3(1.0, 0, -8.3), 30)
+	_prop("trashbag", Vector3(0.6, 0, -5.0), 70)
+	_prop("blood", Vector3(2.4, 0.01, -6.2), 40)
+	_inspect(Vector3(3.2, 0.9, -7.7), ["Ferreyra está acostado, vestido, con los zapatos puestos. Tiene las manos cruzadas sobre el pecho.",
+		"En la mesa de luz, frascos vacíos y un vaso de agua. Se fue durmiendo. Eligió no ver lo que venía.",
+		"No sé si siento lástima o bronca. Las dos cosas pesan lo mismo."], 1.3)
+	_pickup("Kit", "medicine_kit", Vector3(4.6, 0.58, -5.2))
+	_pickup("Shells", "ammo_shells", Vector3(-4.0, 0.05, -2.0), 4)
+	_stalker(Vector3(1.0, 0.05, -1.6), 1.2)
+	_extra_enemy(Vector3(-2.5, 0.05, -6.0), 2, 1.0)
+	# En Quebrado, lo que escribió en la pared del escritorio antes de acostarse.
+	var gated := Node3D.new()
+	gated.set_script(GatedScript)
+	gated.set("threshold", 2)
+	_add(groups.Secrets, gated, "FerreyraWall")
+	var label := Label3D.new()
+	label.text = "LOS ENCERRÉ ABAJO\nPORQUE ME LLAMABAN\nPOR MI NOMBRE"
+	label.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
+	label.font_size = 32
+	label.pixel_size = 0.006
+	label.modulate = Color(0.55, 0.05, 0.03)
+	label.position = Vector3(-0.12, 1.8, -6.8)
+	label.rotation_degrees.y = -90
+	_add(gated, label, "Label3D")
+	return -2.5

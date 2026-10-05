@@ -65,7 +65,7 @@ func _initialize() -> void:
 	check(sanity.in_refuge() and not sanity.has_electricity(), "arranca en el refugio, sin electricidad (el generador empieza roto)")
 	var props := current_scene.get_node("Props").get_child_count()
 	check(props > 150, "mobiliario: %d props" % props)
-	check(get_nodes_in_group(&"enemies").size() == 3, "3 acechadores")
+	check(get_nodes_in_group(&"enemies").size() == 5, "5 acechadores (3 abajo, 2 en el 2° piso)")
 
 	print("-- Navegación")
 	await physics_frame
@@ -84,6 +84,28 @@ func _initialize() -> void:
 		max_y = maxf(max_y, player().global_position.y)
 	Input.action_release("move_forward")
 	check(max_y > H - 0.3, "se sube la escalera caminando: y=%.2f" % max_y)
+	# Segundo tramo: del pasillo de P1 (puerta del ex ascensor) al 2° piso.
+	place(Vector3(7.5, H + 0.05, 9.0), 0.0)
+	await frames(5)
+	max_y = 0.0
+	Input.action_press("move_forward")
+	for i in 260:
+		await physics_frame
+		max_y = maxf(max_y, player().global_position.y)
+	Input.action_release("move_forward")
+	check(max_y > 2 * H - 0.3, "se sube al 2° piso: y=%.2f" % max_y)
+	path = NavigationServer3D.map_get_path(map, Vector3(15.5, 0, 16.5), Vector3(22.2, 2 * H, 7.0), true)
+	check(path.size() > 2 and path[path.size() - 1].distance_to(Vector3(22.2, 2 * H, 7.0)) < 1.0,
+		"hay camino del hall a la terapia grupal (2° piso): %d puntos, fin %s" % [path.size(), path[path.size() - 1] if path.size() > 0 else Vector3.ZERO])
+
+	print("-- Sótano")
+	var basement: Node = current_scene.get_node("Inspectables/BasementDoor")
+	place(Vector3(4.6, 0.05, 4.0), -90.0)
+	await frames(3)
+	basement.interact(player())
+	await frames(3)
+	check(current_scene.name == "Hospital", "sin la llave de Ferreyra el sótano no abre")
+	await shot("20_puerta_sotano")
 
 	print("-- Límites")
 	# Contra las rejas de una ventana del hall: no se sale del edificio.
@@ -122,6 +144,15 @@ func _initialize() -> void:
 		["16_archivo", Vector3(26.8, H + 0.05, 12.2), -130.0],
 		["17_pasillo_p1", Vector3(34.5, H + 0.05, 9.5), 90.0],
 		["18_escalera_p1", Vector3(5.0, H + 0.05, 1.2), 120.0],
+		["21_p2_pasillo", Vector3(1.5, 2 * H + 0.05, 9.5), -90.0],
+		["22_p2_habitacion_203", Vector3(16.5, 2 * H + 0.05, 7.0), 10.0],
+		["23_p2_aislamiento", Vector3(19.5, 2 * H + 0.05, 6.8), 0.0],
+		["24_p2_terapia", Vector3(25.6, 2 * H + 0.05, 7.2), 30.0],
+		["25_p2_sala_de_dia", Vector3(28.0, 2 * H + 0.05, 7.2), -50.0],
+		["26_p2_psiquiatria", Vector3(5.8, 2 * H + 0.05, 12.2), 150.0],
+		["27_p2_enfermeria", Vector3(9.0, 2 * H + 0.05, 12.2), -150.0],
+		["28_p2_duchas", Vector3(27.5, 2 * H + 0.05, 12.2), -130.0],
+		["29_p2_escalera", Vector3(3.0, 2 * H + 0.05, 2.0), -60.0],
 	]
 	for s: Array in shots:
 		place(s[1], s[2])

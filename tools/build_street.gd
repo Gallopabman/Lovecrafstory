@@ -337,12 +337,13 @@ func _ground() -> void:
 ## La fachada de atrás del Hospital San Judas: ladrillo, dos pisos, la salida de emergencia.
 func _hospital_back() -> void:
 	var holder := _add(groups.Structure, Node3D.new(), "HospitalBack")
-	_brick_wall(Vector3(0, 0, WALK + 1.5), Vector3(0, 0, -WALK - 1.5), 2, holder, false)
-	_box(holder, "Cornice", Vector3(-0.2, 8.1, 0), Vector3(0.8, 0.3, 15.6), "cap", false)
+	_brick_wall(Vector3(0, 0, WALK + 1.5), Vector3(0, 0, -WALK - 1.5), 3, holder, false)
+	_box(holder, "Cornice", Vector3(-0.2, 12.1, 0), Vector3(0.8, 0.3, 15.6), "cap", false)
 	_label(holder, "HOSPITAL SAN JUDAS", Vector3(0.12, 3.3, 0), 90, Color(0.75, 0.75, 0.7), 0.012)
 	_label(holder, "SALIDA DE EMERGENCIA", Vector3(0.12, 2.55, 0), 90, Color(0.6, 0.1, 0.08), 0.006)
 	for z in [-4.5, 4.5]:
-		_piece(CITY + "Metal_FirstFloor_Window.gltf", Vector3(0.05, 4.2, z), 90.0, holder, Color(0.5, 0.5, 0.5))
+		for wy in [4.2, 8.2]:
+			_piece(CITY + "Metal_FirstFloor_Window.gltf", Vector3(0.05, wy, z), 90.0, holder, Color(0.5, 0.5, 0.5))
 	var door := Area3D.new()
 	door.set_script(load("res://scripts/world/zone_door.gd"))
 	door.set("target_scene", "res://scenes/levels/hospital.tscn")
@@ -537,7 +538,7 @@ func _house_doors() -> void:
 		[60.3, -1, "", true, "", "", 1.2, 2.3],
 		[11.32, 1, "iglesia", false, "res://scenes/levels/church.tscn", "door_wood_open", 1.7, 2.8],
 		[25.87, 1, "almacen", true, houses, "door_wood_open", 1.2, 2.3],
-		[40.63, 1, "", false, "", "", 1.2, 2.3],
+		[40.63, 1, "ferreyra", false, houses, "door_wood_open", 1.2, 2.3],
 		[55.69, 1, "pension", false, houses, "door_wood_open", 1.2, 2.3],
 	]
 	var locked := [

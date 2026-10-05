@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/key_theater.glb" id="2_key"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"key_basement"
+display_name = "Llave del sótano"
+short_name = "LLA"
+description = "Una llave de seguridad, larga, con un llavero de plástico rojo: \"SAN JUDAS - SÓTANO\". Ferreyra la tenía en el bolsillo del saco."
+kind = 7
+world_color = Color(0.7, 0.7, 0.72, 1)
+world_scene = ExtResource("2_key")
+world_size = 0.18
+world_tint = Color(0.75, 0.78, 0.8, 1)

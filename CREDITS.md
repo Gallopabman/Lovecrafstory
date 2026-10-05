@@ -150,3 +150,9 @@ Armadas en Godot con piezas CC0 (las cadenas son eslabones generados en Godot).
 | `door_wood_open` (entreabierta), `door_metal_open` | Furniture Kit (`doorway`, `doorwayFront`) | Kenney | CC0 | [kenney.nl/assets/furniture-kit](https://kenney.nl/assets/furniture-kit) |
 | `door_boarded` (tapiada) | Furniture Kit `doorway` + Building Kit `barricade-doorway-c` | Kenney | CC0 | [kenney.nl/assets/building-kit](https://kenney.nl/assets/building-kit) |
 | `door_chained` (con cadenas y candado) | Furniture Kit `doorwayFront` + "Padlock" | Kenney, Quaternius | CC0 | [poly.pizza/m/2ZSHgKVr3F](https://poly.pizza/m/2ZSHgKVr3F) |
+
+## El sótano del San Judas
+
+| Asset | Autor | Licencia | Fuente | Ubicación |
+| --- | --- | --- | --- | --- |
+| Hydrach (el jefe del incinerador; el .blend original convertido a .glb) | Tyrfing | CC0 | [opengameart.org/content/hydrach](https://opengameart.org/content/hydrach) | `assets/models/enemies/hydrach/` |

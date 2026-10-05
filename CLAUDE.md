@@ -246,14 +246,24 @@ recaiga. La nota de mamá dice que la llamaron del San Judas por la niebla: eso 
 prueba queda para los tests). La generó [tools/build_hospital.gd](tools/build_hospital.gd), un andamio
 de **una sola pasada**: si ya se editó la escena en el editor, no volver a correrlo (pisa los cambios);
 modificar la escena a mano o actualizar el script y avisar.
-- Planta de 36x20 m, dos pisos de 3.5 m. PB: refugio (sala del personal, NE), farmacia,
+- Planta de 36x20 m, **tres pisos** de 3.5 m (techo a 10.5). PB: refugio (sala del personal, NE), farmacia,
   consultorios, seguridad (barreta), hall/recepción/sala de espera, baños. P1: internación (6 camas),
   quirófano, dirección (pistola + carta del Dr. Ferreyra), enfermería, depósito a oscuras, archivo y
   cuarto tapiado (secreto: aparece en Quebrado; carta de Marta).
-- Límites reales: ventanas con rejas soldadas, entrada encadenada, ascensor muerto. La **salida de
+  **P2: Salud Mental** (pedido del usuario: "un piso más"): habitaciones 201-203 (la **203** es donde estuvo
+  internado el protagonista: la planilla con el alta firmada por mamá, las rayitas en la pared), aislamiento
+  acolchado, terapia grupal (sillas en ronda, "SÓLO POR HOY"), sala de día, consultorio de psiquiatría (su
+  carpeta), enfermería con el armario de psicofármacos vacío, archivo, duchas. Secretos: "¿TE ACORDÁS DE ESTA
+  CAMA?" (Inquieto); una figura en la ronda y un botiquín debajo del colchón de la 203 (Quebrado).
+  Se sube por una **segunda escalera en el hueco del ascensor de P1** (puerta "A 2° PISO", x 7.5).
+- Límites reales: ventanas con rejas soldadas, entrada encadenada, ascensor muerto (en PB). La **salida de
   emergencia** (PB este, x 36) es un `ZoneDoor` a la calle: se fuerza una vez con la barreta
-  (flag `hospital_exit_forced`); volviendo se aparece en `from_street`. Escalera recta con rampa
-  invisible + `NavigationLink3D`. Ambiente `hospital`; el fuego y el generador del refugio suenan.
+  (flag `hospital_exit_forced`); volviendo se aparece en `from_street`. Escaleras rectas con rampa
+  invisible + `NavigationLink3D` (una por tramo). Ambiente `hospital`; el fuego y el generador del refugio suenan.
+  El navmesh usa `agent_height` 2.0: con 2.25 los dinteles de las puertas (2.4) lo cortan en algunos pisos.
+- **La puerta del sótano** (PB, cuarto de la escalera, pared x 6; se llega por la puerta "SERVICIO" x 4.4):
+  `ZoneDoor` con `required_item` = `key_basement` (en la casa de Ferreyra), flag `hospital_basement_open`;
+  volviendo se aparece en `from_basement`.
 - Lore: el hospital se aisló el día 9 de la niebla; Ferreyra soldó las rejas "para que nadie salga".
   Los `Inspectable` (E) cuentan la historia con textos cortos.
 - **Refugio opcional** (sala del personal, PB NE; ya no es el inicial, se puede mudar acá): arranca pelado (colchón en el piso, generador roto, una
@@ -293,6 +303,32 @@ modificar la escena a mano o actualizar el script y avisar.
   los estantes), Relojería Kaufmann (relojes parados a las 3:15; texto que aparece en Quebrado) y Pensión
   Doña Rosa, pasando la barricada (pieza del agente Sosa: su cuaderno, y un acechador). Las otras puertas
   son `Inspectable` "cerrada". Spawn en la calle: `house_<id>`; adentro: `inside`.
+- **Casa del Dr. Ferreyra** (pedido del usuario; `ferreyra`, vereda sur, x 40.63, también en build_houses.gd):
+  living (el retrato con los ojos tachados), escritorio (el **diario de Ferreyra** y la **llave del sótano**
+  en el bolsillo del saco) y dormitorio (Ferreyra muerto en la cama, se fue con pastillas). Quebrado: "LOS
+  ENCERRÉ ABAJO PORQUE ME LLAMABAN POR MI NOMBRE".
+
+## Zona 1b: el sótano del San Judas
+
+[scenes/levels/hospital_basement.tscn](scenes/levels/hospital_basement.tscn), generado por
+[tools/build_basement.gd](tools/build_basement.gd) (extiende build_hospital.gd). Pedido del usuario: "grande, bastante
+lugar para recorrer, una zona con un boss", solo con la llave de la casa de Ferreyra. 56 x 40 m, cielorraso a 3.2 m.
+- Fila norte: escalera (vuelve a PB), calderas (una encendida), lavandería, grupo electrógeno saboteado, depósito.
+  Pasillo principal, morgue (pared de cámaras, una abierta y vacía), patología (el segundo corazón), archivo muerto
+  (la historia clínica de Elena de Sosa, 1979), capilla (velas recién prendidas), pasillo central, residuos
+  patogénicos, pasillo sur, túnel de servicio, cámara frigorífica, taller (donde se hicieron las rejas).
+- **El incinerador** (x 36-56, z 9-31, 6 m de alto, columnas para cubrirse): el jefe `Enemies/BasementBoss`
+  ([scenes/enemies/basement_boss.tscn](scenes/enemies/basement_boss.tscn), Hydrach de Tyrfing, CC0: cuadrúpedo de
+  carne, 600 de vida; animaciones Idle1 / Walk / Attack1 / Death / Jump (aparición) / Crouch (grito)). Despierta con
+  un `BossTrigger` en la entrada. Al morir: `basement_boss_dead` → se abre la **sala de guardia** (`FlagGate`
+  `Structure/GuardGate`): el último puesto de los médicos que bajaron, con botiquín, cartuchos y el estetoscopio de mamá.
+- Lore (inventado, confirmar con el usuario): el día 10 los pacientes "a los que la niebla les hablaba" empezaron a
+  cambiar y los bajaron a la morgue; en el incinerador se juntaron en uno solo. Ferreyra cerró el sótano y se llevó
+  la única llave. La Dra. Ibáñez (mamá) quiso bajar a atenderlos: la planilla de la sala de guardia está firmada con
+  una "I" ("vuelvo arriba a buscar a Ferreyra").
+- Siete acechadores + cinco por dificultad. Secretos: "NO ESTAMOS MUERTOS, ESTAMOS ABAJO" en la morgue (Inquieto), una
+  figura en la capilla y cartuchos en el archivo (Quebrado), la cámara 13 con munición (Difícil).
+- El navmesh del sótano también usa `agent_height` 2.0.
 
 ## Zona 2b: la comisaría y la iglesia (pedido del usuario: "dos zonas nuevas" en la avenida)
 
@@ -366,12 +402,14 @@ Godot **4.7.2** (no está en el PATH):
   cargar y comparar todo, guardado automático al cambiar de zona, volver al menú).
 - Regenerar el hospital / la calle / las casas: `<godot> --headless --path . -s res://tools/build_hospital.gd`
   (o `build_street.gd`, `build_houses.gd`, `build_theater.gd`, `build_home.gd`, `build_park.gd`,
-  `build_avenue_places.gd`). **Antes de regenerar, mirar `git status`**: si el usuario editó la escena en el
+  `build_avenue_places.gd`, `build_basement.gd`). **Antes de regenerar, mirar `git status`**: si el usuario editó la escena en el
   editor, pasar sus cambios al generador primero (pasó con la tele de la casa).
 - **Test del comienzo**: `<godot> --path . -s res://tests/home_test.gd` (casa, ático, rejas, socavón, la vuelta por Rondeau, rampa y puerta
   de guardia, el sobreviviente nuevo llega a casa). Los tests del refugio del hospital hacen `move_to(&"hospital")`.
 - **Test de la comisaría y la iglesia**: `<godot> --path . -s res://tests/avenue_places_test.gd` (entrada y
   salida, secretos por dificultad, bajar a la cripta).
+- **Test del sótano**: `<godot> --path . -s res://tests/basement_test.gd` (casa de Ferreyra y la llave, la puerta del
+  sótano, navmesh, recorrido, el jefe, la sala de guardia, la vuelta al hospital; `test_shotsbasement`).
 - **Test del teatro**: `<godot> --path . -s res://tests/theater_test.gd` (llave, escopeta, jefe, camarín,
   mudarse, el sobreviviente nuevo llega al teatro).
 - Una `class_name` nueva no existe para los tests hasta correr `--import` (refresca la caché de clases).

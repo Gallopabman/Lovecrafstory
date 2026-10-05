@@ -5,7 +5,8 @@ extends SceneTree
 ## NO volver a correrlo (pisaría los cambios).
 ## Uso: <godot> --headless --path . -s res://tools/build_hospital.gd
 ##
-## Planta (x = este, z = sur, 1 unidad = 1 m). Dos pisos de 3.5 m (PB y P1):
+## Planta (x = este, z = sur, 1 unidad = 1 m). Tres pisos de 3.5 m (PB, P1 y P2) y el
+## sótano (otra escena: tools/build_basement.gd, se entra con la llave de Ferreyra):
 ##   Fila norte  (z 0-8):   escalera | ascensor | farmacia / internación | ...
 ##   Pasillo     (z 8-11):  de punta a punta
 ##   Fila sur    (z 11-20): seguridad / dirección | hall / enfermería | ...
@@ -20,7 +21,7 @@ const W := 36.0  # ancho del edificio (x)
 const D := 20.0  # profundidad (z)
 const H := 3.5   # piso a piso
 const CEIL := 3.2  # alto de cada planta hasta el cielorraso
-const ROOF := 7.0
+const ROOF := 10.5  # tres plantas (pedido del usuario: "un piso más")
 const T := 0.2   # paredes interiores
 const TE := 0.3  # paredes exteriores
 const DOOR_W := 1.6  # ancho suficiente para el acechador (radio de navegación 0.5)
@@ -138,6 +139,8 @@ func _initialize() -> void:
 	_refuge()
 	_ground_floor_rooms()
 	_first_floor_rooms()
+	_second_floor_rooms()
+	_basement_door()
 	_details()
 	_secrets()
 	_difficulty_secrets()
@@ -555,56 +558,82 @@ func _structure() -> void:
 			[33, 11, W, D, "floor_dirty"]]:
 		# Sin piso sobre el hueco de la escalera (la superficie de la escalera arranca en x 2.8).
 		_floor(r[0], r[1], r[2], r[3], H, r[4])
+	# Losa de P2 con el hueco de la segunda escalera (en el hueco del ascensor: x 6-9, z 2.1-7.9).
+	for s in [[0, 0, W, 2.1], [0, 7.9, W, D], [0, 2.1, 6, 7.9], [9, 2.1, W, 7.9]]:
+		_box(groups.Structure, "Slab", Vector3((s[0] + s[2]) / 2, 2 * H - 0.16, (s[1] + s[3]) / 2),
+			Vector3(s[2] - s[0], 0.28, s[3] - s[1]), "concrete")
+		_ceiling(s[0], s[1], s[2], s[3], H + CEIL - 0.02)
+	for r in [[0, 0, 6, 8, "concrete"], [6, 0, 9, 2.1, "concrete"], [9, 0, 21, 8, "floor"], [21, 0, 27, 8, "wood"],
+			[27, 0, W, 8, "floor"], [0, 8, W, 11, "floor"], [0, 11, 7, D, "wood"], [7, 11, 16, D, "floor"],
+			[16, 11, 26, D, "floor_dirty"], [26, 11, W, D, "floor"]]:
+		_floor(r[0], r[1], r[2], r[3], 2 * H, r[4])
 	# Techo.
 	_box(groups.Structure, "Roof", Vector3(W / 2, ROOF - 0.15, D / 2), Vector3(W, 0.3, D), "ceiling")
 
-	# Paredes exteriores (de la losa al techo, con ventanas de los dos pisos).
+	# Paredes exteriores (de la losa al techo, con ventanas de los tres pisos).
 	var hw := -0.3
 	var eh := ROOF - hw
+	var y2 := 2 * H + 0.3
 	_wall("x", 0.0, -TE / 2, W + TE / 2, hw, eh, TE,
 		[_window(13, 0.3), _window(21, 0.3), _window(30, 0.3), _window(33.5, 0.3),
-		_window(11.5, H + 0.3), _window(15, H + 0.3), _window(18.5, H + 0.3), _window(22, H + 0.3)])
+		_window(11.5, H + 0.3), _window(15, H + 0.3), _window(18.5, H + 0.3), _window(22, H + 0.3),
+		_window(10.5, y2), _window(13.5, y2), _window(16.5, y2), _window(19.5, y2), _window(24, y2), _window(31.5, y2)])
 	_wall("x", D, -TE / 2, W + TE / 2, hw, eh, TE,
 		[_window(3.5, 0.3), _window(10, 0.3), _window(21, 0.3), _window(27, 0.3),
-		_window(3.5, H + 0.3), _window(10, H + 0.3), _window(15, H + 0.3), _window(29.5, H + 0.3)])
+		_window(3.5, H + 0.3), _window(10, H + 0.3), _window(15, H + 0.3), _window(29.5, H + 0.3),
+		_window(3.5, y2), _window(11.5, y2), _window(21, y2), _window(29, y2), _window(33.5, y2)])
 	_wall("z", 0.0, TE / 2, D - TE / 2, hw, eh, TE,
-		[[9.5, DOOR_W, 0.0, -hw + DOOR_H], [16.5, DOOR_W, 0.0, -hw + DOOR_H], [9.5, 1.6, H + 1.3, H + 2.6]])
-	_wall("z", W, TE / 2, D - TE / 2, hw, eh, TE, [[9.5, 1.6, H + 1.3, H + 2.6]])
+		[[9.5, DOOR_W, 0.0, -hw + DOOR_H], [16.5, DOOR_W, 0.0, -hw + DOOR_H], [9.5, 1.6, H + 1.3, H + 2.6],
+		[9.5, 1.6, 2 * H + 1.3, 2 * H + 2.6]])
+	_wall("z", W, TE / 2, D - TE / 2, hw, eh, TE, [[9.5, 1.6, H + 1.3, H + 2.6], [9.5, 1.6, 2 * H + 1.3, 2 * H + 2.6]])
 
 	# Paredes interiores por planta.
-	for level: int in [0, 1]:
+	var plan := {
+		0: {"north": [_door(1.5), _door(4.4), _door(12.5), _door(20.5), _door(28)],
+			"south": [_door(3.5), [15.5, 7.0, 0.0, 2.8], _door(27), _door(33)],
+			"signs": [["ESCALERA", 1.5, true], ["SERVICIO", 4.4, true], ["FARMACIA", 12.5, true],
+				["CONSULTORIO 1", 20.5, true], ["PERSONAL", 28.0, true], ["SEGURIDAD", 3.5, false], ["HALL", 15.5, false],
+				["CONSULTORIO 2", 27.0, false], ["BAÑOS", 33.0, false]],
+			"north_parts": [6.0, 9.0, 17.0, 25.0], "south_parts": [7.0, 24.0, 30.0], "elevator": true},
+		# En P1 el hueco del ascensor es ahora la escalera a P2 (la cabina quedó trabada abajo).
+		1: {"north": [_door(4.3), _door(7.5), _door(12), _door(21), _door(29.5)],
+			"south": [_door(3.5), [12.5, 5.0, 0.0, 2.8], _door(22), _door(29.5)],
+			"signs": [["ESCALERA", 4.3, true], ["A 2° PISO", 7.5, true], ["INTERNACIÓN", 12.0, true],
+				["INTERNACIÓN", 21.0, true], ["QUIRÓFANO", 29.5, true], ["DIRECCIÓN", 3.5, false],
+				["ENFERMERÍA", 12.5, false], ["DEPÓSITO", 22.0, false], ["ARCHIVO", 29.5, false]],
+			"north_parts": [6.0, 9.0, 24.0], "south_parts": [7.0, 18.0, 26.0], "elevator": false},
+		# P2: Salud Mental (habitaciones chicas, terapia grupal, sala de día).
+		2: {"north": [_door(4.3), _door(10.5), _door(13.5), _door(16.5), _door(19.5), _door(24), _door(31.5)],
+			"south": [_door(3.5), _door(11.5), _door(21), _door(31)],
+			"signs": [["ESCALERA", 4.3, true], ["HAB. 201", 10.5, true], ["HAB. 202", 13.5, true],
+				["HAB. 203", 16.5, true], ["AISLAMIENTO", 19.5, true], ["TERAPIA GRUPAL", 24.0, true],
+				["SALA DE DÍA", 31.5, true], ["PSIQUIATRÍA", 3.5, false], ["ENFERMERÍA SM", 11.5, false],
+				["ARCHIVO SM", 21.0, false], ["DUCHAS", 31.0, false]],
+			"north_parts": [9.0, 12.0, 15.0, 18.0, 21.0, 27.0], "south_parts": [7.0, 16.0, 26.0], "elevator": false},
+	}
+	for level: int in plan:
 		var y0 := level * H
-		var north_doors := [_door(1.5), _door(12.5), _door(20.5), _door(28)] if level == 0 \
-			else [_door(4.3), _door(12), _door(21), _door(29.5)]
-		var south_doors := [_door(3.5), [15.5, 7.0, 0.0, 2.8], _door(27), _door(33)] if level == 0 \
-			else [_door(3.5), [12.5, 5.0, 0.0, 2.8], _door(22), _door(29.5)]
+		var p: Dictionary = plan[level]
+		var north_doors: Array = p.north
+		var south_doors: Array = p.south
 		_wall("x", 8.0, TE / 2, W - TE / 2, y0, CEIL, T, north_doors)
 		_wall("x", 11.0, TE / 2, W - TE / 2, y0, CEIL, T, south_doors)
-		# Pasamanos a los dos lados del pasillo (el ascensor también corta el de la pared norte).
-		_handrail(8.0 + T / 2, 1.0, 0.3, W - 0.3, y0, north_doors + [[7.5, 1.5]])
+		# Pasamanos a los dos lados del pasillo (el ascensor de PB también corta el de la pared norte).
+		_handrail(8.0 + T / 2, 1.0, 0.3, W - 0.3, y0, north_doors + ([[7.5, 1.5]] if p.elevator else []))
 		_handrail(11.0 - T / 2, -1.0, 0.3, W - 0.3, y0, south_doors)
-		var signs := [["ESCALERA", 1.5, true], ["FARMACIA", 12.5, true], ["CONSULTORIO 1", 20.5, true],
-			["PERSONAL", 28.0, true], ["SEGURIDAD", 3.5, false], ["HALL", 15.5, false],
-			["CONSULTORIO 2", 27.0, false], ["BAÑOS", 33.0, false]] if level == 0 else \
-			[["ESCALERA", 4.3, true], ["INTERNACIÓN", 12.0, true], ["INTERNACIÓN", 21.0, true],
-			["QUIRÓFANO", 29.5, true], ["DIRECCIÓN", 3.5, false], ["ENFERMERÍA", 12.5, false],
-			["DEPÓSITO", 22.0, false], ["ARCHIVO", 29.5, false]]
-		for s: Array in signs:
+		for s: Array in p.signs:
 			# Sobre las aberturas anchas (2.8 m) el cartel va más alto.
 			var wide: bool = s[0] == "HALL" or s[0] == "ENFERMERÍA"
 			_room_sign(s[0], s[1], 8.0 + T / 2 if s[2] else 11.0 - T / 2, y0, s[2], 3.0 if wide else 2.62)
-		var north_parts := [6.0, 9.0, 17.0, 25.0] if level == 0 else [6.0, 9.0, 24.0]
-		for x in north_parts:
+		for x: float in p.north_parts:
 			_wall("z", x, TE / 2, 8.0 - T / 2, y0, CEIL, T)
-		var south_parts := [7.0, 24.0, 30.0] if level == 0 else [7.0, 18.0, 26.0]
-		for x in south_parts:
+		for x: float in p.south_parts:
 			_wall("z", x, 11.0 + T / 2, D - TE / 2, y0, CEIL, T)
 	# Pared del archivo al cuarto tapiado (P1, x 33): con un hueco que tapa la "pared que miente".
 	_wall("z", 33.0, 11.0 + T / 2, D - TE / 2, H, CEIL, T, [[15.5, DOOR_W, 0.0, DOOR_H]], "wall", false)
 
-	# Puertas cerradas: ascensor (dos pisos), entrada principal, salida de emergencia.
+	# Puertas cerradas: ascensor (PB), entrada principal, salida de emergencia.
 	_closed_door(Vector3(7.5, 0, 8.0), 0.0, 1.4)
-	_closed_door(Vector3(7.5, H, 8.0), 0.0, 1.4)
 	# La entrada principal, encadenada por Ferreyra (dos hojas, del lado de adentro).
 	for x in [15.0, 16.0]:
 		_door_prop(groups.Structure, "MainDoor", "door_chained", Vector3(x, 0, D - TE / 2 - 0.02), 180.0, 1.0, 2.4)
@@ -632,6 +661,18 @@ func _stairs() -> void:
 	# Baranda en P1 sobre el hueco.
 	_box(groups.Structure, "Rail", Vector3(2.8, H + 0.5, 5.0), Vector3(0.08, 1.0, 5.8), "bars")
 	_box(groups.Structure, "RailTop", Vector3(2.8, H + 1.0, 5.0), Vector3(0.12, 0.05, 5.8), "metal")
+	# Segundo tramo, de P1 a P2, en el hueco del ascensor (x 6.3-8.7): se entra desde el
+	# pasillo de P1 por x 7.5 y se llega al descanso de P2 (z 0-2.1).
+	for i in steps:
+		var top := (i + 1) * rise
+		var z := z_start - (i + 0.5) * run
+		_box(groups.Structure, "Step", Vector3(7.5, H + top / 2, z), Vector3(2.4, top, run), "concrete", false)
+	var ramp2 := _box(groups.Structure, "StairRamp", Vector3(7.5, H + H / 2 + 0.03, z_start - steps * run / 2),
+		Vector3(2.4, 0.1, length + 0.3), "concrete", true, false)
+	ramp2.rotation.x = angle
+	# Baranda en P2 sobre el hueco (del lado oeste; al este está la pared de x 9).
+	_box(groups.Structure, "Rail", Vector3(6.0, 2 * H + 0.5, 5.0), Vector3(0.08, 1.0, 5.8), "bars")
+	_box(groups.Structure, "RailTop", Vector3(6.0, 2 * H + 1.0, 5.0), Vector3(0.12, 0.05, 5.8), "metal")
 
 
 func _lights() -> void:
@@ -642,6 +683,12 @@ func _lights() -> void:
 		_ceiling_light(x, 9.5, 0, pb[x])
 	for x: int in p1:
 		_ceiling_light(x, 9.5, 1, p1[x])
+	var p2 := {3: "flicker", 9: "off", 15: "on", 21: "flicker", 27: "off", 33: "on"}
+	for x: int in p2:
+		_ceiling_light(x, 9.5, 2, p2[x])
+	for l in [[3.0, 4.0, "off"], [13.5, 4.0, "flicker"], [16.5, 4.0, "on"], [24.0, 4.0, "flicker"], [31.5, 4.0, "on"],
+			[3.5, 15.5, "flicker"], [11.5, 15.5, "on"], [21.0, 15.5, "off"], [31.0, 15.5, "flicker"]]:
+		_ceiling_light(l[0], l[1], 2, l[2])
 	# Ambientes.
 	for l in [[3.5, 4, 0, "flicker"], [13, 4, 0, "flicker"], [21, 4, 0, "on"], [3.5, 15.5, 0, "flicker"],
 			[11, 15.5, 0, "on"], [20, 15.5, 0, "flicker"], [27, 15.5, 0, "off"], [33, 15.5, 0, "flicker"],
@@ -995,13 +1042,190 @@ func _first_floor_rooms() -> void:
 	_prop("fire_extinguisher", Vector3(20.0, y + 0.9, 8.18), 0, {"anchor": 2})
 	_prop("exit_sign", Vector3(4.3, y + 2.65, 8.12), 0)
 	_prop("trashcan", Vector3(34.8, y, 10.6))
-	_inspect(Vector3(7.5, y + 1.2, 8.4), ["El ascensor. Adentro de la cabina, detenida entre pisos, algo golpea despacio. Siempre tres veces."])
+	_inspect(Vector3(7.5, y + 1.2, 8.4), ["Donde estaba el ascensor ahora hay una escalera de servicio. La cabina quedó trabada abajo, en PB.",
+		"Alguien atornilló un cartel a mano: \"SALUD MENTAL - 2° PISO\"."])
+
+
+## P2: Salud Mental (pedido del usuario: un piso más). El protagonista estuvo internado
+## acá, en la 203, cuando tocó fondo.
+func _second_floor_rooms() -> void:
+	var y := 2 * H
+	# Descanso de la escalera (x 0-9, z 0-8).
+	_prop("bench", Vector3(2.5, y, 0.5))
+	_prop("pottedPlant", Vector3(0.6, y, 0.6))
+	_prop("trashcan", Vector3(5.4, y, 7.4))
+	_box(groups.Props, "Poster", Vector3(0.17, y + 1.6, 4.0), Vector3(0.02, 0.8, 0.6), "paper", false)
+	_inspect(Vector3(0.6, y + 1.4, 4.0), ["Un afiche: \"PEDIR AYUDA NO ES DEBILIDAD\". Debajo, el número de la línea de prevención, tachado con birome hasta romper el papel."])
+
+	# Habitaciones 201-203 (x 9-18): cama, mesa de luz, silla. Las ventanas tienen rejas, como todo.
+	for x0: float in [9.0, 12.0, 15.0]:
+		var cx := x0 + 1.5
+		_prop("bedSingle", Vector3(cx + 0.4, y, 1.3), 0, {"colors": hospital_bed_colors})
+		_prop("cabinetBedDrawerTable", Vector3(x0 + 0.45, y, 0.45))
+		_prop("chair", Vector3(x0 + 0.6, y, 5.6), 40)
+	_prop("blood", Vector3(13.4, y + 0.01, 4.6), 70)
+	_prop("cardboardBoxOpen", Vector3(11.3, y, 6.8), 20)
+	_inspect(Vector3(10.5, y + 0.8, 1.3), ["Las sábanas están atadas en una soga larga. No llega a ningún lado: la ventana tiene rejas."])
+	# La 203: la suya.
+	_prop("books", Vector3(15.5, y + 0.55, 0.45), 15)
+	_prop("radio", Vector3(17.4, y, 6.9), 200)
+	_inspect(Vector3(16.9, y + 0.8, 1.3), ["La 203. Acá estuve cuarenta y cinco días, hace dos años, cuando mamá me encontró en el baño.",
+		"En la tablilla de los pies de la cama todavía hay una planilla: \"Episodio depresivo mayor. Consumo problemático. Riesgo: alto.\"",
+		"Abajo, con la letra de mamá: \"Alta. Ya está. Vamos a casa.\""], 1.1)
+	_inspect(Vector3(15.4, y + 1.4, 7.6), ["Las marcas en la pared, al lado de la puerta. Rayitas de a cinco. Las hice yo, con la uña. Cuarenta y cinco."])
+	# Aislamiento (x 18-21): paredes acolchadas y un colchón en el piso.
+	for z in [0.25]:
+		_box(groups.Props, "Padding", Vector3(19.5, y + 1.5, z), Vector3(2.7, 2.9, 0.12), "mattress", false)
+	for x in [18.2, 20.8]:
+		_box(groups.Props, "Padding", Vector3(x, y + 1.5, 4.0), Vector3(0.12, 2.9, 7.3), "mattress", false)
+	_box(groups.Props, "FloorMattress", Vector3(19.5, y + 0.1, 2.0), Vector3(1.9, 0.2, 0.95), "mattress", false)
+	_inspect(Vector3(19.5, y + 0.6, 2.0), ["La sala de aislamiento. Las paredes acolchadas están rasguñadas desde adentro, a la altura de la cara."])
+
+	# Terapia grupal (x 21-27): sillas en ronda y un pizarrón.
+	for i in 8:
+		var a := TAU * i / 8.0
+		var p := Vector3(24.0 + cos(a) * 1.8, y, 4.0 + sin(a) * 1.8)
+		_prop("chairModernCushion", p, rad_to_deg(-a) - 90.0)
+	_box(groups.Props, "Whiteboard", Vector3(24.0, y + 1.5, 0.2), Vector3(2.4, 1.2, 0.04), "paper", false)
+	var board := Label3D.new()
+	board.text = "SÓLO POR HOY\n\n¿Qué me trajo acá?\n¿Qué me hace seguir?"
+	board.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
+	board.font_size = 16
+	board.pixel_size = 0.006
+	board.modulate = Color(0.2, 0.25, 0.45)
+	board.position = Vector3(24.0, y + 1.5, 0.23)
+	_add(groups.Props, board, "BoardText")
+	_inspect(Vector3(24.0, y + 0.9, 4.0), ["Ocho sillas en ronda. Una está dada vuelta, mirando a la pared.",
+		"En el grupo había una regla: lo que se dice acá, se queda acá. Ahora no queda nadie para escuchar."], 1.4)
+
+	# Sala de día (x 27-36): mesas, sillones, la tele.
+	_prop("loungeSofa", Vector3(33.5, y, 6.9), 180)
+	_prop("tableCoffee", Vector3(33.5, y, 5.4))
+	_prop("televisionVintage", Vector3(33.5, y + 0.55, 0.55))
+	_prop("cabinetTelevision", Vector3(33.5, y, 0.55))
+	for p in [Vector3(29.0, y, 2.5), Vector3(29.0, y, 5.5)]:
+		_prop("table", p)
+		_prop("chair", p + Vector3(0, 0, -0.8))
+		_prop("chair", p + Vector3(0, 0, 0.8), 180)
+	_prop("bookcaseClosed", Vector3(35.6, y, 3.0), -90)
+	_prop("books", Vector3(29.0, y + 0.78, 2.5), 40)
+	_inspect(Vector3(29.0, y + 1.0, 2.5), ["Un rompecabezas de mil piezas a medio armar: un faro en la costa. Faltan las piezas del cielo."])
+
+	# Consultorio de psiquiatría (x 0-7, z 11-20).
+	_prop("rugRectangle", Vector3(3.5, y + 0.005, 15.5))
+	_prop("desk", Vector3(3.5, y, 17.8))
+	_prop("chairDesk", Vector3(3.5, y, 18.7), 180)
+	_prop("chair", Vector3(3.5, y, 16.7))
+	_prop("loungeChair", Vector3(1.2, y, 13.0), 60)
+	_prop("bookcaseClosedWide", Vector3(6.55, y, 13.5), -90)
+	_prop("plantSmall1", Vector3(4.6, y + 0.76, 17.9))
+	_point_light(Vector3(3.5, y + 1.6, 17.6), Color(1.0, 0.82, 0.6), 0.6, 4.0)
+	_inspect(Vector3(3.5, y + 1.0, 17.8), ["Sobre el escritorio hay una carpeta con mi nombre, abierta en la última sesión.",
+		"\"Refiere mejoría. Duerme mejor. Habla de la madre con menos culpa. Continuar seguimiento ambulatorio.\"",
+		"Continuar. Me gusta esa palabra."], 1.1)
+
+	# Enfermería de Salud Mental (x 7-16): el mostrador y el armario de los psicofármacos.
+	_counter(8.4, 12.4, 13.3, y)
+	_prop("chairDesk", Vector3(10.0, y, 14.3), 180)
+	_prop("computerScreen", Vector3(9.6, y + 1.05, 13.4))
+	for x in [14.2, 15.0]:
+		_prop("tall_cabinet", Vector3(x, y, 19.5), 180)
+	_prop("file_cabinet", Vector3(8.0, y, 19.5), 180)
+	_prop("water_cooler", Vector3(15.5, y, 12.0), -90)
+	_inspect(Vector3(14.6, y + 1.2, 19.0), ["El armario de los psicofármacos. \"BAJO LLAVE\", dice el cartel. Está abierto y vacío.",
+		"Lo primero que alguien vino a buscar cuando empezó la niebla. Lo entiendo mejor de lo que quisiera."], 1.1)
+
+	# Archivo de Salud Mental (x 16-26).
+	for z in [13.2, 16.6]:
+		for i in 5:
+			_prop("file_cabinet", Vector3(17.4 + i * 0.85, y, z), 180 if z > 15 else 0)
+	_prop("cardboardBoxOpen", Vector3(24.8, y, 19.2), 30)
+	_prop("cardboardBoxClosed", Vector3(25.2, y, 12.2))
+	_prop("blood", Vector3(22.0, y + 0.01, 15.0), 100)
+	_inspect(Vector3(19.0, y + 1.0, 13.6), ["Historias clínicas de Salud Mental. Las del último mes dicen todas lo mismo, con distintas letras:",
+		"\"El paciente refiere que la niebla le habla con la voz de alguien que perdió.\""])
+
+	# Duchas (x 26-36).
+	for x in [28.0, 30.0, 32.0, 34.0]:
+		_box(groups.Structure, "ShowerWall", Vector3(x, y + 1.0, 18.8), Vector3(0.06, 2.0, 2.2), "metal")
+	for x in [27.0, 29.0, 31.0, 33.0, 35.0]:
+		_box(groups.Props, "ShowerHead", Vector3(x, y + 2.1, 19.75), Vector3(0.15, 0.08, 0.2), "metal", false)
+	for z in [12.6, 14.0]:
+		_prop("bathroomSink", Vector3(35.65, y, z), -90)
+	_prop("mop_bucket", Vector3(26.8, y, 12.0))
+	_prop("blood", Vector3(31.0, y + 0.01, 18.6), 30)
+	_inspect(Vector3(31.0, y + 1.2, 18.6), ["Una de las duchas está abierta. No sale agua: sale niebla, tibia, despacio."])
+
+	# Pasillo P2.
+	_prop("bench", Vector3(27.5, y, 10.7), 180)
+	_prop("wheelchair", Vector3(14.6, y, 10.4), 140)
+	_prop("fire_extinguisher", Vector3(8.6, y + 0.9, 8.18), 0, {"anchor": 2})
+	_prop("exit_sign", Vector3(4.3, y + 2.65, 8.12), 0)
+	_prop("trashcan", Vector3(35.0, y, 10.6))
+
+	# Secretos de P2: en Inquieto, el espejo de la 203 pregunta; en Quebrado, alguien está
+	# sentado en la ronda de terapia, esperando su turno, y debajo del colchón de la 203
+	# aparece lo que escondía hace dos años.
+	var mirror := Node3D.new()
+	mirror.set_script(GatedScript)
+	mirror.set("threshold", 1)
+	_add(groups.Secrets, mirror, "Room203Writing")
+	var ask := Label3D.new()
+	ask.text = "¿TE ACORDÁS\nDE ESTA CAMA?"
+	ask.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
+	ask.font_size = 32
+	ask.pixel_size = 0.007
+	ask.modulate = Color(0.55, 0.05, 0.03)
+	ask.position = Vector3(16.5, y + 1.8, 0.17)
+	_add(mirror, ask, "Label3D")
+	var broken := Node3D.new()
+	broken.set_script(GatedScript)
+	broken.set("threshold", 2)
+	_add(groups.Secrets, broken, "GroupFigure")
+	_instance("res://scenes/enemies/horror_placeholder.tscn", broken, "Figure", Vector3(24.0, y, 2.2))
+	_instance("res://scenes/world/pickup.tscn", broken, "HiddenKit", Vector3(16.9, y + 0.62, 2.0),
+		{"item": load("res://assets/items/medicine_kit.tres"), "count": 1})
+	_inspect(Vector3(16.9, y + 0.8, 2.6), ["Debajo del colchón hay un hueco cortado con una birome. Ahí escondía las pastillas que no tomaba.",
+		"Ahora hay un botiquín. Alguien lo dejó para mí, sabiendo que iba a buscar acá."], 0.8, broken)
+
+
+## La puerta del sótano (PB, en la pared este del cuarto de la escalera). Se abre con la
+## llave que se llevó Ferreyra a su casa (zona de la avenida).
+func _basement_door() -> void:
+	var door := Area3D.new()
+	door.set_script(load("res://scripts/world/zone_door.gd"))
+	door.set("target_scene", "res://scenes/levels/hospital_basement.tscn")
+	door.set("target_spawn", &"from_hospital")
+	door.set("required_item", load("res://assets/items/key_basement.tres"))
+	door.set("unlock_flag", &"hospital_basement_open")
+	door.set("locked_text", "Una puerta de metal: \"SÓTANO - SOLO PERSONAL\". Tiene una cerradura nueva, de las buenas, y alguien soldó la manija para que no gire sin la llave.")
+	door.set("unlock_text", "La llave de Ferreyra entra justa. Del otro lado sube un olor a formol y a algo quemado.")
+	door.set("radius", 1.2)
+	door.position = Vector3(5.4, 1.2, 4.0)
+	_add(groups.Inspectables, door, "BasementDoor")
+	_zone_door_visuals(door, Vector3(6.0 - T / 2 - 0.02, 0, 4.0), -90.0, "door_metal_open", "door_chained", 1.3, 2.3, true)
+	var sign := Label3D.new()
+	sign.text = "SÓTANO"
+	sign.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
+	sign.font_size = 16
+	sign.pixel_size = 0.0075
+	sign.modulate = Color(0.8, 0.2, 0.15)
+	sign.position = Vector3(5.87, 2.6, 4.0)
+	sign.rotation_degrees.y = -90.0
+	_add(groups.Structure, sign, "BasementSign")
+	_prop("WetFloorSign_01", Vector3(4.8, 0, 5.8), 200)
+	var spawn := Marker3D.new()
+	spawn.set_script(load("res://scripts/world/spawn_point.gd"))
+	spawn.set("spawn_id", &"from_basement")
+	spawn.position = Vector3(4.2, 0.05, 3.0)
+	spawn.rotation_degrees.y = 180.0
+	_add(scene_root, spawn, "SpawnFromBasement")
 
 
 ## Detalles que hacen que el lugar se sienta real (Poly Haven, CC0).
 func _details() -> void:
 	# Cámaras de seguridad en los extremos de los pasillos, mirando hacia adentro.
-	for level: int in [0, 1]:
+	for level: int in [0, 1, 2]:
 		var y0 := level * H
 		_prop("security_camera_01", Vector3(0.18, y0 + 2.9, 9.5), 90)
 		_prop("security_camera_01", Vector3(35.82, y0 + 2.9, 8.6), -90)
@@ -1069,6 +1293,10 @@ func _discovery() -> void:
 		["p1_stairs", 0, 0, 6, 8, 1], ["p1_ward", 9, 0, 24, 8, 1], ["p1_surgery", 24, 0, 36, 8, 1],
 		["p1_corridor", 0, 8, 36, 11, 1], ["p1_director", 0, 11, 7, 20, 1], ["p1_nurses", 7, 11, 18, 20, 1],
 		["p1_storage", 18, 11, 26, 20, 1], ["p1_archive", 26, 11, 33, 20, 1], ["p1_hidden", 33, 11, 36, 20, 1],
+		["p2_stairs", 0, 0, 6, 8, 2], ["p2_rooms", 9, 0, 18, 8, 2], ["p2_isolation", 18, 0, 21, 8, 2],
+		["p2_group", 21, 0, 27, 8, 2], ["p2_dayroom", 27, 0, 36, 8, 2], ["p2_corridor", 0, 8, 36, 11, 2],
+		["p2_psych", 0, 11, 7, 20, 2], ["p2_nurses", 7, 11, 16, 20, 2], ["p2_archive", 16, 11, 26, 20, 2],
+		["p2_showers", 26, 11, 36, 20, 2],
 	]
 	var parent := _add(scene_root, Node3D.new(), "Places")
 	for p: Array in places:
@@ -1104,6 +1332,11 @@ func _items() -> void:
 		["Peaches3", "food_canned_peaches", Vector3(20.5, H + 0.55, 0.45), 1],
 		# Cuarto tapiado (secreto)
 		["LetterMarta", "letter_marta_01", Vector3(34.6, H + 0.5, 18.2), 1],
+		# P2 (pocos y separados)
+		["Chocolate4", "food_chocolate_bar", Vector3(29.0, 2 * H + 0.78, 5.5), 1],
+		["Ammo3", "ammo_9mm", Vector3(3.0, 2 * H + 0.76, 17.8), 6],
+		["Bandage3", "medicine_bandage", Vector3(9.0, 2 * H + 1.05, 13.3), 1],
+		["Cable4", "material_cable", Vector3(25.0, 2 * H, 18.6), 1],
 		# Materiales para el refugio (alcanzan para las primeras mejoras, no para todas).
 		["Wood1", "material_wood", Vector3(10.4, 0.0, 6.9), 2],
 		["Wood2", "material_wood", Vector3(16.8, 0.0, 18.5), 1],
@@ -1131,6 +1364,9 @@ func _enemies() -> void:
 	_instance(stalker, groups.Enemies, "StalkerLobby", Vector3(15.5, 0.05, 16.5), {"wander_radius": 4.0})
 	_instance(stalker, groups.Enemies, "StalkerWard", Vector3(16.5, H + 0.05, 5.0), {"wander_radius": 4.0})
 	_instance(stalker, groups.Enemies, "StalkerStorage", Vector3(22.0, H + 0.05, 17.5), {"wander_radius": 2.5})
+	# P2: uno en el pasillo y otro en la sala de terapia.
+	_instance(stalker, groups.Enemies, "StalkerP2Corridor", Vector3(18.0, 2 * H + 0.05, 9.6), {"wander_radius": 6.0})
+	_instance(stalker, groups.Enemies, "StalkerGroup", Vector3(24.0, 2 * H + 0.05, 6.6), {"wander_radius": 1.5})
 	# Alucinación: la figura del quirófano que se ve en las cámaras (desde Inquieto).
 	var hallucination := Node3D.new()
 	hallucination.set_script(GatedScript)
@@ -1147,7 +1383,7 @@ func _systems() -> void:
 	navmesh.geometry_source_group_name = &"nav_source"
 	navmesh.cell_size = 0.25
 	navmesh.cell_height = 0.25
-	navmesh.agent_height = 2.25
+	navmesh.agent_height = 2.0  # con 2.25 los dinteles de las puertas (2.4) cortan el navmesh en algunos pisos
 	navmesh.agent_radius = 0.5
 	navmesh.agent_max_climb = 0.25
 	navmesh.agent_max_slope = 40.0
@@ -1161,6 +1397,11 @@ func _systems() -> void:
 	link.start_position = Vector3(1.5, 0.0, 8.7)
 	link.end_position = Vector3(1.5, H, 1.1)
 	_add(nav, link, "StairLink")
+	var link2 := NavigationLink3D.new()
+	link2.bidirectional = true
+	link2.start_position = Vector3(7.5, H, 8.7)
+	link2.end_position = Vector3(7.5, 2 * H, 1.1)
+	_add(nav, link2, "StairLink")
 	var persistence := Node3D.new()
 	persistence.set_script(load("res://scripts/world/world_persistence.gd"))
 	_add(scene_root, persistence, "WorldPersistence")
@@ -1232,6 +1473,8 @@ func _difficulty_enemies() -> void:
 	_extra_enemy(Vector3(27.5, 0.05, 15.5), 2, 2.5)
 	_extra_enemy(Vector3(14.0, H + 0.05, 4.0), 2, 3.0)
 	_extra_enemy(Vector3(30.0, H + 0.05, 9.6), 2, 4.0)
+	_extra_enemy(Vector3(31.0, 2 * H + 0.05, 9.6), 1, 4.0)
+	_extra_enemy(Vector3(12.0, 2 * H + 0.05, 15.5), 2, 3.0)
 
 
 ## La armería de seguridad (desde Difícil): detrás de la pared de Seguridad, al oeste,
