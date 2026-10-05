@@ -135,7 +135,9 @@ func _initialize() -> void:
 	check(inventory.equipped_item() == pistol and inventory.equipped.loaded == 3, "vuelve la pistola en la mano con 3 balas")
 	check(inventory.times_used(letter) == 1, "la carta ya leída sigue leída")
 	check(is_equal_approx(sanity.maximum, 110.0), "cordura máxima con la carta: %.0f" % sanity.maximum)
-	check(absf(sanity.current - 55.0) < 1.0, "cordura guardada: %.1f" % sanity.current)
+	# Lo guardado (la locura sigue subiendo mientras carga la escena, así que se mira el archivo).
+	var saved_sanity: float = save_game.read().get("sanity", {}).get("current", -1.0)
+	check(absf(saved_sanity - 55.0) < 1.0 and sanity.current <= saved_sanity, "cordura guardada: %.1f (ahora %.1f)" % [saved_sanity, sanity.current])
 	check(game_state.has_flag(&"hospital_exit_forced"), "vuelven los hechos del mundo")
 	check(shelter.stock[&"material_wood"] == 4 and shelter.level(&"fire") == 1, "vuelve el refugio")
 	check(shelter.stash.size() == 1 and shelter.stash[0].item == peaches and shelter.stash[0].count == 2, "vuelve el alijo")

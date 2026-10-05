@@ -135,11 +135,28 @@ func _initialize() -> void:
 	var in_refuge_before: float = sanity.madness()
 	await seconds(1.0)
 	check(sanity.madness() < in_refuge_before, "en el refugio la locura baja: %.3f -> %.3f" % [in_refuge_before, sanity.madness()])
+	var refuge_rate: float = (in_refuge_before - sanity.madness()) * sanity.maximum
+	check(refuge_rate < 0.4, "en el refugio baja de a poco: %.2f por segundo" % refuge_rate)
 	place(Vector3(0, 0.05, 8), 0.0)
 	await frames(10)
 	var before: float = sanity.madness()
 	await seconds(1.0)
 	check(not sanity.in_refuge() and sanity.madness() > before, "afuera la locura sube: %.3f -> %.3f" % [before, sanity.madness()])
+	# Las velocidades (pedido del usuario: subir más rápido afuera, bajar de a poco en el refugio).
+	var c0: float = sanity.current
+	await seconds(2.0)
+	var out_rate: float = (c0 - sanity.current) / 2.0
+	check(out_rate > 0.35 and out_rate < 0.6, "afuera sube ~0.45 por segundo: %.2f" % out_rate)
+	var chaser: Node3D = get_nodes_in_group(&"enemies")[0]
+	var chaser_pos := chaser.global_position
+	chaser.global_position = player().global_position + Vector3(4, 0, 0)
+	chaser.set("state", 1)
+	c0 = sanity.current
+	await seconds(2.0)
+	var chase_rate: float = (c0 - sanity.current) / 2.0
+	check(chase_rate > out_rate * 1.6, "si te persiguen, sube el doble: %.2f" % chase_rate)
+	chaser.set("state", 0)
+	chaser.global_position = chaser_pos
 	sanity.restore(1000.0)
 
 	print("-- Golpe")
@@ -148,7 +165,7 @@ func _initialize() -> void:
 	sanity.take_hit(10.0)
 	await frames(2)
 	check(absf(pre_health - health.current - 10.0) < 0.1, "golpe baja 10 de vida (Normal)")
-	check(absf(pre_hit - sanity.current) < 0.1, "el golpe no toca la locura")
+	check(absf(pre_hit - sanity.current - sanity.hit_madness) < 0.2, "el golpe también suma locura: %.1f" % (pre_hit - sanity.current))
 	check(anim.current_animation == &"CharacterArmature|HitRecieve", "anim de golpe")
 	await frames(60)
 

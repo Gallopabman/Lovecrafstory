@@ -62,10 +62,13 @@ en vez de inventarlo.
 - **Autoloads**:
   - `Sanity` ([scripts/autoload/sanity_manager.gd](scripts/autoload/sanity_manager.gd)): por dentro, la
     cordura (`current`, estados, refugios, horrores vistos, `lost` + `lost_in_refuge`); **en pantalla es la
-    locura** (`madness()` = 1 - cordura, pedido del usuario): afuera sube con el goteo, en el refugio activo
-    baja (`refuge_recovery_per_second` x `RefugeZone.current_recovery_multiplier()`, que en los refugios sale
-    del cozy: x1 pelado → x3 completo). `add_madness()` = susto/grito. `take_hit()` = golpe físico: lo pasa a
-    `Health`. **Dificultad** según la locura (`difficulty`, señal `difficulty_changed`): Normal < 50 %, Difícil
+    locura** (`madness()` = 1 - cordura, pedido del usuario): afuera sube con el goteo (`drain_per_second` 0.45 =
+    la barra se llena en ~3.7 min; x2 `chase_drain_multiplier` mientras un enemigo te persigue o ataca a menos de
+    15 m, `is_chased()`), en el refugio activo baja de a poco (`refuge_recovery_per_second` 0.12 x
+    `RefugeZone.current_recovery_multiplier()`, que en los refugios sale del cozy: x1 pelado → x3 completo, o sea de
+    ~14 a ~4.6 min para vaciarla). Pedido del usuario: "más violenta la subida" y "que en el refugio baje de a
+    poco". `add_madness()` = susto/grito. `take_hit()` = golpe físico: lo pasa a `Health` y además suma
+    `hit_madness` (4) de locura. **Dificultad** según la locura (`difficulty`, señal `difficulty_changed`): Normal < 50 %, Difícil
     50-75 %, Insane > 75 % (el usuario escribió los rangos al revés, en términos de cordura; se interpretó así).
     `player_damage_multiplier()` [1, 0.8, 0.6] y `damage_taken_multiplier()` [1, 1.35, 1.75].
   - `Health` ([scripts/autoload/health.gd](scripts/autoload/health.gd)): la vida (100). `take_damage` aplica

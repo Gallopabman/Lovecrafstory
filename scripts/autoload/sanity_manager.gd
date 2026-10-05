@@ -35,10 +35,17 @@ enum Difficulty { NORMAL, HARD, INSANE }
 const DIFFICULTY_NAMES := ["Normal", "Difícil", "Insane"]
 
 @export var base_maximum := 100.0
-## Goteo constante fuera del refugio (la locura llena la barra en ~11 minutos).
-@export var drain_per_second := 0.15
-## Lo que baja la locura por segundo en el refugio activo (x el multiplicador del refugio).
-@export var refuge_recovery_per_second := 0.2
+## Goteo constante fuera del refugio: la locura llena la barra en ~3.7 minutos (pedido del usuario:
+## "más violenta la subida"; antes, 0.15 = ~11 minutos).
+@export var drain_per_second := 0.45
+## Mientras algún enemigo te persigue o te ataca cerca, la locura sube más rápido.
+@export var chase_drain_multiplier := 2.0
+@export var chase_range := 15.0
+## Locura que suma cada golpe (además de la vida que saca).
+@export var hit_madness := 4.0
+## Lo que baja la locura por segundo en el refugio activo, de a poco (x el multiplicador del
+## refugio: x1 pelado, x3 con todas las mejoras = de ~14 a ~4.6 minutos para vaciarla).
+@export var refuge_recovery_per_second := 0.12
 @export var uneasy_below := 0.7
 @export var broken_below := 0.4
 @export var brink_below := 0.15
@@ -72,7 +79,20 @@ func _process(delta: float) -> void:
 	if in_refuge():
 		_set_current(current + refuge_recovery_per_second * recovery_multiplier() * delta)
 	else:
-		_set_current(current - drain_per_second * delta)
+		var rate := drain_per_second * (chase_drain_multiplier if is_chased() else 1.0)
+		_set_current(current - rate * delta)
+
+
+## Si algún enemigo te está persiguiendo o atacando a menos de `chase_range`.
+func is_chased() -> bool:
+	var player := get_tree().get_first_node_in_group(&"player") as Node3D
+	if player == null:
+		return false
+	for enemy in get_tree().get_nodes_in_group(&"enemies"):
+		var state: Variant = enemy.get("state")
+		if (state == 1 or state == 2) and (enemy as Node3D).global_position.distance_to(player.global_position) <= chase_range:
+			return true
+	return false
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -165,6 +185,8 @@ func take_hit(amount: float) -> void:
 		return
 	hit_taken.emit(dealt)
 	shocked.emit(clampf(dealt / 20.0, 0.2, 1.0))
+	if Health.alive:
+		_set_current(current - hit_madness)
 
 
 func has_seen(horror_id: StringName) -> bool:
