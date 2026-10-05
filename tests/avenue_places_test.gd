@@ -78,28 +78,44 @@ func _initialize() -> void:
 	await settle()
 	check(current_scene.name == "PoliceStation", "la puerta de la avenida lleva a la comisaría")
 	check(current_scene.has_node("Items/PoliceLog"), "el libro de guardia está en la mesa de entradas")
-	for s: Array in [["01_comisaria_entrada", Vector3(10.0, 0.05, 11.4), 0.0], ["02_comisaria_oficina", Vector3(5.5, 0.05, 7.5), 30.0],
-			["03_comisaria_guardia", Vector3(11.0, 0.05, 8.0), 10.0], ["04_calabozos", Vector3(16.5, 0.05, 7.5), 0.0]]:
+	const PY := 3.6
+	for s: Array in [["01_comisaria_entrada", Vector3(22.0, 0.05, 29.4), 0.0], ["02_comisaria_denuncias", Vector3(12.5, 0.05, 23.2), 130.0],
+			["03_comisaria_guardia", Vector3(31.0, 0.05, 16.8), 30.0], ["04_calabozos", Vector3(35.7, 0.05, 16.5), 180.0],
+			["04b_garaje", Vector3(16.0, 0.05, 7.2), -20.0], ["04c_archivo", Vector3(6.0, 0.05, 17.0), 170.0],
+			["04d_investigaciones", Vector3(22.0, PY + 0.05, 23.0), 180.0], ["04e_comisario", Vector3(7.0, PY + 0.05, 23.2), 180.0],
+			["04f_interrogatorio", Vector3(32.5, PY + 0.05, 23.2), 160.0], ["04g_brigada", Vector3(39.0, PY + 0.05, 16.8), 0.0],
+			["04h_dormitorios", Vector3(29.0, PY + 0.05, 16.8), 20.0]]:
 		place(s[1], s[2])
 		await shot(s[0])
+	place(Vector3(22.0, 0.05, 19.6), 0.0)
+	var top := 0.0
+	Input.action_press("move_forward")
+	for i in 420:
+		await physics_frame
+		top = maxf(top, player().global_position.y)
+	Input.action_release("move_forward")
+	check(top > PY - 0.3, "se sube a la planta alta: y=%.2f" % top)
+	var map: RID = player().get_world_3d().navigation_map
+	var path := NavigationServer3D.map_get_path(map, Vector3(22, 0, 28), Vector3(39, PY, 10), true)
+	check(path.size() > 2 and path[path.size() - 1].distance_to(Vector3(39, PY, 10)) < 1.0, "los enemigos también suben: %d puntos" % path.size())
 	check(current_scene.get_node("Secrets/EvidenceWall").visible and not current_scene.get_node("Secrets/Evidence").visible,
 		"en Normal el depósito de evidencias está tapiado")
 	set_madness(0.6)
 	await frames(5)
 	check(not current_scene.get_node("Secrets/EvidenceWall").visible and current_scene.get_node("Secrets/Evidence").visible,
 		"en Difícil la pared desaparece: el depósito de evidencias")
-	place(Vector3(10.0, 0.05, 2.0), 0.0)
+	place(Vector3(29.0, 0.05, 10.0), 0.0)
 	await walk("move_forward", 90)
-	check(player().global_position.z < -0.5, "se entra al depósito: z=%.2f" % player().global_position.z)
+	check(player().global_position.z < 7.5, "se entra al depósito: z=%.2f" % player().global_position.z)
 	await shot("05_evidencias")
 	check(not current_scene.get_node("Secrets/Cell3Open").visible, "el calabozo 3 sigue cerrado en Difícil")
 	set_madness(0.8)
 	await frames(5)
 	check(current_scene.get_node("Secrets/Cell3Open").visible and not current_scene.get_node("Secrets/Cell3Bars").visible,
 		"en Insane se abre el calabozo 3")
-	place(Vector3(18.83, 0.05, 6.0), 0.0)
+	place(Vector3(35.8, 0.05, 10.5), -90.0)
 	await walk("move_forward", 90)
-	check(player().global_position.z < 3.5, "se entra al calabozo 3: z=%.2f" % player().global_position.z)
+	check(player().global_position.x > 38.2, "se entra al calabozo 3: x=%.2f" % player().global_position.x)
 	await shot("06_calabozo_3")
 	set_madness(0.0)
 	await frames(3)

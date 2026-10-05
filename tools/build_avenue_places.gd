@@ -18,6 +18,8 @@ func _initialize() -> void:
 	GatedScript = load("res://scripts/world/sanity_gated.gd")
 	RefugeScript = load("res://scripts/world/refuge_zone.gd")
 	seed(1212)
+	for id in ["barrel_03", "Barrel_01"]:
+		upgrades[id] = [id, {}]
 	_make_materials()
 	_build("PoliceStation", "res://scenes/levels/police_station.tscn", _police_station)
 	_build("Church", "res://scenes/levels/church.tscn", _church)
@@ -128,7 +130,7 @@ func _place_systems(door_pos: Vector3, spawn_pos: Vector3, ambience: StringName)
 	navmesh.geometry_source_group_name = &"nav_source"
 	navmesh.cell_size = 0.25
 	navmesh.cell_height = 0.25
-	navmesh.agent_height = 2.25
+	navmesh.agent_height = 2.0
 	navmesh.agent_radius = 0.5
 	navmesh.agent_max_climb = 0.25
 	navmesh.agent_max_slope = 40.0
@@ -167,124 +169,378 @@ func _street_door(id: String, pos: Vector3, wall_pos: Vector3, yaw: float, width
 
 
 # --- Comisaría 12 -------------------------------------------------------------------
-# Planta: x 0-20, z 0-14. Entrada al sur (z = 14, x = 10). Mesa de entradas (z 9-14),
-# oficina del comisario (x 0-7, z 0-9), sala de guardia (x 7-13), calabozos (x 13-20).
-# Secretos: depósito de evidencias detrás de la guardia (Difícil) y el calabozo 3 (Insane).
+# Pedido del usuario: "10 veces más grande". Dos plantas de 44 x 32 m (x 0-44, z 0-32),
+# P1 a 3.6 m. Entrada al sur (z = 32, x = 22).
+#   PB  z 22-32: denuncias | mesa de entradas (hall) | sala de espera
+#       z 18-22: pasillo
+#       z 8-18:  archivo | vestuarios | escalera | sala de guardia | calabozos (x 34-44, z 0-18)
+#       z 0-8:   armería (cerrada) | garaje | depósito de evidencias (secreto, Difícil)
+#   P1  z 22-32: oficina del comisario | investigaciones | interrogatorios (con observación)
+#       z 8-18:  comedor | baños | escalera | dormitorios · brigada (x 34-44, z 0-18)
+#       z 0-8:   radio | archivo de causas | oficial de servicio
+# Secretos: el depósito de evidencias (Difícil) y el calabozo 3 (Insane).
+
+const PW := 44.0
+const PD := 32.0
+const P1Y := 3.6         # piso de la planta alta
+const CELL_X := 37.5     # frente de los calabozos
+const STAIR_X := 22.0
+
+
+## Rejas de un calabozo a lo largo de Z (en x fijo), con hueco de puerta en `door_z`.
+func _cell_bars_x(x: float, z0: float, z1: float, door_z: float, door_open: bool, parent: Node = null) -> void:
+	var holder: Node = parent if parent else groups.Structure
+	var z := z0 + 0.12
+	while z < z1:
+		if not (absf(z - door_z) < 0.55 and door_open):
+			_box(holder, "Bar", Vector3(x, PC / 2, z), Vector3(0.05, PC, 0.05), "bars", false)
+		z += 0.2
+	_box(holder, "BarRail", Vector3(x, 2.2, (z0 + z1) / 2), Vector3(0.06, 0.06, z1 - z0), "bars", false)
+	if door_open:
+		_box(holder, "BarsCollider", Vector3(x, PC / 2, (z0 + door_z - 0.55) / 2), Vector3(0.15, PC, door_z - 0.55 - z0), "bars", true, false)
+		_box(holder, "BarsCollider", Vector3(x, PC / 2, (door_z + 0.55 + z1) / 2), Vector3(0.15, PC, z1 - door_z - 0.55), "bars", true, false)
+	else:
+		_box(holder, "BarsCollider", Vector3(x, PC / 2, (z0 + z1) / 2), Vector3(0.15, PC, z1 - z0), "bars", true, false)
+
 
 func _police_station() -> Array:
 	_environment()
-	_floor(0, 0, 20, 14, 0.0, "police_floor")
-	_floor(13, 0, 20, 9, 0.0, "cell_floor")
-	_ceiling(0, 0, 20, 14, PC)
-	_wall("x", 14.0, -TE / 2, 20 + TE / 2, 0.0, PC, TE, [[10.0, 1.4, 0.0, 2.4], _window(3.0), _window(17.0)], "police_wall", true)
-	_wall("x", 0.0, -TE / 2, 20 + TE / 2, 0.0, PC, TE, [[10.0, DOOR_W, 0.0, DOOR_H]], "police_wall", false)
-	_wall("z", 0.0, 0.0, 14.0, 0.0, PC, TE, [], "police_wall", false)
-	_wall("z", 20.0, 0.0, 14.0, 0.0, PC, TE, [], "police_wall", false)
-	# Pared entre la mesa de entradas y el fondo, con tres puertas.
-	_wall("x", 9.0, 0.0, 20.0, 0.0, PC, T, [_door(3.5), _door(10.0), _door(16.5)], "police_wall", false)
-	_wall("z", 7.0, 0.0, 9.0, 0.0, PC, T, [], "police_wall", false)
-	_wall("z", 13.0, 0.0, 9.0, 0.0, PC, T, [], "police_wall", false)
-	for x in [3.0, 17.0]:
-		_box(groups.Structure, "FogWindow", Vector3(x, 1.65, 14.4), Vector3(1.9, 1.3, 0.05), "fog_window" if mats.has("fog_window") else "lamp_off", false)
-	for p in [Vector3(5.0, 0, 11.5), Vector3(15.0, 0, 11.5), Vector3(3.5, 0, 4.5), Vector3(10.0, 0, 4.5), Vector3(16.5, 0, 6.5)]:
-		_ceiling_light(p.x, p.z, 0, "flicker" if p.x == 10.0 else ("off" if p.x == 16.5 else "on"), 0.7)
-	_room_sign("COMISARÍA 12", 10.0, 9.0 + T / 2, 0.0, true, 2.75)
+	_police_structure()
+	_police_stairs()
+	_police_ground_rooms()
+	_police_cells()
+	_police_upper_rooms()
+	_police_secrets()
+	_police_enemies()
+	_street_door("comisaria", Vector3(STAIR_X, 1.2, PD - 0.5), Vector3(STAIR_X, 0, PD - TE / 2 - 0.02), 180.0, 1.6, 2.6)
+	return [Vector3(STAIR_X, 1.2, PD - 0.5), Vector3(STAIR_X, 0.05, PD - 2.6), &"hospital"]
 
-	# Mesa de entradas (z 9-14): mostrador, bancos, carteles de búsqueda.
-	_counter(6.5, 13.5, 10.6, 0.0)
-	_prop("computerScreen", Vector3(8.0, 1.05, 10.6), 180)
-	_prop("chairDesk", Vector3(9.5, 0, 9.8), 0)
-	for x in [1.5, 3.0, 17.0, 18.5]:
-		_prop("bench", Vector3(x, 0, 13.4), 180)
-	_prop("pottedPlant", Vector3(0.6, 0, 9.6), 0, {"tint": Color(0.4, 0.38, 0.3)})
-	_prop("water_cooler", Vector3(19.4, 0, 9.6), -90)
+
+func _police_structure() -> void:
+	var y2 := P1Y + PC
+	# Pisos: PB entero; P1 con el hueco de la escalera (x 20.8-23.2, z 12-18).
+	_floor(0, 0, PW, PD, 0.0, "police_floor")
+	_floor(34, 0, PW, 18, 0.0, "cell_floor")
+	_floor(12, 0, 24, 8, 0.0, "cell_floor")
+	for s in [[0, 0, PW, 12], [0, 18, PW, PD], [0, 12, 20.8, 18], [23.2, 12, PW, 18]]:
+		_box(groups.Structure, "Slab", Vector3((s[0] + s[2]) / 2.0, P1Y - 0.2, (s[1] + s[3]) / 2.0),
+			Vector3(s[2] - s[0], 0.4, s[3] - s[1]), "concrete")
+		_ceiling(s[0], s[1], s[2], s[3], PC)
+		_floor(s[0], s[1], s[2], s[3], P1Y, "police_floor")
+	_ceiling(0, 0, PW, PD, y2)
+	_box(groups.Structure, "Roof", Vector3(PW / 2, y2 + 0.3, PD / 2), Vector3(PW, 0.4, PD), "concrete", false)
+	# Paredes exteriores con ventanas enrejadas en los dos pisos (la de la calle, con la entrada).
+	var win := []
+	for x in [6.0, 38.0]:
+		win.append(_window(x))
+	for x in [5.0, 13.0, 31.0, 39.0]:
+		win.append(_window(x, P1Y))
+	_wall("x", PD, -TE / 2, PW + TE / 2, 0.0, y2, TE, [[STAIR_X, 1.8, 0.0, 2.6]] + win, "police_wall", true)
+	_wall("x", 0.0, -TE / 2, PW + TE / 2, 0.0, y2, TE, [_window(6.0, P1Y), _window(18.0, P1Y)], "police_wall", true)
+	_wall("z", 0.0, 0.0, PD, 0.0, y2, TE, [_window(26.0), _window(13.0, P1Y), _window(27.0, P1Y)], "police_wall", true)
+	_wall("z", PW, 0.0, PD, 0.0, y2, TE, [_window(27.0), _window(27.0, P1Y), _window(5.0, P1Y)], "police_wall", true)
+	for w in [[6.0, 1.65, PD + 0.4], [38.0, 1.65, PD + 0.4]]:
+		_box(groups.Structure, "FogWindow", Vector3(w[0], w[1], w[2]), Vector3(1.9, 1.3, 0.05), "lamp_off", false)
+	# PB: pasillo (z 18-22) y filas.
+	_wall("x", 22.0, 0.0, PW, 0.0, PC, T, [_door(7.0), [STAIR_X, 8.0, 0.0, 2.8], _door(37.0)], "police_wall", false)
+	_wall("x", 18.0, 0.0, PW, 0.0, PC, T, [_door(6.0), _door(16.0), _door(STAIR_X), _door(29.0), _door(35.6)], "police_wall", false)
+	for x in [14.0, 30.0]:
+		_wall("z", x, 22.0, PD, 0.0, PC, T, [], "police_wall", false)
+	for x in [12.0, 19.0, 25.0]:
+		_wall("z", x, 8.0, 18.0, 0.0, PC, T, [], "police_wall", false)
+	_wall("z", 34.0, 0.0, 18.0, 0.0, PC, T, [], "police_wall", false)
+	_wall("x", 8.0, 0.0, 24.0, 0.0, PC, T, [_door(6.0), _door(16.0)], "police_wall", false)
+	for x in [12.0, 24.0]:
+		_wall("z", x, 0.0, 8.0, 0.0, PC, T, [], "police_wall", false)
+	# P1.
+	_wall("x", 22.0, 0.0, PW, P1Y, PC, T, [_door(7.0), _door(22.0), _door(32.5), _door(39.0)], "police_wall", false)
+	_wall("x", 18.0, 0.0, PW, P1Y, PC, T, [_door(6.0), _door(16.0), _door(19.95), _door(29.0), _door(39.0)], "police_wall", false)
+	for x in [14.0, 30.0, 35.0]:
+		_wall("z", x, 22.0, PD, P1Y, PC, T, [[27.0, 2.2, 1.0, 2.0]] if x == 35.0 else [], "police_wall", false)
+	for x in [12.0, 19.0, 25.0, 34.0]:
+		_wall("z", x, 0.0 if x == 34.0 else 8.0, 18.0, P1Y, PC, T, [], "police_wall", false)
+	_wall("x", 8.0, 0.0, 34.0, P1Y, PC, T, [_door(6.0), _door(22.0), _door(29.0)], "police_wall", false)
+	for x in [12.0, 24.0]:
+		_wall("z", x, 0.0, 8.0, P1Y, PC, T, [], "police_wall", false)
+	# El vidrio espejado de la sala de interrogatorios (visto desde la observación, es oscuro).
+	_box(groups.Structure, "OneWayGlass", Vector3(35.0, P1Y + 1.5, 27.0), Vector3(0.04, 1.0, 2.2), "gap_dark")
+	# Carteles.
+	# El pasillo (z 18-22) queda al norte de la pared 22 y al sur de la 18; los de la pared 8 se leen desde el sur.
+	for s: Array in [["DENUNCIAS", 7.0, 22.0], ["ESPERA", 37.0, 22.0], ["ARCHIVO", 6.0, 18.0], ["VESTUARIOS", 16.0, 18.0],
+			["ESCALERA", STAIR_X, 18.0], ["GUARDIA", 29.0, 18.0], ["CALABOZOS", 35.6, 18.0], ["ARMERÍA", 6.0, 8.0], ["GARAJE", 16.0, 8.0]]:
+		var south: bool = s[2] != 22.0
+		_room_sign(s[0], s[1], s[2] + (T / 2 if south else -T / 2), 0.0, south)
+	for s: Array in [["COMISARIO", 7.0, 22.0], ["INVESTIGACIONES", 22.0, 22.0], ["OBSERVACIÓN", 32.5, 22.0],
+			["INTERROGATORIO", 39.0, 22.0], ["COMEDOR", 6.0, 18.0], ["BAÑOS", 16.0, 18.0], ["ESCALERA", 19.95, 18.0],
+			["DORMITORIOS", 29.0, 18.0], ["BRIGADA", 39.0, 18.0], ["RADIO", 6.0, 8.0], ["CAUSAS", 22.0, 8.0],
+			["OFICIAL DE SERVICIO", 29.0, 8.0]]:
+		var south: bool = s[2] != 22.0
+		_room_sign(s[0], s[1], s[2] + (T / 2 if south else -T / 2), P1Y, south)
+	_room_sign("COMISARÍA 12", STAIR_X, 22.0 + T / 2, 0.0, true, 2.95)
+	# Luces: tubos, la mitad muertos.
+	var modes := ["on", "flicker", "off", "on", "flicker", "off", "off"]
+	var i := 0
+	for level in [0, 1]:
+		var y0: float = 0.0 if level == 0 else P1Y
+		for p in [Vector2(7, 27), Vector2(22, 27), Vector2(37, 27), Vector2(6, 20), Vector2(17, 20), Vector2(28, 20), Vector2(39, 20),
+				Vector2(6, 13), Vector2(16, 13), Vector2(29.5, 13), Vector2(39, 9), Vector2(6, 4), Vector2(18, 4), Vector2(29, 4)]:
+			_police_light(p.x, p.y, y0, modes[i % modes.size()])
+			i += 1
+
+
+## Tubo de techo a la altura de cada planta de la comisaría.
+func _police_light(x: float, z: float, y0: float, mode: String) -> void:
+	_prop("mounted_fluorescent_lights", Vector3(x, y0 + PC, z), 90, {"parent": groups.Lights})
+	if mode == "off":
+		return
+	var light := OmniLight3D.new()
+	if mode == "flicker":
+		light.set_script(FlickerScript)
+	light.light_color = Color(0.82, 0.92, 0.95)
+	light.light_energy = 0.7
+	light.omni_range = 7.0
+	light.omni_attenuation = 1.3
+	light.position = Vector3(x, y0 + PC - 0.3, z)
+	_add(groups.Lights, light, "Light")
+
+
+## Escalera recta de PB a P1 (x 20.8-23.2): se entra desde el pasillo y se llega al
+## descanso de arriba (z 8-12); se sale al pasillo de P1 por la puerta de x 19.95.
+func _police_stairs() -> void:
+	var steps := 18
+	var rise := P1Y / steps
+	var run := 0.31
+	var z_start := 17.7
+	for i in steps:
+		var top := (i + 1) * rise
+		_box(groups.Structure, "Step", Vector3(STAIR_X, top / 2, z_start - (i + 0.5) * run), Vector3(2.4, top, run), "concrete", false)
+	var length := Vector2(steps * run, P1Y).length()
+	var ramp := _box(groups.Structure, "StairRamp", Vector3(STAIR_X, P1Y / 2 + 0.03, z_start - steps * run / 2),
+		Vector3(2.4, 0.1, length + 0.3), "concrete", true, false)
+	ramp.rotation.x = atan2(P1Y, steps * run)
+	for x in [20.75, 23.25]:
+		_box(groups.Structure, "StairSide", Vector3(x, P1Y / 2, z_start - steps * run / 2), Vector3(0.08, P1Y, steps * run),
+			"concrete", true, false)
+		_box(groups.Structure, "Rail", Vector3(x, P1Y + 0.5, 15.0), Vector3(0.08, 1.0, 6.0), "bars")
+		_box(groups.Structure, "RailTop", Vector3(x, P1Y + 1.0, 15.0), Vector3(0.12, 0.05, 6.0), "metal")
+	_box(groups.Structure, "RailEnd", Vector3(STAIR_X, P1Y + 0.5, 17.95), Vector3(2.5, 1.0, 0.08), "bars")
+	var link := NavigationLink3D.new()
+	link.bidirectional = true
+	link.start_position = Vector3(STAIR_X, 0.0, 18.7)
+	link.end_position = Vector3(STAIR_X, P1Y, 10.5)
+	_add(scene_root, link, "StairLink")
+
+
+func _police_ground_rooms() -> void:
+	# Mesa de entradas (x 14-30, z 22-32): mostrador, bancos, carteles de búsqueda.
+	_counter(17.5, 26.5, 25.6, 0.0)
+	_prop("computerScreen", Vector3(19.0, 1.05, 25.6), 180)
+	_prop("chairDesk", Vector3(20.5, 0, 24.8), 0)
+	for x in [15.4, 16.9, 27.1, 28.6]:
+		_prop("bench", Vector3(x, 0, 31.4), 180)
+	_prop("pottedPlant", Vector3(14.6, 0, 22.6), 0, {"tint": Color(0.4, 0.38, 0.3)})
+	_prop("water_cooler", Vector3(29.4, 0, 22.6), -90)
 	for i in 4:
-		_box(groups.Structure, "Poster", Vector3(0.17, 1.6, 10.2 + i * 0.75), Vector3(0.02, 0.6, 0.45), "paper", false)
-	_label3d(groups.Structure, "SE BUSCA", Vector3(0.19, 2.0, 11.3), 90, Color(0.2, 0.15, 0.1), 0.006)
-	_pickup("PoliceLog", "letter_police_02", Vector3(11.2, 1.07, 10.6))
-	_inspect(Vector3(0.4, 1.5, 11.3), ["Carteles de \"se busca\". Las caras están todas raspadas con algo filoso.",
+		_box(groups.Structure, "Poster", Vector3(14.17, 1.6, 26.2 + i * 0.75), Vector3(0.02, 0.6, 0.45), "paper", false)
+	_label3d(groups.Structure, "SE BUSCA", Vector3(14.19, 2.0, 27.3), 90, Color(0.2, 0.15, 0.1), 0.006)
+	_pickup("PoliceLog", "letter_police_02", Vector3(24.2, 1.07, 25.6))
+	_inspect(Vector3(14.4, 1.5, 27.3), ["Carteles de \"se busca\". Las caras están todas raspadas con algo filoso.",
 		"En uno, debajo de la raspadura, se lee: \"Ibáñez\"."], 1.2)
-
-	# Oficina del comisario (x 0-7, z 0-9).
-	_prop("desk", Vector3(3.5, 0, 2.0), 180)
-	_prop("chairDesk", Vector3(3.5, 0, 2.9), 0)
-	_prop("file_cabinet", Vector3(0.45, 0, 1.0), 90)
-	_prop("file_cabinet", Vector3(0.45, 0, 2.0), 90)
-	_prop("bookcaseClosed", Vector3(6.55, 0, 1.2), -90)
-	_prop("wall_clock", Vector3(3.5, 2.3, 0.17), 0)
-	_pickup("Ammo1", "ammo_9mm", Vector3(3.0, 0.8, 2.0), 8)
-	_inspect(Vector3(3.5, 1.0, 2.2), ["El escritorio del comisario. Un expediente: \"Desaparición Elena M. de Sosa, 1979. Archivado\".",
-		"Alguien lo desarchivó hace poco. Las hojas están húmedas."], 1.1)
-
-	# Sala de guardia (x 7-13, z 0-9): lockers, mesa, café.
-	for z in [0.6, 1.4, 2.2]:
-		_prop("locker", Vector3(7.45, 0, z), 90)
-	_prop("table", Vector3(10.5, 0, 5.0), 0)
-	for p in [[Vector3(10.5, 0, 5.9), 180], [Vector3(10.5, 0, 4.1), 0], [Vector3(9.6, 0, 5.0), 90]]:
+	# Denuncias (x 0-14): escritorios y la máquina de escribir.
+	for x in [3.5, 10.0]:
+		_prop("desk", Vector3(x, 0, 26.0), 0)
+		_prop("chairDesk", Vector3(x, 0, 25.2), 180)
+		_prop("chair", Vector3(x, 0, 27.0))
+	_prop("file_cabinet", Vector3(0.45, 0, 30.5), 90)
+	_inspect(Vector3(3.5, 1.0, 26.0), ["Una denuncia a medio tipear: \"La señora refiere que su hijo salió a la niebla y volvió con la voz cambiada\".",
+		"El oficial dejó de escribir en la mitad de una palabra."], 1.1)
+	# Sala de espera (x 30-44): sillas en fila, una tele apagada.
+	for i in 6:
+		_prop("chairModernCushion", Vector3(32.0 + i * 1.0, 0, 30.8), 180)
+	_prop("televisionModern", Vector3(43.85, 1.6, 27.0), -90)
+	_prop("vending_machine", Vector3(43.3, 0, 23.0), -90)
+	_pickup("Chocolate", "food_chocolate_bar", Vector3(42.6, 0.05, 23.0))
+	# Archivo (x 0-12, z 8-18): laberinto de archiveros.
+	for row in 3:
+		for k in 4:
+			_prop("file_cabinet", Vector3(1.5 + k * 2.6, 0, 10.0 + row * 2.8), 0 if row % 2 == 0 else 180)
+	_prop("cardboardBoxOpen", Vector3(11.0, 0, 17.2), 30)
+	_inspect(Vector3(6.4, 1.0, 12.6), ["Expedientes de 1979. Un cajón entero con la misma etiqueta: \"Imperio\"."], 1.2)
+	# Vestuarios (x 12-19): lockers y bancos.
+	for z in [9.0, 10.0, 11.0, 12.0, 13.0, 14.0]:
+		_prop("locker", Vector3(12.45, 0, z), 90)
+	_prop("bench", Vector3(16.0, 0, 12.0), 90)
+	_pickup("Cloth", "material_cloth", Vector3(18.3, 0.0, 9.0), 2)
+	# Sala de guardia (x 25-34): mesa, café, el locker de Sosa.
+	for z in [9.0, 10.0, 11.0]:
+		_prop("locker", Vector3(25.45, 0, z), 90)
+	_prop("table", Vector3(29.5, 0, 13.0), 0)
+	for p in [[Vector3(29.5, 0, 13.9), 180], [Vector3(29.5, 0, 12.1), 0], [Vector3(28.6, 0, 13.0), 90]]:
 		_prop("chair", p[0], p[1])
-	_prop("kitchenCoffeeMachine", Vector3(12.5, 0.95, 0.5), 0)
-	_prop("kitchenCabinet", Vector3(12.5, 0, 0.5), 0)
-	_pickup("Bandage", "medicine_bandage", Vector3(10.5, 0.8, 5.0), 1)
-	_pickup("Metal", "material_metal", Vector3(8.0, 0, 7.8), 2)
-	_pickup("Cable", "material_cable", Vector3(12.4, 0, 8.4), 1)
-	_inspect(Vector3(7.8, 1.2, 1.4), ["Lockers de los agentes. El de \"Sosa, R.\" está abierto y vacío. Adentro, una foto de una mujer cantando."], 1.0)
+	_prop("kitchenCabinet", Vector3(33.5, 0, 9.0), -90)
+	_prop("kitchenCoffeeMachine", Vector3(33.5, 0.95, 9.0), -90)
+	_pickup("Bandage", "medicine_bandage", Vector3(29.5, 0.8, 13.0), 1)
+	_inspect(Vector3(25.8, 1.2, 10.0), ["Lockers de los agentes. El de \"Sosa, R.\" está abierto y vacío. Adentro, una foto de una mujer cantando."], 1.0)
+	# Armería (x 0-12, z 0-8): cerrada desde siempre.
+	_door_prop(groups.Structure, "ArmoryDoor", "door_chained", Vector3(6.0, 0, 8.0 + T / 2 + 0.02), 180.0, DOOR_W, DOOR_H)
+	_box(groups.Structure, "ArmoryLock", Vector3(6.0, DOOR_H / 2, 8.0), Vector3(DOOR_W, DOOR_H, 0.15), "concrete", true, false)
+	_inspect(Vector3(6.0, 1.2, 8.8), ["La armería. Cadena, candado y un cartel escrito a mano: \"NO DARLES ARMAS A LOS QUE OYEN\"."], 1.2)
+	# Garaje (x 12-24, z 0-8): un patrullero, bidones, herramientas.
+	var car: Node3D = PropScript.new()
+	car.set("model", load("res://assets/models/props/cars/police.glb"))
+	car.set("model_scale", 1.5)
+	car.set("tint", Color(0.7, 0.7, 0.72))
+	car.position = Vector3(18.0, 0, 3.6)
+	car.rotation_degrees.y = 90.0
+	_add(groups.Props, car, "PoliceCar")
+	for p in [Vector3(12.8, 0, 0.8), Vector3(13.6, 0, 0.7)]:
+		_prop("barrel_03", p, randf_range(0, 360), {"h": 1.0})
+	_prop("bookcaseOpenLow", Vector3(23.4, 0, 6.6), -90)
+	_pickup("Metal", "material_metal", Vector3(22.8, 0, 1.2), 2)
+	_pickup("Cable", "material_cable", Vector3(23.4, 0.9, 6.6), 2)
+	_point_light(Vector3(18.0, 2.8, 4.0), Color(0.85, 0.9, 1.0), 0.6, 8.0, true)
+	_inspect(Vector3(18.0, 1.0, 5.4), ["Un patrullero con el motor abierto. Le sacaron la batería y la radio.",
+		"En el asiento de atrás hay marcas de uñas en el tapizado, de adentro hacia afuera."], 1.6)
 
-	# Calabozos (x 13-20, z 0-9): tres celdas contra la pared norte (z 0-4), pasillo al sur.
-	for i in 3:
-		var x0 := 13.0 + i * 2.33
-		if i > 0:
-			_wall("z", x0, 0.0, 4.0, 0.0, PC, 0.15, [], "police_wall", false)
-		_cell_bars(4.0, x0, x0 + 2.33, x0 + 1.17, i != 1)
-		_prop("bench", Vector3(x0 + 1.17, 0, 0.7), 0, {"tint": Color(0.5, 0.5, 0.5)})
-	_label3d(groups.Structure, "1", Vector3(14.17, 2.6, 4.1), 0, Color(0.8, 0.8, 0.75), 0.01)
-	_label3d(groups.Structure, "2", Vector3(16.5, 2.6, 4.1), 0, Color(0.8, 0.8, 0.75), 0.01)
-	_label3d(groups.Structure, "3", Vector3(18.83, 2.6, 4.1), 0, Color(0.8, 0.8, 0.75), 0.01)
-	_box(groups.Props, "PocketWatch", Vector3(16.5, 0.02, 2.4), Vector3(0.08, 0.02, 0.08), "gold" if mats.has("gold") else "gold2", false)
-	_inspect(Vector3(16.5, 1.0, 4.4), ["El calabozo 2, el del relojero. La reja tiene el candado puesto.",
+
+## Los calabozos (x 34-44, z 0-18): pasillo al oeste, seis celdas de 3 m.
+func _police_cells() -> void:
+	for k in 6:
+		var z0 := 15.0 - k * 3.0
+		if k < 5:
+			_wall("x", z0, CELL_X, PW, 0.0, PC, 0.15, [], "police_wall", false)
+		var number := k + 1
+		if number != 3:
+			_cell_bars_x(CELL_X, z0, z0 + 3.0, z0 + 1.5, number != 2)
+		_prop("bench", Vector3(43.2, 0, z0 + 1.5), -90, {"tint": Color(0.5, 0.5, 0.5)})
+		_label3d(groups.Structure, str(number), Vector3(CELL_X - 0.08, 2.6, z0 + 1.5), -90, Color(0.8, 0.8, 0.75), 0.01)
+	_box(groups.Props, "PocketWatch", Vector3(40.5, 0.02, 13.5), Vector3(0.08, 0.02, 0.08), "gold2", false)
+	_inspect(Vector3(CELL_X - 0.6, 1.0, 13.5), ["El calabozo 2, el del relojero. La reja tiene el candado puesto.",
 		"En el piso, un reloj de bolsillo parado a las tres y cuarto."], 1.2)
-	_inspect(Vector3(18.83, 1.0, 4.4), ["El calabozo 3 está cerrado. Adentro, alguien raspó la pared con las uñas hasta los ladrillos."], 1.2)
+	_inspect(Vector3(CELL_X - 0.6, 1.0, 10.5), ["El calabozo 3 está cerrado. Adentro, alguien raspó la pared con las uñas hasta los ladrillos."], 1.2)
+	_prop("desk", Vector3(35.6, 0, 1.2), 90)
+	_prop("chairDesk", Vector3(36.4, 0, 1.2), -90)
+	_pickup("Water", "food_water_bottle", Vector3(41.0, 0.05, 1.0))
+	_prop("blood", Vector3(41.0, 0.01, 7.4), 40)
 
-	# Secreto (Difícil): el depósito de evidencias, tapiado detrás de la sala de guardia (z < 0).
+
+func _police_upper_rooms() -> void:
+	var y := P1Y
+	# Oficina del comisario (x 0-14, z 22-32).
+	_prop("rugRectangle", Vector3(7.0, y + 0.005, 27.0))
+	_prop("desk", Vector3(7.0, y, 30.0), 0)
+	_prop("chairDesk", Vector3(7.0, y, 30.9), 180)
+	_prop("chair", Vector3(7.0, y, 28.9))
+	_prop("file_cabinet", Vector3(0.45, y, 24.0), 90)
+	_prop("file_cabinet", Vector3(0.45, y, 25.0), 90)
+	_prop("bookcaseClosedWide", Vector3(13.55, y, 27.0), -90)
+	_prop("wall_clock", Vector3(7.0, y + 2.3, 31.83), 180)
+	_pickup("Ammo1", "ammo_9mm", Vector3(6.4, y + 0.8, 30.0), 8)
+	_inspect(Vector3(7.0, y + 1.0, 29.8), ["El escritorio del comisario. Un expediente: \"Desaparición Elena M. de Sosa, 1979. Archivado\".",
+		"Alguien lo desarchivó hace poco. Las hojas están húmedas."], 1.1)
+	# Investigaciones (x 14-30): escritorios y el pizarrón del caso.
+	for p in [Vector3(17.0, y, 25.0), Vector3(17.0, y, 29.0), Vector3(27.0, y, 25.0)]:
+		_prop("desk", p, 0)
+		_prop("chairDesk", p + Vector3(0, 0, 0.9), 180)
+	_box(groups.Props, "CaseBoard", Vector3(22.0, y + 1.6, 31.82), Vector3(4.0, 1.6, 0.04), "cork")
+	for k in 9:
+		_box(groups.Props, "CasePhoto", Vector3(20.4 + (k % 3) * 1.6, y + 1.1 + (k / 3) * 0.5, 31.78), Vector3(0.35, 0.28, 0.01), "paper", false)
+	_box(groups.Props, "RedString", Vector3(22.0, y + 1.6, 31.77), Vector3(3.4, 0.02, 0.01), "glass_red", false)
+	_inspect(Vector3(22.0, y + 1.4, 31.2), ["El pizarrón del caso. En el centro, la foto de la soprano Elena M. de Sosa. Hilos rojos hacia todos lados:",
+		"el Teatro Imperio, el relojero Kaufmann, la parroquia, el San Judas. Y una foto nueva, de esta semana: el agente Sosa.",
+		"Alguien escribió con marcador: \"SE LO LLEVÓ LA MISMA CANCIÓN\"."], 1.5)
+	# Observación e interrogatorios (x 30-44).
+	_prop("chair", Vector3(32.5, y, 27.0), -90)
+	_prop("table", Vector3(39.5, y, 27.0), 0)
+	_prop("chair", Vector3(39.5, y, 28.0), 180)
+	_prop("chair", Vector3(39.5, y, 26.0), 0)
+	_point_light(Vector3(39.5, y + 2.6, 27.0), Color(1.0, 0.9, 0.7), 0.8, 5.0, true)
+	_inspect(Vector3(33.6, y + 1.4, 27.0), ["Del otro lado del vidrio espejado hay una mesa y dos sillas. En una, alguien sentado de espaldas.",
+		"Parpadeás y la silla está vacía. La grabadora de la mesa sigue andando."], 1.2)
+	_pickup("Water2", "food_water_bottle", Vector3(40.2, y + 0.8, 27.0))
+	# Comedor (x 0-12, z 8-18).
+	_prop("table", Vector3(6.0, y, 12.0))
+	for p in [[Vector3(6.0, y, 12.9), 180], [Vector3(6.0, y, 11.1), 0]]:
+		_prop("chair", p[0], p[1])
+	_prop("kitchenCabinet", Vector3(0.45, y, 9.5), 90)
+	_prop("kitchenSink", Vector3(0.45, y, 10.4), 90)
+	_prop("kitchenFridge", Vector3(0.5, y, 11.5), 90)
+	_pickup("Peaches", "food_canned_peaches", Vector3(6.0, y + 0.8, 12.0))
+	# Baños (x 12-19).
+	for z in [9.5, 11.0, 12.5]:
+		_prop("bathroomSink", Vector3(18.55, y, z), -90)
+	for x in [13.0, 14.6]:
+		_prop("toilet", Vector3(x, y, 17.3), 180)
+	# Dormitorios de guardia (x 25-34): cuchetas.
+	for x in [26.5, 29.5, 32.5]:
+		_prop("bedSingle", Vector3(x, y, 9.4), 0)
+		_box(groups.Props, "UpperBunk", Vector3(x, y + 1.3, 9.4), Vector3(0.95, 0.12, 2.0), "mattress", false)
+	_pickup("Wood", "material_wood", Vector3(33.4, y, 16.8), 2)
+	# Brigada (x 34-44, z 0-18): la oficina de Sosa.
+	_prop("desk", Vector3(39.0, y, 2.0), 180)
+	_prop("chairDesk", Vector3(39.0, y, 2.9), 0)
+	_prop("bookcaseClosedDoors", Vector3(43.55, y, 9.0), -90)
+	_prop("file_cabinet", Vector3(34.6, y, 1.0), 90)
+	_inspect(Vector3(39.0, y + 1.0, 2.2), ["El escritorio del agente Sosa. Un mapa de la avenida con la pensión marcada y el teatro tachado tres veces.",
+		"En un post-it: \"Mamá. Fila 7, butaca 13. Ir solo.\""], 1.1)
+	_pickup("Shells", "ammo_shells", Vector3(38.4, y + 0.8, 2.0), 4)
+	# Radio (x 0-12, z 0-8), causas (12-24) y oficial de servicio (24-34).
+	_prop("desk", Vector3(6.0, y, 0.7), 180)
+	_prop("radio", Vector3(6.0, y + 0.76, 0.7), 180)
+	_prop("chairDesk", Vector3(6.0, y, 1.6), 0)
+	_inspect(Vector3(6.0, y + 1.0, 1.0), ["La radio de la comisaría, en la frecuencia de emergencias. Entre la estática, una voz de mujer canta muy bajito."], 1.1)
+	for x in [13.5, 15.5, 17.5, 19.5, 21.5]:
+		_prop("bookcaseOpen", Vector3(x, y, 0.4), 0)
+	for p in [Vector3(14.5, y, 6.5), Vector3(19.0, y, 6.8)]:
+		_prop("cardboardBoxClosed", p, randf_range(-30, 30))
+	_prop("desk", Vector3(29.0, y, 0.8), 180)
+	_prop("chairDesk", Vector3(29.0, y, 1.7), 0)
+	_prop("first_aid_kit", Vector3(33.8, y + 1.5, 4.0), -90)
+
+
+func _police_secrets() -> void:
+	# Difícil: el depósito de evidencias (x 24-34, z 0-8) estaba tapiado detrás de la guardia.
 	var lying := _difficulty_gate("EvidenceWall", 1, true)
 	var wall: StaticBody3D = GreyBoxScript.new()
-	wall.set("size", Vector3(DOOR_W, DOOR_H, TE + 0.04))
+	wall.set("size", Vector3(DOOR_W, DOOR_H, T + 0.04))
 	wall.set("material", mats.police_wall)
-	wall.position = Vector3(10.0, DOOR_H / 2, 0.0)
+	wall.position = Vector3(29.0, DOOR_H / 2, 8.0)
 	_add(lying, wall, "Wall")
+	_wall("x", 8.0, 24.0, 34.0, 0.0, PC, T, [[29.0, DOOR_W, 0.0, DOOR_H]], "police_wall", false)
 	var room := _difficulty_gate("Evidence", 1)
-	_box(room, "EvidenceFloor", Vector3(10.0, -0.01, -1.7), Vector3(4.0, 0.02, 3.0), "cell_floor")
-	_box(room, "EvidenceCeiling", Vector3(10.0, PC + 0.01, -1.7), Vector3(4.0, 0.02, 3.0), "ceiling", false)
-	_box(room, "EvidenceWallN", Vector3(10.0, PC / 2, -3.3), Vector3(4.2, PC, 0.2), "police_wall")
-	_box(room, "EvidenceWallW", Vector3(7.9, PC / 2, -1.7), Vector3(0.2, PC, 3.2), "police_wall")
-	_box(room, "EvidenceWallE", Vector3(12.1, PC / 2, -1.7), Vector3(0.2, PC, 3.2), "police_wall")
-	_prop("bookcaseOpen", Vector3(8.4, 0, -2.6), 90, {"parent": room})
-	_prop("bookcaseOpen", Vector3(11.6, 0, -2.6), -90, {"parent": room})
-	for p in [Vector3(9.3, 0, -2.9), Vector3(10.7, 0, -2.9)]:
+	for x in [24.6, 33.4]:
+		for z in [1.5, 4.5]:
+			_prop("bookcaseOpen", Vector3(x, 0, z), 90 if x < 29.0 else -90, {"parent": room})
+	for p in [Vector3(27.5, 0, 0.7), Vector3(30.5, 0, 0.8), Vector3(29.0, 0, 3.0)]:
 		_prop("cardboardBoxClosed", p, randf_range(-10, 10), {"parent": room, "h": 0.5})
-	_point_light(Vector3(10.0, 2.6, -1.7), Color(0.85, 0.9, 1.0), 0.6, 4.5, true, room)
-	_pickup("EvidenceShells", "ammo_shells", Vector3(8.4, 1.0, -2.6), 6, room)
-	_pickup("EvidenceAmmo", "ammo_9mm", Vector3(11.6, 1.0, -2.6), 12, room)
-	_pickup("EvidenceKit", "medicine_kit", Vector3(10.0, 0.05, -2.2), 1, room)
-	# Secreto (Insane): el calabozo 3 se abre y adentro hay algo para vos.
+	_point_light(Vector3(29.0, 2.6, 4.0), Color(0.85, 0.9, 1.0), 0.6, 6.0, true, room)
+	_pickup("EvidenceShells", "ammo_shells", Vector3(24.6, 1.0, 1.5), 6, room)
+	_pickup("EvidenceAmmo", "ammo_9mm", Vector3(33.4, 1.0, 4.5), 12, room)
+	_pickup("EvidenceKit", "medicine_kit", Vector3(29.0, 0.55, 3.0), 1, room)
+	_inspect(Vector3(29.0, 1.0, 3.8), ["El depósito de evidencias. Bolsas con etiquetas: \"Imperio 1979\", \"Imperio 1979\", \"Imperio 1979\".",
+		"Alguien tapió la puerta con durlock y lo pintó del mismo color que la pared."], 1.2, room)
+	# Insane: el calabozo 3 se abre y adentro hay algo para vos.
 	var cell := _difficulty_gate("Cell3Open", 2)
-	_pickup("Cell3Kit", "medicine_kit", Vector3(18.8, 0.05, 1.4), 1, cell)
-	_pickup("Cell3Shells", "ammo_shells", Vector3(18.2, 0.05, 2.4), 4, cell)
-	_label3d(cell, "ACÁ ESTUVO\nTU MADRE", Vector3(18.83, 1.7, 0.17), 0, Color(0.55, 0.05, 0.03), 0.007)
+	_pickup("Cell3Kit", "medicine_kit", Vector3(42.4, 0.05, 10.0), 1, cell)
+	_pickup("Cell3Shells", "ammo_shells", Vector3(41.0, 0.05, 11.2), 4, cell)
+	_label3d(cell, "ACÁ ESTUVO\nTU MADRE", Vector3(PW - 0.17, 1.7, 10.5), -90, Color(0.55, 0.05, 0.03), 0.007)
+	_cell_bars_x(CELL_X, 9.0, 12.0, 10.5, true, cell)
 	var cell_bars := _difficulty_gate("Cell3Bars", 2, true)
-	_box(cell_bars, "Cell3Lock", Vector3(18.83, 1.1, 4.0), Vector3(1.1, 2.2, 0.15), "bars", true, false)
-	for i in 5:
-		_box(cell_bars, "Cell3DoorBar", Vector3(18.4 + i * 0.2, PC / 2, 4.0), Vector3(0.05, PC, 0.05), "bars", false)
-	_box(cell_bars, "Cell3Padlock", Vector3(18.83, 1.1, 4.08), Vector3(0.1, 0.14, 0.06), "metal", false)
+	_cell_bars_x(CELL_X, 9.0, 12.0, 10.5, false, cell_bars)
+	_box(cell_bars, "Cell3Padlock", Vector3(CELL_X - 0.08, 1.1, 10.5), Vector3(0.06, 0.14, 0.1), "metal", false)
 
-	# Enemigos.
-	_stalker(Vector3(16.5, 0.05, 6.5), 2.5)
-	_stalker(Vector3(4.0, 0.05, 6.0), 2.0)
-	_extra_enemy(Vector3(10.0, 0.05, 11.8), 1, 3.0)
-	_extra_enemy(Vector3(10.5, 0.05, 3.0), 2, 2.0)
-	_extra_enemy(Vector3(3.5, 0.05, 11.5), 2, 2.0)
 
-	_street_door("comisaria", Vector3(10.0, 1.2, 13.5), Vector3(10.0, 0, 14.0 - TE / 2 - 0.02), 180.0, 1.4, 2.4)
-	return [Vector3(10.0, 1.2, 13.5), Vector3(10.0, 0.05, 11.4), &"hospital"]
+func _police_enemies() -> void:
+	_stalker(Vector3(35.7, 0.05, 9.0), 2.5)
+	_stalker(Vector3(6.0, 0.05, 13.0), 2.0)
+	_stalker(Vector3(22.0, P1Y + 0.05, 20.0), 6.0)
+	_stalker(Vector3(29.5, P1Y + 0.05, 13.0), 2.0)
+	_instance("res://scenes/enemies/spitter.tscn", groups.Enemies, "Spitter", Vector3(22.0, P1Y + 0.05, 26.5), {"wander_radius": 2.0})
+	_extra_enemy(Vector3(22.0, 0.05, 20.0), 1, 5.0)
+	_extra_enemy(Vector3(16.0, 0.05, 4.0), 1, 2.0)
+	_extra_enemy(Vector3(7.0, P1Y + 0.05, 26.0), 2, 2.0)
+	_extra_enemy(Vector3(39.0, P1Y + 0.05, 8.0), 2, 2.0)
+	_extra_enemy(Vector3(37.0, 0.05, 27.0), 2, 2.0)
 
 
 # --- Parroquia San Judas Tadeo --------------------------------------------------------

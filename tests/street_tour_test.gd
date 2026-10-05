@@ -7,6 +7,7 @@ extends SceneTree
 ## No usar class_name del juego acá (compila antes que los autoloads).
 
 const OUT := "user://test_shots/street/"
+const TZ := 66.0
 
 var fails := 0
 var sanity: Node
@@ -85,46 +86,51 @@ func _initialize() -> void:
 	check(current_scene.name == "Street", "con la barreta se sale a la calle")
 	check(game_state.has_flag(&"hospital_exit_forced"), "la puerta queda forzada")
 	check(player().global_position.distance_to(Vector3(2.8, 0, 0)) < 0.5, "aparece en la puerta del hospital: %s" % player().global_position)
-	check(get_nodes_in_group(&"enemies").size() == 4, "4 acechadores en la calle")
+	check(get_nodes_in_group(&"enemies").size() == 12, "9 acechadores y 3 escupidores: %d" % get_nodes_in_group(&"enemies").size())
 	await shot("01_salida")
 
 	print("-- Navegación")
 	await physics_frame
 	var map: RID = player().get_world_3d().navigation_map
-	var path := NavigationServer3D.map_get_path(map, Vector3(5, 0, 0), Vector3(40, 0, -29), true)
-	check(path.size() > 2 and path[path.size() - 1].distance_to(Vector3(40, 0, -29)) < 1.0,
-		"hay camino de la avenida al patio: %d puntos" % path.size())
-	path = NavigationServer3D.map_get_path(map, Vector3(45, 0, 0), Vector3(58, 0, 0), true)
-	check(path.size() > 2 and path[path.size() - 1].distance_to(Vector3(58, 0, 0)) < 1.0,
-		"los enemigos pasan la barricada por la vereda")
+	for t: Vector3 in [Vector3(64, 0, -106), Vector3(150, 0, 66), Vector3(120, 0, -40), Vector3(200, 0, 0)]:
+		var path := NavigationServer3D.map_get_path(map, Vector3(5, 0, 0), t, true)
+		check(path.size() > 1 and path[path.size() - 1].distance_to(t) < 1.0, "hay camino a %s: %d puntos" % [t, path.size()])
 
 	print("-- Límites")
-	place(Vector3(46.0, 0.05, 1.0), -90.0)
+	place(Vector3(156.0, 0.05, 2.0), -90.0)
 	await walk("move_forward", 150)
-	check(player().global_position.x < 49.5, "la barricada frena: x=%.2f" % player().global_position.x)
-	place(Vector3(46.0, 0.05, -5.0), -90.0)
+	check(player().global_position.x < 158.9, "la barricada frena: x=%.2f" % player().global_position.x)
+	place(Vector3(156.0, 0.05, -8.3), -90.0)
 	await walk("move_forward", 200)
-	check(player().global_position.x > 53.0, "se pasa por la vereda norte: x=%.2f" % player().global_position.x)
-	place(Vector3(20.0, 0.05, -4.5), 0.0)
+	check(player().global_position.x > 163.0, "se pasa por la vereda norte: x=%.2f" % player().global_position.x)
+	place(Vector3(20.0, 0.05, -7.5), 0.0)
 	await walk("move_forward", 120)
-	check(player().global_position.z > -6.4, "los edificios frenan: z=%.2f" % player().global_position.z)
-	place(Vector3(60.0, 0.05, 0.0), -90.0)
+	check(player().global_position.z > -9.4, "los edificios frenan: z=%.2f" % player().global_position.z)
+	place(Vector3(210.0, 0.05, 0.0), -90.0)
 	await walk("move_forward", 200)
-	check(player().global_position.x < 66.0, "el teatro está cerrado: x=%.2f" % player().global_position.x)
-	place(Vector3(35.5, 0.05, -20.0), 0.0)
+	check(player().global_position.x < 216.0, "el teatro está cerrado: x=%.2f" % player().global_position.x)
+	place(Vector3(64.0, 0.05, -96.0), 0.0)
 	await walk("move_forward", 250)
-	check(player().global_position.z > -33.9, "el patio está cerrado: z=%.2f" % player().global_position.z)
+	check(player().global_position.z > -111.6, "el patio está cerrado: z=%.2f" % player().global_position.z)
+	place(Vector3(47.0, 0.05, -72.0), 90.0)
+	await walk("move_forward", 200)
+	check(player().global_position.x > 42.0, "Lavalle termina en una pared: x=%.2f" % player().global_position.x)
 
 	print("-- Capturas")
 	var shots := [
-		["02_avenida_este", Vector3(3.0, 0.05, 1.5), -80.0],
+		["02_avenida", Vector3(3.0, 0.05, 1.5), -80.0],
 		["03_hospital", Vector3(8.0, 0.05, -1.0), 100.0],
-		["04_ambulancia", Vector3(25.0, 0.05, 2.5), -70.0],
-		["05_callejon", Vector3(35.5, 0.05, -4.0), 0.0],
-		["06_patio", Vector3(35.0, 0.05, -25.5), -30.0],
-		["07_barricada", Vector3(42.0, 0.05, 1.0), -85.0],
-		["08_teatro", Vector3(56.0, 0.05, -1.0), -90.0],
-		["09_vereda_sur", Vector3(30.0, 0.05, 4.8), 100.0],
+		["04_ambulancia", Vector3(25.0, 0.05, 1.5), -70.0],
+		["05_parana", Vector3(48.0, 0.05, -20.0), 0.0],
+		["06_lavalle", Vector3(56.0, 0.05, -72.0), -90.0],
+		["07_callejon", Vector3(63.0, 0.05, -80.0), 0.0],
+		["08_patio", Vector3(62.0, 0.05, -101.0), -30.0],
+		["09_viamonte", Vector3(84.0, 0.05, 20.0), 180.0],
+		["10_tucuman", Vector3(100.0, 0.05, TZ), -90.0],
+		["11_iglesia", Vector3(132.0, 0.05, TZ), 0.0],
+		["12_barricada", Vector3(152.0, 0.05, 1.0), -85.0],
+		["13_teatro", Vector3(206.0, 0.05, -1.0), -90.0],
+		["14_uruguay", Vector3(120.0, 0.05, -30.0), 90.0],
 	]
 	for s: Array in shots:
 		place(s[1], s[2])
@@ -134,11 +140,10 @@ func _initialize() -> void:
 	sanity._set_current(sanity.maximum * 0.3)
 	await frames(10)
 	check(not current_scene.get_node("Secrets/LyingWall").visible, "Quebrado: el ladrillo flojo desaparece")
-	place(Vector3(38.0, 0.05, -31.0), 0.0)
+	place(Vector3(64.0, 0.05, -109.0), 0.0)
 	await create_timer(2.0).timeout
-	await shot("10_nicho")
+	await shot("15_nicho")
 	sanity._set_current(sanity.maximum)
-
 	print("-- Casas")
 	var houses := {
 		"ibarra": ["HouseIbarra", [["20_ibarra_living", Vector3(0.0, 0.05, -1.2), 20.0], ["21_ibarra_cocina", Vector3(-0.5, 0.05, -1.5), -60.0]]],
@@ -159,7 +164,7 @@ func _initialize() -> void:
 		await settle()
 		var spawn: Node3D = current_scene.get_node("SpawnHouse_" + id)
 		check(current_scene.name == "Street" and player().global_position.distance_to(spawn.global_position) < 0.5,
-			"se sale de %s a la vereda" % id)
+			"se sale de %s a la vereda: %s vs %s" % [id, player().global_position, spawn.global_position])
 
 	print("-- Vuelta al hospital")
 	place(Vector3(1.4, 0.05, 0), 90.0)
