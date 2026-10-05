@@ -1,0 +1,1302 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/grey_box.gd" id="1_73g73"]
+[ext_resource type="Material" path="res://assets/materials/hospital/m_floor.tres" id="2_pqhq8"]
+[ext_resource type="Material" path="res://assets/materials/hospital/m_ceiling.tres" id="3_510fa"]
+[ext_resource type="Material" path="res://assets/materials/houses/m_house_wall2.tres" id="4_tuptt"]
+[ext_resource type="Material" path="res://assets/materials/hospital/m_trim.tres" id="5_fwvyf"]
+[ext_resource type="Material" path="res://assets/materials/houses/m_fog_window.tres" id="6_7puno"]
+[ext_resource type="Material" path="res://assets/materials/hospital/m_bars.tres" id="7_i1kpr"]
+[ext_resource type="Material" path="res://assets/materials/houses/m_house_wall.tres" id="8_wa31i"]
+[ext_resource type="Material" path="res://assets/materials/hospital/m_paper.tres" id="9_xcv4f"]
+[ext_resource type="Material" path="res://assets/materials/houses/m_bulb.tres" id="10_6rfc7"]
+[ext_resource type="Script" path="res://scripts/world/flicker_light.gd" id="11_cg3ys"]
+[ext_resource type="Material" path="res://assets/materials/hospital/m_counter.tres" id="12_vk8fe"]
+[ext_resource type="Material" path="res://assets/materials/hospital/m_counter_top.tres" id="13_kes4j"]
+[ext_resource type="Material" path="res://assets/materials/hospital/m_soot.tres" id="14_6xcg2"]
+[ext_resource type="Script" path="res://scripts/world/prop.gd" id="15_3l5fm"]
+[ext_resource type="PackedScene" path="res://assets/models/props/kenney/computerScreen.glb" id="16_k71x2"]
+[ext_resource type="PackedScene" path="res://assets/models/props/polyhaven/modern_arm_chair_01/modern_arm_chair_01.gltf" id="17_pqngw"]
+[ext_resource type="PackedScene" path="res://assets/models/props/kenney/bench.glb" id="18_ilu5x"]
+[ext_resource type="PackedScene" path="res://assets/models/props/kenney/pottedPlant.glb" id="19_lre3c"]
+[ext_resource type="Material" path="res://assets/materials/houses/m_shelf_wood.tres" id="20_lxkjs"]
+[ext_resource type="Material" path="res://assets/materials/hospital/m_metal.tres" id="21_xgdrx"]
+[ext_resource type="PackedScene" path="res://assets/models/props/hospital/tall_cabinet.glb" id="22_53iy5"]
+[ext_resource type="PackedScene" path="res://assets/models/props/kenney/kitchenSink.glb" id="23_t0bke"]
+[ext_resource type="PackedScene" path="res://assets/models/props/hospital/blood.glb" id="24_bb84j"]
+[ext_resource type="Material" path="res://assets/materials/hospital/m_blanket.tres" id="25_4go46"]
+[ext_resource type="FontFile" path="res://assets/fonts/pixel_operator/PixelOperator.ttf" id="26_hqbnb"]
+[ext_resource type="Script" path="res://scripts/world/house_cat.gd" id="27_4j86w"]
+[ext_resource type="PackedScene" path="res://assets/models/animals/cat/cat.glb" id="28_3c13j"]
+[ext_resource type="PackedScene" path="res://assets/models/props/polyhaven/wooden_crate_01/wooden_crate_01.gltf" id="29_2iydr"]
+[ext_resource type="PackedScene" path="res://scenes/world/pickup.tscn" id="30_by0ai"]
+[ext_resource type="Script" path="res://scripts/world/pickup.gd" id="31_p33rv"]
+[ext_resource type="Resource" path="res://assets/items/medicine_bandage.tres" id="32_r57xl"]
+[ext_resource type="Resource" path="res://assets/items/material_cloth.tres" id="33_f2d81"]
+[ext_resource type="Resource" path="res://assets/items/food_chocolate_bar.tres" id="34_50mcs"]
+[ext_resource type="Script" path="res://scripts/world/inspectable.gd" id="35_1e6oq"]
+[ext_resource type="Script" path="res://scripts/world/zone_door.gd" id="36_pdxyl"]
+[ext_resource type="PackedScene" path="res://assets/models/doors/door_wood_open.glb" id="37_q8tfn"]
+[ext_resource type="Script" path="res://scripts/world/sanity_gated.gd" id="38_kpbjj"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/stalker.tscn" id="39_pwdtt"]
+[ext_resource type="Script" path="res://scripts/enemies/stalker.gd" id="40_sblgx"]
+[ext_resource type="Texture2D" path="res://assets/models/enemies/thin_zombie/thin_zombie.png" id="41_47oso"]
+[ext_resource type="Script" path="res://scripts/world/difficulty_spawn.gd" id="42_ydi34"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/spitter.tscn" id="43_m5dd2"]
+[ext_resource type="Script" path="res://scripts/world/atmosphere.gd" id="44_meotx"]
+[ext_resource type="Script" path="res://scripts/world/runtime_nav_bake.gd" id="45_ka38c"]
+[ext_resource type="Script" path="res://scripts/world/world_persistence.gd" id="46_idy3u"]
+[ext_resource type="Script" path="res://scripts/world/level_audio.gd" id="47_cf4cn"]
+[ext_resource type="Script" path="res://scripts/world/spawn_point.gd" id="48_ngsaq"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="49_sxwx3"]
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="50_h0cok"]
+[ext_resource type="PackedScene" path="res://scenes/effects/ps1_post_process.tscn" id="51_o6iej"]
+[ext_resource type="PackedScene" path="res://scenes/ui/game_ui.tscn" id="52_biuhr"]
+[ext_resource type="Script" path="res://scripts/ui/game_ui.gd" id="53_l0ejl"]
+
+[sub_resource type="Environment" id="Environment_6ur3s"]
+background_mode = 1
+background_color = Color(0.07, 0.07, 0.075, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.4, 0.43, 0.46, 1)
+ambient_light_energy = 0.35
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_wuaom"]
+geometry_parsed_geometry_type = 1
+geometry_source_geometry_mode = 1
+geometry_source_group_name = &"nav_source"
+cell_size = 0.2
+cell_height = 0.2
+agent_height = 2.2
+agent_radius = 0.4
+agent_max_climb = 0.2
+
+[node name="HouseVeterinaria" type="Node3D" unique_id=1859342886]
+
+[node name="Structure" type="Node3D" parent="." unique_id=528453104 groups=["nav_source"]]
+
+[node name="Floor" type="StaticBody3D" parent="Structure" unique_id=1059601274]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, -6)
+script = ExtResource("1_73g73")
+size = Vector3(14, 0.02, 12)
+subdivisions_per_meter = 2.0
+material = ExtResource("2_pqhq8")
+
+[node name="Ceiling" type="StaticBody3D" parent="Structure" unique_id=417338924]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.21, -6)
+script = ExtResource("1_73g73")
+size = Vector3(14, 0.02, 12)
+subdivisions_per_meter = 2.0
+material = ExtResource("3_510fa")
+collision_enabled = false
+
+[node name="Wall" type="StaticBody3D" parent="Structure" unique_id=904770275]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 1.6, 0)
+script = ExtResource("1_73g73")
+size = Vector3(6.3, 3.2, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("4_tuptt")
+
+[node name="Wall2" type="StaticBody3D" parent="Structure" unique_id=1671240424]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+script = ExtResource("1_73g73")
+size = Vector3(1.6, 0.8, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("4_tuptt")
+
+[node name="Wall3" type="StaticBody3D" parent="Structure" unique_id=1659347504]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 1.6, 0)
+script = ExtResource("1_73g73")
+size = Vector3(6.3, 3.2, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("4_tuptt")
+
+[node name="Trim" type="StaticBody3D" parent="Structure" unique_id=1052908608]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.76, 1.16, 0)
+script = ExtResource("1_73g73")
+size = Vector3(0.08, 2.32, 0.26)
+subdivisions_per_meter = 2.0
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="Trim2" type="StaticBody3D" parent="Structure" unique_id=1854891325]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.76, 1.16, 0)
+script = ExtResource("1_73g73")
+size = Vector3(0.08, 2.32, 0.26)
+subdivisions_per_meter = 2.0
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="Trim3" type="StaticBody3D" parent="Structure" unique_id=2127362696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.36, 0)
+script = ExtResource("1_73g73")
+size = Vector3(1.6, 0.08, 0.26)
+subdivisions_per_meter = 2.0
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="FogWindow" type="StaticBody3D" parent="Structure" unique_id=106858099]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.6, -12.4)
+script = ExtResource("1_73g73")
+size = Vector3(1.6, 1.4, 0.05)
+subdivisions_per_meter = 2.0
+material = ExtResource("6_7puno")
+collision_enabled = false
+
+[node name="FogWindow2" type="StaticBody3D" parent="Structure" unique_id=1572121780]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1.6, -12.4)
+script = ExtResource("1_73g73")
+size = Vector3(1.6, 1.4, 0.05)
+subdivisions_per_meter = 2.0
+material = ExtResource("6_7puno")
+collision_enabled = false
+
+[node name="Wall4" type="StaticBody3D" parent="Structure" unique_id=256606873]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.15, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(1.9, 3.2, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("4_tuptt")
+
+[node name="Wall5" type="StaticBody3D" parent="Structure" unique_id=1028389452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0.5, -12)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 1, 0.2)
+material = ExtResource("4_tuptt")
+
+[node name="Wall6" type="StaticBody3D" parent="Structure" unique_id=636664011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 2.7, -12)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 1, 0.2)
+material = ExtResource("4_tuptt")
+
+[node name="Wall7" type="StaticBody3D" parent="Structure" unique_id=1924643897]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(7.6, 3.2, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("4_tuptt")
+
+[node name="Wall8" type="StaticBody3D" parent="Structure" unique_id=1659104267]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0.5, -12)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 1, 0.2)
+material = ExtResource("4_tuptt")
+
+[node name="Wall9" type="StaticBody3D" parent="Structure" unique_id=1908358511]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 2.7, -12)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 1, 0.2)
+material = ExtResource("4_tuptt")
+
+[node name="Wall10" type="StaticBody3D" parent="Structure" unique_id=1631582770]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.15, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(1.9, 3.2, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("4_tuptt")
+
+[node name="Bar" type="StaticBody3D" parent="Structure" unique_id=103922076]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.9666667, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 1.2, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Bar2" type="StaticBody3D" parent="Structure" unique_id=934441901]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.733333, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 1.2, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Bar3" type="StaticBody3D" parent="Structure" unique_id=1449245463]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 1.2, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Bar4" type="StaticBody3D" parent="Structure" unique_id=1521819324]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.266667, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 1.2, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Bar5" type="StaticBody3D" parent="Structure" unique_id=675154082]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0333333, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 1.2, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Bar6" type="StaticBody3D" parent="Structure" unique_id=1953076084]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Trim4" type="StaticBody3D" parent="Structure" unique_id=428775482]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.03, -12)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.06, 0.26)
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="Bar7" type="StaticBody3D" parent="Structure" unique_id=5413582]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0333333, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 1.2, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Bar8" type="StaticBody3D" parent="Structure" unique_id=157653976]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.266667, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 1.2, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Bar9" type="StaticBody3D" parent="Structure" unique_id=1144811225]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 1.2, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Bar10" type="StaticBody3D" parent="Structure" unique_id=1113042086]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.733333, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 1.2, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Bar11" type="StaticBody3D" parent="Structure" unique_id=2002915762]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.9666667, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 1.2, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Bar12" type="StaticBody3D" parent="Structure" unique_id=623596651]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1.6, -12)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.04)
+material = ExtResource("7_i1kpr")
+
+[node name="Trim5" type="StaticBody3D" parent="Structure" unique_id=1396436244]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1.03, -12)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.06, 0.26)
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="Wall11" type="StaticBody3D" parent="Structure" unique_id=1716696387]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1.6, -6)
+script = ExtResource("1_73g73")
+size = Vector3(0.2, 3.2, 12)
+subdivisions_per_meter = 2.0
+material = ExtResource("4_tuptt")
+
+[node name="Wall12" type="StaticBody3D" parent="Structure" unique_id=563636821]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.6, -6)
+script = ExtResource("1_73g73")
+size = Vector3(0.2, 3.2, 12)
+subdivisions_per_meter = 2.0
+material = ExtResource("4_tuptt")
+
+[node name="Wall13" type="StaticBody3D" parent="Structure" unique_id=2125333133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.9, 1.6, -5)
+script = ExtResource("1_73g73")
+size = Vector3(2.2, 3.2, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("8_wa31i")
+
+[node name="Wall14" type="StaticBody3D" parent="Structure" unique_id=1173685057]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.8, -5)
+script = ExtResource("1_73g73")
+size = Vector3(1.6, 0.8, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("8_wa31i")
+
+[node name="Wall15" type="StaticBody3D" parent="Structure" unique_id=956358399]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.6, -5)
+script = ExtResource("1_73g73")
+size = Vector3(5.4, 3.2, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("8_wa31i")
+
+[node name="Wall16" type="StaticBody3D" parent="Structure" unique_id=586981047]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2.8, -5)
+script = ExtResource("1_73g73")
+size = Vector3(1.6, 0.8, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("8_wa31i")
+
+[node name="Wall17" type="StaticBody3D" parent="Structure" unique_id=1435979068]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.4, 1.6, -5)
+script = ExtResource("1_73g73")
+size = Vector3(3.2, 3.2, 0.2)
+subdivisions_per_meter = 2.0
+material = ExtResource("8_wa31i")
+
+[node name="Trim6" type="StaticBody3D" parent="Structure" unique_id=1053809872]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.76, 1.16, -5)
+script = ExtResource("1_73g73")
+size = Vector3(0.08, 2.32, 0.26)
+subdivisions_per_meter = 2.0
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="Trim7" type="StaticBody3D" parent="Structure" unique_id=2142036858]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.24, 1.16, -5)
+script = ExtResource("1_73g73")
+size = Vector3(0.08, 2.32, 0.26)
+subdivisions_per_meter = 2.0
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="Trim8" type="StaticBody3D" parent="Structure" unique_id=171516657]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.36, -5)
+script = ExtResource("1_73g73")
+size = Vector3(1.6, 0.08, 0.26)
+subdivisions_per_meter = 2.0
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="Trim9" type="StaticBody3D" parent="Structure" unique_id=178988822]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.24, 1.16, -5)
+script = ExtResource("1_73g73")
+size = Vector3(0.08, 2.32, 0.26)
+subdivisions_per_meter = 2.0
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="Trim10" type="StaticBody3D" parent="Structure" unique_id=102323998]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.76, 1.16, -5)
+script = ExtResource("1_73g73")
+size = Vector3(0.08, 2.32, 0.26)
+subdivisions_per_meter = 2.0
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="Trim11" type="StaticBody3D" parent="Structure" unique_id=1266743730]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2.36, -5)
+script = ExtResource("1_73g73")
+size = Vector3(1.6, 0.08, 0.26)
+subdivisions_per_meter = 2.0
+material = ExtResource("5_fwvyf")
+collision_enabled = false
+
+[node name="Wall18" type="StaticBody3D" parent="Structure" unique_id=370953978]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.6, -8.5)
+script = ExtResource("1_73g73")
+size = Vector3(0.2, 3.2, 7)
+subdivisions_per_meter = 2.0
+material = ExtResource("8_wa31i")
+
+[node name="Poster" type="StaticBody3D" parent="Structure" unique_id=812019339]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.6, -4.88)
+script = ExtResource("1_73g73")
+size = Vector3(0.6, 0.8, 0.02)
+material = ExtResource("9_xcv4f")
+collision_enabled = false
+
+[node name="Poster2" type="StaticBody3D" parent="Structure" unique_id=528784787]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 1.6, -4.88)
+script = ExtResource("1_73g73")
+size = Vector3(0.6, 0.8, 0.02)
+material = ExtResource("9_xcv4f")
+collision_enabled = false
+
+[node name="Poster3" type="StaticBody3D" parent="Structure" unique_id=369480438]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.6, -4.88)
+script = ExtResource("1_73g73")
+size = Vector3(0.6, 0.8, 0.02)
+material = ExtResource("9_xcv4f")
+collision_enabled = false
+
+[node name="Lights" type="Node3D" parent="." unique_id=1592135289]
+
+[node name="Light" type="OmniLight3D" parent="Lights" unique_id=215728121]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 1.6, -11.4)
+light_color = Color(0.7, 0.75, 0.8, 1)
+light_energy = 0.35
+omni_range = 3.5
+
+[node name="Light2" type="OmniLight3D" parent="Lights" unique_id=1447428099]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1.6, -11.4)
+light_color = Color(0.7, 0.75, 0.8, 1)
+light_energy = 0.35
+omni_range = 3.5
+
+[node name="Cord" type="StaticBody3D" parent="Lights" unique_id=334422927]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.95, -2.5)
+script = ExtResource("1_73g73")
+size = Vector3(0.015, 0.5, 0.015)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="Bulb" type="StaticBody3D" parent="Lights" unique_id=827066468]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.68, -2.5)
+script = ExtResource("1_73g73")
+size = Vector3(0.07, 0.09, 0.07)
+material = ExtResource("10_6rfc7")
+collision_enabled = false
+
+[node name="Light3" type="OmniLight3D" parent="Lights" unique_id=1238500202]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -2.5)
+light_color = Color(1, 0.78, 0.52, 1)
+light_energy = 0.8
+omni_range = 6.5
+script = ExtResource("11_cg3ys")
+
+[node name="Cord2" type="StaticBody3D" parent="Lights" unique_id=103136668]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.95, -8.5)
+script = ExtResource("1_73g73")
+size = Vector3(0.015, 0.5, 0.015)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="Bulb2" type="StaticBody3D" parent="Lights" unique_id=268037170]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.68, -8.5)
+script = ExtResource("1_73g73")
+size = Vector3(0.07, 0.09, 0.07)
+material = ExtResource("10_6rfc7")
+collision_enabled = false
+
+[node name="Light4" type="OmniLight3D" parent="Lights" unique_id=1892921068]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.5, -8.5)
+light_color = Color(1, 0.78, 0.52, 1)
+light_energy = 0.6
+omni_range = 6.5
+
+[node name="Cord3" type="StaticBody3D" parent="Lights" unique_id=2085506911]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2.95, -8.5)
+script = ExtResource("1_73g73")
+size = Vector3(0.015, 0.5, 0.015)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="Bulb3" type="StaticBody3D" parent="Lights" unique_id=1323883000]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2.68, -8.5)
+script = ExtResource("1_73g73")
+size = Vector3(0.07, 0.09, 0.07)
+material = ExtResource("10_6rfc7")
+collision_enabled = false
+
+[node name="Light5" type="OmniLight3D" parent="Lights" unique_id=651532424]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2.5, -8.5)
+light_color = Color(1, 0.78, 0.52, 1)
+light_energy = 0.5
+omni_range = 6.5
+script = ExtResource("11_cg3ys")
+
+[node name="Props" type="Node3D" parent="." unique_id=1666313706 groups=["nav_source"]]
+
+[node name="Counter" type="StaticBody3D" parent="Props" unique_id=977067102]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.75, 0.5, -3.6)
+script = ExtResource("1_73g73")
+size = Vector3(4.5, 1, 0.6)
+subdivisions_per_meter = 2.0
+material = ExtResource("12_vk8fe")
+
+[node name="CounterTop" type="StaticBody3D" parent="Props" unique_id=821217602]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.75, 1.02, -3.63)
+script = ExtResource("1_73g73")
+size = Vector3(4.56, 0.04, 0.7)
+subdivisions_per_meter = 2.0
+material = ExtResource("13_kes4j")
+collision_enabled = false
+
+[node name="CounterKick" type="StaticBody3D" parent="Props" unique_id=380464240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.75, 0.05, -3.94)
+script = ExtResource("1_73g73")
+size = Vector3(4.5, 0.1, 0.02)
+subdivisions_per_meter = 2.0
+material = ExtResource("14_6xcg2")
+collision_enabled = false
+
+[node name="computerScreen" type="Node3D" parent="Props" unique_id=1826805280]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 3, 1.05, -3.5)
+script = ExtResource("15_3l5fm")
+model = ExtResource("16_k71x2")
+fit_height = 0.42
+tint = Color(0.78, 0.76, 0.74, 1)
+collision = false
+
+[node name="modern_arm_chair_01" type="Node3D" parent="Props" unique_id=1202840874]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -4.4)
+script = ExtResource("15_3l5fm")
+model = ExtResource("17_pqngw")
+tint = Color(0.85, 0.84, 0.82, 1)
+
+[node name="bench" type="Node3D" parent="Props" unique_id=141428731]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -6, 0, -1)
+script = ExtResource("15_3l5fm")
+model = ExtResource("18_ilu5x")
+fit_height = 0.45
+tint = Color(0.78, 0.76, 0.74, 1)
+
+[node name="bench2" type="Node3D" parent="Props" unique_id=1989599729]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -4.8, 0, -1)
+script = ExtResource("15_3l5fm")
+model = ExtResource("18_ilu5x")
+fit_height = 0.45
+tint = Color(0.78, 0.76, 0.74, 1)
+
+[node name="pottedPlant" type="Node3D" parent="Props" unique_id=1268516773]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.4, 0, -4.4)
+script = ExtResource("15_3l5fm")
+model = ExtResource("19_lre3c")
+fit_height = 1.1
+tint = Color(0.78, 0.76, 0.74, 1)
+
+[node name="FishTank" type="StaticBody3D" parent="Props" unique_id=1759293682]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 1.1, -3)
+script = ExtResource("1_73g73")
+size = Vector3(0.5, 0.5, 1.2)
+material = ExtResource("6_7puno")
+
+[node name="FishTankStand" type="StaticBody3D" parent="Props" unique_id=1047767649]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 0.42, -3)
+script = ExtResource("1_73g73")
+size = Vector3(0.5, 0.84, 1.2)
+material = ExtResource("20_lxkjs")
+
+[node name="ExamTable" type="StaticBody3D" parent="Props" unique_id=1600080384]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.45, -8.5)
+script = ExtResource("1_73g73")
+size = Vector3(1.2, 0.9, 0.7)
+material = ExtResource("21_xgdrx")
+
+[node name="tall_cabinet" type="Node3D" parent="Props" unique_id=942753036]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -6.6, 0, -9)
+script = ExtResource("15_3l5fm")
+model = ExtResource("22_53iy5")
+fit_height = 1.9
+
+[node name="kitchenSink" type="Node3D" parent="Props" unique_id=1096716539]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -11.55)
+script = ExtResource("15_3l5fm")
+model = ExtResource("23_t0bke")
+fit_height = 1.0
+tint = Color(0.78, 0.76, 0.74, 1)
+
+[node name="Scale" type="StaticBody3D" parent="Props" unique_id=1082923851]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.05, -10.8)
+script = ExtResource("1_73g73")
+size = Vector3(0.6, 0.1, 0.5)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="blood" type="Node3D" parent="Props" unique_id=262131472]
+transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, -3.6, 0.035, -7.4)
+script = ExtResource("15_3l5fm")
+model = ExtResource("24_bb84j")
+fit_largest = 1.3
+collision = false
+
+[node name="CageFloor" type="StaticBody3D" parent="Props" unique_id=205816628]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.120000005, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+
+[node name="CageTop" type="StaticBody3D" parent="Props" unique_id=696364018]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.98, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide" type="StaticBody3D" parent="Props" unique_id=1310371809]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18, 0.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide2" type="StaticBody3D" parent="Props" unique_id=665490723]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1800001, 0.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageBar" type="StaticBody3D" parent="Props" unique_id=949986810]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.100000024, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar2" type="StaticBody3D" parent="Props" unique_id=746531520]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.099999994, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar3" type="StaticBody3D" parent="Props" unique_id=122831332]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar4" type="StaticBody3D" parent="Props" unique_id=740466320]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar5" type="StaticBody3D" parent="Props" unique_id=649569068]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar6" type="StaticBody3D" parent="Props" unique_id=463762688]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar7" type="StaticBody3D" parent="Props" unique_id=1533627725]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageFloor2" type="StaticBody3D" parent="Props" unique_id=1051989209]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 0.120000005, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+
+[node name="CageTop2" type="StaticBody3D" parent="Props" unique_id=1112017228]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 0.98, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide3" type="StaticBody3D" parent="Props" unique_id=661100618]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4199998, 0.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide4" type="StaticBody3D" parent="Props" unique_id=965451367]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.78, 0.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageBar8" type="StaticBody3D" parent="Props" unique_id=512265120]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4999999, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar9" type="StaticBody3D" parent="Props" unique_id=2066783942]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6999999, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar10" type="StaticBody3D" parent="Props" unique_id=1082430639]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8999999, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar11" type="StaticBody3D" parent="Props" unique_id=1033501951]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar12" type="StaticBody3D" parent="Props" unique_id=369985589]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar13" type="StaticBody3D" parent="Props" unique_id=1854153544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar14" type="StaticBody3D" parent="Props" unique_id=1269527592]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6999998, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBlanket" type="StaticBody3D" parent="Props" unique_id=2066719519]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 0.16000003, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.2, 0.04, 0.7)
+material = ExtResource("25_4go46")
+collision_enabled = false
+
+[node name="CageFloor3" type="StaticBody3D" parent="Props" unique_id=2133802591]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7, 0.120000005, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+
+[node name="CageTop3" type="StaticBody3D" parent="Props" unique_id=443738014]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7, 0.98, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide5" type="StaticBody3D" parent="Props" unique_id=727504084]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.02, 0.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide6" type="StaticBody3D" parent="Props" unique_id=680323393]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.38, 0.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageBar15" type="StaticBody3D" parent="Props" unique_id=115814160]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar16" type="StaticBody3D" parent="Props" unique_id=515146878]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar17" type="StaticBody3D" parent="Props" unique_id=1289329333]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar18" type="StaticBody3D" parent="Props" unique_id=314928452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar19" type="StaticBody3D" parent="Props" unique_id=1938662723]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar20" type="StaticBody3D" parent="Props" unique_id=476076879]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.1, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar21" type="StaticBody3D" parent="Props" unique_id=1955438103]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3, 0.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageFloor4" type="StaticBody3D" parent="Props" unique_id=1992012773]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3, 0.120000005, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+
+[node name="CageTop4" type="StaticBody3D" parent="Props" unique_id=2032082317]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3, 0.98, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide7" type="StaticBody3D" parent="Props" unique_id=321940516]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6200004, 0.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide8" type="StaticBody3D" parent="Props" unique_id=1395302755]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.98, 0.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageDoorOpen" type="StaticBody3D" parent="Props" unique_id=1398487449]
+transform = Transform3D(0.52188504, 0.015850037, 0.85286856, 0.25488698, 0.9512512, -0.17364818, -0.8140446, 0.3080095, 0.49240384, 4.3, 0.45000002, -10.55)
+script = ExtResource("1_73g73")
+size = Vector3(0.6, 0.7, 0.03)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageFloor5" type="StaticBody3D" parent="Props" unique_id=897245102]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.1199999, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+
+[node name="CageTop5" type="StaticBody3D" parent="Props" unique_id=1424109600]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.98, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide9" type="StaticBody3D" parent="Props" unique_id=149273631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18, 1.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide10" type="StaticBody3D" parent="Props" unique_id=548337898]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1800001, 1.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageDoorOpen2" type="StaticBody3D" parent="Props" unique_id=1602577932]
+transform = Transform3D(0.52188504, 0.015850037, 0.85286856, 0.25488698, 0.9512512, -0.17364818, -0.8140446, 0.3080095, 0.49240384, -0.5, 1.4499999, -10.55)
+script = ExtResource("1_73g73")
+size = Vector3(0.6, 0.7, 0.03)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageFloor6" type="StaticBody3D" parent="Props" unique_id=1870397750]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 1.1199999, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+
+[node name="CageTop6" type="StaticBody3D" parent="Props" unique_id=1429908965]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 1.98, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide11" type="StaticBody3D" parent="Props" unique_id=1554132986]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4199998, 1.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide12" type="StaticBody3D" parent="Props" unique_id=1255505230]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.78, 1.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageBar22" type="StaticBody3D" parent="Props" unique_id=354644515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4999999, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar23" type="StaticBody3D" parent="Props" unique_id=1314315244]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6999999, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar24" type="StaticBody3D" parent="Props" unique_id=206464322]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8999999, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar25" type="StaticBody3D" parent="Props" unique_id=1013753346]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar26" type="StaticBody3D" parent="Props" unique_id=1829560720]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar27" type="StaticBody3D" parent="Props" unique_id=1900609615]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar28" type="StaticBody3D" parent="Props" unique_id=993409753]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6999998, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageFloor7" type="StaticBody3D" parent="Props" unique_id=1665709224]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7, 1.1199999, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+
+[node name="CageTop7" type="StaticBody3D" parent="Props" unique_id=1484872541]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7, 1.98, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide13" type="StaticBody3D" parent="Props" unique_id=178201951]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.02, 1.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide14" type="StaticBody3D" parent="Props" unique_id=1765885522]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.38, 1.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageBar29" type="StaticBody3D" parent="Props" unique_id=1681658170]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar30" type="StaticBody3D" parent="Props" unique_id=16017838]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar31" type="StaticBody3D" parent="Props" unique_id=1628758148]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar32" type="StaticBody3D" parent="Props" unique_id=1304262279]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar33" type="StaticBody3D" parent="Props" unique_id=1125877557]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar34" type="StaticBody3D" parent="Props" unique_id=781330524]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.1, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar35" type="StaticBody3D" parent="Props" unique_id=1052441645]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageFloor8" type="StaticBody3D" parent="Props" unique_id=1863529797]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3, 1.1199999, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+
+[node name="CageTop8" type="StaticBody3D" parent="Props" unique_id=1051623344]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3, 1.98, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(1.4, 0.04, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide15" type="StaticBody3D" parent="Props" unique_id=752550631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6200004, 1.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageSide16" type="StaticBody3D" parent="Props" unique_id=1643303394]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.98, 1.55, -11.3)
+script = ExtResource("1_73g73")
+size = Vector3(0.04, 0.9, 0.9)
+material = ExtResource("21_xgdrx")
+collision_enabled = false
+
+[node name="CageBar36" type="StaticBody3D" parent="Props" unique_id=1136154401]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7000003, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar37" type="StaticBody3D" parent="Props" unique_id=1508572455]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.9, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar38" type="StaticBody3D" parent="Props" unique_id=277179348]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.1000004, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar39" type="StaticBody3D" parent="Props" unique_id=532684628]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar40" type="StaticBody3D" parent="Props" unique_id=1809091969]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar41" type="StaticBody3D" parent="Props" unique_id=947932657]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7000003, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="CageBar42" type="StaticBody3D" parent="Props" unique_id=1541296379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9, 1.55, -10.85)
+script = ExtResource("1_73g73")
+size = Vector3(0.025, 0.84, 0.025)
+material = ExtResource("7_i1kpr")
+collision_enabled = false
+
+[node name="Label" type="Label3D" parent="Props" unique_id=684915767]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 1.25, -10.48)
+pixel_size = 0.004
+modulate = Color(0.15, 0.15, 0.2, 1)
+text = "TEODORO
+ALTA"
+font = ExtResource("26_hqbnb")
+
+[node name="Teodoro" type="Area3D" parent="Props" unique_id=83447061]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1, 0.14, -11.3)
+script = ExtResource("27_4j86w")
+mode = 0
+model_scene = ExtResource("28_3c13j")
+model_scale = 1.3
+tint = Color(0.95, 0.92, 0.88, 1)
+anim_idle = &"Idle_CatArmature"
+radius = 1.6
+
+[node name="blood2" type="Node3D" parent="Props" unique_id=1417847876]
+transform = Transform3D(-0.50000006, 0, 0.8660254, 0, 1, 0, -0.8660254, 0, -0.50000006, 5.2, 0.035, -9.8)
+script = ExtResource("15_3l5fm")
+model = ExtResource("24_bb84j")
+fit_largest = 1.3
+collision = false
+
+[node name="wooden_crate_01" type="Node3D" parent="Props" unique_id=956365804]
+transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 6.3, 0, -6)
+script = ExtResource("15_3l5fm")
+model = ExtResource("29_2iydr")
+tint = Color(0.85, 0.84, 0.82, 1)
+
+[node name="Items" type="Node3D" parent="." unique_id=1118958960]
+
+[node name="Bandage" type="Area3D" parent="Items" unique_id=413058939 instance=ExtResource("30_by0ai")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.6, 1, -9)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+script = ExtResource("31_p33rv")
+item = ExtResource("32_r57xl")
+
+[node name="Cloth" type="Area3D" parent="Items" unique_id=1564346704 instance=ExtResource("30_by0ai")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.2, 0.45, -6)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+script = ExtResource("31_p33rv")
+item = ExtResource("33_f2d81")
+count = 2
+
+[node name="Chocolate" type="Area3D" parent="Items" unique_id=713799342 instance=ExtResource("30_by0ai")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 1.05, -3.6)
+collision_layer = 4
+collision_mask = 0
+monitoring = false
+script = ExtResource("31_p33rv")
+item = ExtResource("34_50mcs")
+
+[node name="Inspectables" type="Node3D" parent="." unique_id=1939445565]
+
+[node name="Inspect" type="Area3D" parent="Inspectables" unique_id=643633051]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1.2, -3)
+script = ExtResource("35_1e6oq")
+texts = PackedStringArray("La pecera. El agua está turbia y los peces nadan todos juntos, en círculo, sin parar.")
+radius = 1.0
+
+[node name="Inspect2" type="Area3D" parent="Inspectables" unique_id=1327580813]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 1.2, -3.2)
+script = ExtResource("35_1e6oq")
+texts = PackedStringArray("En el mostrador, el libro de turnos. La última línea: \"Teodoro - ALTA - avisar a la familia\".", "Al lado, alguien dibujó un gato con birome. Tiene cara de enojado. Es igualito.")
+radius = 1.2
+
+[node name="Inspect3" type="Area3D" parent="Inspectables" unique_id=1875376836]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 1.5, -4.6)
+script = ExtResource("35_1e6oq")
+texts = PackedStringArray("Carteles: \"VACUNACIÓN ANTIRRÁBICA\", \"CASTRÁ A TU MASCOTA\". Alguien escribió abajo, a mano: \"Teo, esto va por vos\".")
+radius = 1.2
+
+[node name="Inspect4" type="Area3D" parent="Inspectables" unique_id=1422829064]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1, -8.5)
+script = ExtResource("35_1e6oq")
+texts = PackedStringArray("La camilla de acero todavía tiene pelos grises pegados. Muchos. Demasiados para un solo animal.")
+radius = 1.1
+
+[node name="Inspect5" type="Area3D" parent="Inspectables" unique_id=874412890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3, 1, -10.2)
+script = ExtResource("35_1e6oq")
+texts = PackedStringArray("Dos jaulas están abiertas, con los barrotes doblados hacia afuera. Lo que había adentro salió solo.")
+radius = 1.2
+
+[node name="StreetDoor" type="Area3D" parent="Inspectables" unique_id=1134187356]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -0.3)
+script = ExtResource("36_pdxyl")
+target_scene = "res://scenes/levels/park_street.tscn"
+target_spawn = &"house_veterinaria"
+radius = 1.1
+
+[node name="OpenDoor" type="Node3D" parent="Inspectables/StreetDoor" unique_id=1034979006]
+transform = Transform3D(-1.5686275, 0, -8.742278e-08, 0, 1.1428572, 0, 1.3713377e-07, 0, -1, 0, -1.2, 0.18)
+script = ExtResource("15_3l5fm")
+model = ExtResource("37_q8tfn")
+anchor = 3
+tint = Color(0.85, 0.82, 0.78, 1)
+collision = false
+
+[node name="Secrets" type="Node3D" parent="." unique_id=182438094]
+
+[node name="CageWriting" type="Node3D" parent="Secrets" unique_id=1998850980]
+script = ExtResource("38_kpbjj")
+
+[node name="Label2" type="Label3D" parent="Secrets/CageWriting" unique_id=129899786]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 2.6, -10.45)
+pixel_size = 0.004
+modulate = Color(0.55, 0.05, 0.03, 1)
+text = "ÉL TAMBIÉN
+TE ESPERABA"
+font = ExtResource("26_hqbnb")
+
+[node name="Enemies" type="Node3D" parent="." unique_id=1818832832]
+
+[node name="Stalker" type="CharacterBody3D" parent="Enemies" unique_id=1254025743 instance=ExtResource("39_pwdtt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.05, -10.4)
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("40_sblgx")
+tint = Color(0.85, 0.8, 0.8, 1)
+albedo_texture = ExtResource("41_47oso")
+wander_radius = 1.2
+attack_hit_time = 0.75
+
+[node name="ExtraHard" type="Marker3D" parent="Enemies" unique_id=487979452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.05, -7)
+script = ExtResource("42_ydi34")
+enemy_scene = ExtResource("39_pwdtt")
+wander_radius = 1.5
+
+[node name="ExtraInsane" type="Marker3D" parent="Enemies" unique_id=1404694616]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.05, -2)
+script = ExtResource("42_ydi34")
+enemy_scene = ExtResource("43_m5dd2")
+min_difficulty = 2
+wander_radius = 1.0
+
+[node name="Atmosphere" type="WorldEnvironment" parent="." unique_id=2116734937]
+environment = SubResource("Environment_6ur3s")
+script = ExtResource("44_meotx")
+fog_color = Color(0.07, 0.07, 0.075, 1)
+fog_end = 17.0
+insane_fog_color = Color(0.02, 0.015, 0.015, 1)
+
+[node name="Navigation" type="NavigationRegion3D" parent="." unique_id=1573864711]
+navigation_mesh = SubResource("NavigationMesh_wuaom")
+script = ExtResource("45_ka38c")
+
+[node name="WorldPersistence" type="Node3D" parent="." unique_id=416856611]
+script = ExtResource("46_idy3u")
+
+[node name="LevelAudio" type="Node" parent="." unique_id=100131849]
+script = ExtResource("47_cf4cn")
+ambience = &"hospital"
+ambience_db = -10.0
+
+[node name="SpawnInside" type="Marker3D" parent="." unique_id=1682576583]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -2.1)
+script = ExtResource("48_ngsaq")
+spawn_id = &"inside"
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=911144939 instance=ExtResource("49_sxwx3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -1.3)
+collision_mask = 3
+script = ExtResource("50_h0cok")
+
+[node name="PS1PostProcess" type="CanvasLayer" parent="." unique_id=789919227 instance=ExtResource("51_o6iej")]
+layer = 100
+
+[node name="GameUI" type="CanvasLayer" parent="." unique_id=807366195 instance=ExtResource("52_biuhr")]
+process_mode = 3
+layer = 50
+scale = Vector2(2, 2)
+transform = Transform2D(2, 0, 0, 2, 0, 0)
+script = ExtResource("53_l0ejl")

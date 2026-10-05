@@ -759,6 +759,8 @@ func _refuge() -> void:
 	_prop("chair", Vector3(28.2, 0, 4.5))
 	_prop("lampRoundFloor", Vector3(33.5, 0, 6.9))
 	_inspect(Vector3(31, 0.8, 0.9), ["Un televisor viejo y una videocasetera. Sin electricidad no sirven de nada."])
+	# Teodoro, si te mudaste acá (y ya lo rescataste).
+	_cat(Vector3(33.4, 0.0, 5.4), -40.0, 1, &"hospital")
 	_station(Vector3(28.6, 0.9, 0.7), groups.Refuge, "RadioStation", 3)
 
 	# El plano en la pared: abre el menú de mejoras.
@@ -1598,3 +1600,27 @@ func _zone_door_visuals(door: Node3D, wall_pos: Vector3, yaw: float, open_model:
 	_door_prop(door, "OpenDoor", open_model, rel, open_yaw, width, height, true)
 	if locked_model != "":
 		_door_prop(door, "LockedDoor", locked_model, rel, yaw, width, height, true)
+
+
+# --- Teodoro, el gato (pedido del usuario) ------------------------------------------
+
+const CAT_MODEL := "res://assets/models/animals/cat/cat.glb"
+
+
+## El gato: mode 0 = en la jaula de la veterinaria, 1 = en un refugio (ver HouseCat).
+func _cat(pos: Vector3, yaw: float, mode: int, refuge := &"home", parent: Node = null) -> Node3D:
+	var cat := Area3D.new()
+	cat.set_script(load("res://scripts/world/house_cat.gd"))
+	cat.set("mode", mode)
+	cat.set("refuge_id", refuge)
+	if ResourceLoader.exists(CAT_MODEL):
+		cat.set("model_scene", load(CAT_MODEL))
+		for k: String in cat_settings:
+			cat.set(k, cat_settings[k])
+	cat.position = pos
+	cat.rotation_degrees.y = yaw
+	return _add(parent if parent else groups.Props, cat, "Teodoro")
+
+
+## Escala, animación y color del modelo del gato (se completan al elegir el modelo).
+var cat_settings := {"model_scale": 1.3, "anim_idle": &"Idle_CatArmature", "tint": Color(0.95, 0.92, 0.88)}

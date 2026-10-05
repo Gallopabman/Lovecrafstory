@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_envelope.glb" id="2_env"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_vet_01"
+display_name = "Nota de la veterinaria"
+short_name = "NOTA"
+description = "Una hoja con el membrete de la Veterinaria San Roque, con una huella de pata dibujada en la esquina. Abajo, con otra letra, unas líneas de mamá."
+kind = 3
+max_sanity_bonus = 10.0
+letter_text = "VETERINARIA SAN ROQUE - Rondeau 1450
+
+Paciente: TEODORO. Felino, macho entero (sin castrar), común, negro con el pecho blanco, unos 6 años.
+
+Le informamos que Teodoro ya está recuperado de la herida del cuello y de la infección de la oreja izquierda. Ayer le sacamos los puntos. Comió bien y está de muy mal humor, lo cual en su caso es buena señal.
+
+Está listo para el alta. Pasen a buscarlo cuando puedan.
+
+Les recordamos (otra vez) que mientras no esté castrado va a seguir saliendo a pelear: ya tiene más cicatrices que pelo en la cabeza. Les dejamos el presupuesto adjunto.
+
+Dra. Ruiz
+
+---
+
+Hijo: lo íbamos a buscar el sábado juntos. Si yo no llego, andá vos. Te va a hacer bien caminar un poco, y él te extraña. Le gusta que le rasquen debajo del collar, ya sabés.
+
+Mamá"
+world_color = Color(0.92, 0.9, 0.82, 1)
+world_scene = ExtResource("2_env")
+world_size = 0.26
+world_rotation = Vector3(-90, 0, 0)
+world_tint = Color(0.95, 0.92, 0.8, 1)

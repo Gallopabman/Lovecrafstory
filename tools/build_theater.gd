@@ -662,6 +662,7 @@ func _camarin_refuge() -> void:
 	_box(groups.Refuge, "StarVanity", Vector3(49.5 + CAM_DX, S + 0.4, 15.5 + CAM_DZ), Vector3(3.0, 0.8, 0.7), "stage")
 	_box(groups.Refuge, "StarMirror", Vector3(49.5 + CAM_DX, S + 1.6, 15.84 + CAM_DZ), Vector3(2.6, 1.0, 0.04), "mirror", false)
 	_prop("loungeSofa", Vector3(47.2 + CAM_DX, S, 9.8 + CAM_DZ), 0, {"tint": Color(0.65, 0.25, 0.25)})
+	_cat(Vector3(48.6 + CAM_DX, S, 11.4 + CAM_DZ), 20.0, 1, REFUGE)
 	_prop("chair", Vector3(49.5 + CAM_DX, S, 14.7 + CAM_DZ), 0)
 	_pickup("LetterMarta3", "letter_marta_03", Vector3(50.3 + CAM_DX, S + 0.82, 15.5 + CAM_DZ))
 	_inspect(Vector3(49.5 + CAM_DX, S + 1.2, 15.2 + CAM_DZ), ["El espejo del camarín. Tu reflejo tarda un instante de más en moverse."], 1.2)

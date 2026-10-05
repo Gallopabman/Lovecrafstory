@@ -65,6 +65,8 @@ const SLOT_ORDER: Array[StringName] = [&"fire", &"power", &"bed", &"windows", &"
 ## Multiplicador de lo rápido que baja la locura en el refugio: pelado y completo.
 @export var recovery_multiplier_bare := 1.0
 @export var recovery_multiplier_full := 3.0
+## Con Teodoro en el refugio activo, la locura baja un poco más rápido (HouseCat).
+@export var cat_recovery_bonus := 1.3
 
 @export_group("Estaciones")
 @export var cooked_multiplier := 1.8
@@ -266,7 +268,10 @@ func cozy_max() -> int:
 
 ## Qué tan rápido baja la locura en el refugio según el nivel cozy.
 func recovery_multiplier(refuge: StringName = &"") -> float:
-	return lerpf(recovery_multiplier_bare, recovery_multiplier_full, float(cozy(refuge)) / cozy_max())
+	var m := lerpf(recovery_multiplier_bare, recovery_multiplier_full, float(cozy(refuge)) / cozy_max())
+	if GameState.has_flag(&"cat_rescued") and _r(refuge) == active:
+		m *= cat_recovery_bonus
+	return m
 
 
 func has_electricity(refuge: StringName = &"") -> bool:

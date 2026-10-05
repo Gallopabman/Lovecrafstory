@@ -230,6 +230,16 @@ recaiga. La nota de mamá dice que la llamaron del San Judas por la niebla: eso 
   dormido, flag de muerte `attic_boss_dead`). Modelo: 3D Horror Game Monster (CC0, sin cara, boca vertical);
   no trae ataque ni muerte: se arman con `Stalker.generated_animations` (`AnimationRetarget.make_sequence`):
   ataque con dos cuadros de `Poses`, muerte = `Jump` al revés (se hunde en el piso), `Jump` = aparición.
+- **Teodoro, el gato** (pedido del usuario: un macho sin castrar, lleno de cicatrices de pelear, que hay que ir a
+  buscar a la veterinaria). En la cocina de casa, la **nota de la veterinaria** (`letter_vet_01`, con unas líneas de
+  mamá: "andá vos, te va a hacer bien"). La **Veterinaria San Roque** está en Rondeau, en el barrio (x 130-144, vereda
+  norte; `_vet_front` en build_park.gd) y es una casa más de build_houses.gd (`veterinaria`, vuelve al barrio por
+  `RETURN_SCENES`): sala de espera, consultorio e internación con jaulas; Teodoro en la suya ("TEODORO - ALTA").
+  `HouseCat` ([scripts/world/house_cat.gd](scripts/world/house_cat.gd)): CAGED (rescatarlo marca `cat_rescued`, +15 de
+  cordura) y HOME (está en el refugio **activo**: casa, hospital o teatro, helper `_cat` de build_hospital.gd).
+  Acariciarlo baja la locura (8, cada 90 s; si no, se va a un rincón) y, mientras está, el refugio calma x1.3
+  (`Shelter.cat_recovery_bonus`). Modelo: el gato de Quaternius (CC0), negro con el pecho blanco, solo trae Idle y Walk.
+  Nombre inventado: la Dra. Ruiz (confirmar). Sonidos `cat_meow` / `cat_purr` (todavía no hay archivos).
 - **El barrio** ([scenes/levels/park_street.tscn](scenes/levels/park_street.tscn),
   [tools/build_park.gd](tools/build_park.gd), extiende build_street.gd; escena `ParkStreet`). Pedido del usuario:
   "por lo menos 10 veces más grande" que la cuadra original y con los objetos espaciados. Cuadrícula de calles de
@@ -438,6 +448,8 @@ Godot **4.7.2** (no está en el PATH):
   de guardia, el sobreviviente nuevo llega a casa). Los tests del refugio del hospital hacen `move_to(&"hospital")`.
 - **Test de la comisaría y la iglesia**: `<godot> --path . -s res://tests/avenue_places_test.gd` (entrada y
   salida, secretos por dificultad, bajar a la cripta).
+- **Test de Teodoro**: `<godot> --path . -s res://tests/cat_test.gd` (la nota, la veterinaria, el rescate, el gato en casa,
+  las caricias, el bono del refugio, la mudanza; `test_shots/cat/`).
 - **Test del Escupidor**: `<godot> --path . -s res://tests/spitter_test.gd` (escupe, lastima, se esquiva de costado,
   retrocede si te acercás, muere; `test_shots/spitter/`).
 - **Test del sótano**: `<godot> --path . -s res://tests/basement_test.gd` (casa de Ferreyra y la llave, la puerta del

@@ -156,3 +156,9 @@ Armadas en Godot con piezas CC0 (las cadenas son eslabones generados en Godot).
 | Asset | Autor | Licencia | Fuente | Ubicación |
 | --- | --- | --- | --- | --- |
 | Hydrach (el jefe del incinerador; el .blend original convertido a .glb) | Tyrfing | CC0 | [opengameart.org/content/hydrach](https://opengameart.org/content/hydrach) | `assets/models/enemies/hydrach/` |
+
+## Teodoro, el gato
+
+| Asset | Autor | Licencia | Fuente | Ubicación |
+| --- | --- | --- | --- | --- |
+| Cat (Animal Pack Vol.2; el .blend convertido a .glb, con colores puestos a mano) | Quaternius | CC0 | [opengameart.org/content/animated-animales-low-poly](https://opengameart.org/content/animated-animales-low-poly) | `assets/models/animals/cat/` |

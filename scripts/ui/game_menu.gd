@@ -25,7 +25,7 @@ const ZONE_NAMES := {
 	&"Hospital": "Hospital San Judas", &"Street": "La avenida", &"TestRoom": "Sala de prueba",
 	&"HouseIbarra": "Depto. de los Ibarra", &"HouseAlmacen": "Almacén La Estrella",
 	&"HouseRelojeria": "Relojería Kaufmann", &"HousePension": "Pensión Doña Rosa",
-	&"HouseFerreyra": "Casa del Dr. Ferreyra", &"HospitalBasement": "Sótano del San Judas",
+	&"HouseFerreyra": "Casa del Dr. Ferreyra", &"HouseVeterinaria": "Veterinaria San Roque", &"HospitalBasement": "Sótano del San Judas",
 	&"Theater": "Teatro Imperio", &"Home": "Casa", &"ParkStreet": "El barrio",
 	&"PoliceStation": "Comisaría 12", &"Church": "Parroquia San Judas",
 }

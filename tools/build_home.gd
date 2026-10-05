@@ -376,6 +376,11 @@ func _label(parent: Node, text: String, pos: Vector3, rot_y: float, color: Color
 
 func _home_items() -> void:
 	_pickup("LetterMother", "letter_mother_01", Vector3(9.8, 0.8, 6.2))
+	_pickup("LetterVet", "letter_vet_01", Vector3(9.2, 0.8, 6.7))
+	# Teodoro, cuando vuelve de la veterinaria: en el living, al lado del hogar.
+	_cat(Vector3(1.8, 0.0, 6.4), 60.0, 1, &"home")
+	_box(groups.Props, "CatBowl", Vector3(10.6, 0.03, 9.4), Vector3(0.22, 0.06, 0.22), "metal", false)
+	_inspect(Vector3(10.6, 0.4, 9.4), ["El plato de Teodoro, vacío. Tiene su nombre escrito con marcador, en letra de mamá."], 0.8)
 	_pickup("Peaches1", "food_canned_peaches", Vector3(12.6, 0.95, 3.9))
 	_pickup("Peaches2", "food_canned_peaches", Vector3(12.6, 0.95, 3.0))
 	_pickup("Water", "food_water_bottle", Vector3(10.2, 0.8, 6.8))

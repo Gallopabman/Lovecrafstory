@@ -18,9 +18,12 @@ const HOUSES := {
 	"relojeria": "HouseRelojeria",
 	"pension": "HousePension",
 	"ferreyra": "HouseFerreyra",
+	"veterinaria": "HouseVeterinaria",
 }
 
 var house_id := ""
+## Las casas que no dan a la avenida: a qué escena vuelven.
+const RETURN_SCENES := {"veterinaria": "res://scenes/levels/park_street.tscn"}
 
 
 func _initialize() -> void:
@@ -147,7 +150,7 @@ func _house_systems(door_x: float) -> void:
 	# Puerta de vuelta a la calle.
 	var door := Area3D.new()
 	door.set_script(load("res://scripts/world/zone_door.gd"))
-	door.set("target_scene", "res://scenes/levels/street.tscn")
+	door.set("target_scene", RETURN_SCENES.get(house_id, "res://scenes/levels/street.tscn"))
 	door.set("target_spawn", StringName("house_" + house_id))
 	door.set("radius", 1.1)
 	door.position = Vector3(door_x, 1.2, -0.3)
@@ -363,3 +366,94 @@ func _house_ferreyra() -> float:
 	label.rotation_degrees.y = -90
 	_add(gated, label, "Label3D")
 	return -2.5
+
+
+## La Veterinaria San Roque (pedido del usuario: ahí está Teodoro, listo para el alta).
+## Se entra desde Rondeau, en el barrio. Sala de espera con mostrador; atrás, el
+## consultorio y la internación con las jaulas.
+func _house_veterinaria() -> float:
+	_shell(14.0, 12.0, "floor", "house_wall2", 0.0, [-4.5, 4.5])
+	# Pared entre la sala de espera (z -5..0) y el fondo, y la que separa consultorio e internación.
+	_wall("x", -5.0, -7.0, 7.0, 0.0, CEIL, T, [_door(-4.0), _door(3.0)], "house_wall", false)
+	_wall("z", -1.0, -12.0, -5.0, 0.0, CEIL, T, [], "house_wall", false)
+	_bulb(0.0, -2.5, 0.8, true)
+	_bulb(-4.0, -8.5, 0.6)
+	_bulb(3.0, -8.5, 0.5, true)
+	# Sala de espera: mostrador, bancos, carteles, la pecera.
+	_counter(1.5, 6.0, -3.6, 0.0)
+	_prop("computerScreen", Vector3(3.0, 1.05, -3.5), 180)
+	_prop("chairDesk", Vector3(3.0, 0, -4.4), 0)
+	for x in [-6.0, -4.8]:
+		_prop("bench", Vector3(x, 0, -1.0), 90)
+	_prop("pottedPlant", Vector3(-6.4, 0, -4.4))
+	_box(groups.Props, "FishTank", Vector3(-6.5, 1.1, -3.0), Vector3(0.5, 0.5, 1.2), "fog_window")
+	_box(groups.Props, "FishTankStand", Vector3(-6.5, 0.42, -3.0), Vector3(0.5, 0.84, 1.2), "shelf_wood")
+	for i in 3:
+		_box(groups.Structure, "Poster", Vector3(-1.5 + i * 0.9, 1.6, -4.88), Vector3(0.6, 0.8, 0.02), "paper", false)
+	_inspect(Vector3(-6.0, 1.2, -3.0), ["La pecera. El agua está turbia y los peces nadan todos juntos, en círculo, sin parar."], 1.0)
+	_inspect(Vector3(3.6, 1.2, -3.2), ["En el mostrador, el libro de turnos. La última línea: \"Teodoro - ALTA - avisar a la familia\".",
+		"Al lado, alguien dibujó un gato con birome. Tiene cara de enojado. Es igualito."], 1.2)
+	_inspect(Vector3(-0.6, 1.5, -4.6), ["Carteles: \"VACUNACIÓN ANTIRRÁBICA\", \"CASTRÁ A TU MASCOTA\". Alguien escribió abajo, a mano: \"Teo, esto va por vos\"."], 1.2)
+	# Consultorio (x -7..-1): camilla de acero, armario, pileta, balanza.
+	_box(groups.Props, "ExamTable", Vector3(-4.0, 0.45, -8.5), Vector3(1.2, 0.9, 0.7), "metal")
+	_prop("tall_cabinet", Vector3(-6.6, 0, -9.0), 90)
+	_prop("kitchenSink", Vector3(-4.0, 0, -11.55), 0)
+	_box(groups.Props, "Scale", Vector3(-2.0, 0.05, -10.8), Vector3(0.6, 0.1, 0.5), "metal", false)
+	_prop("blood", Vector3(-3.6, 0.01, -7.4), 30)
+	_inspect(Vector3(-4.0, 1.0, -8.5), ["La camilla de acero todavía tiene pelos grises pegados. Muchos. Demasiados para un solo animal."], 1.1)
+	# Internación (x -1..7): las jaulas contra el fondo, dos filas.
+	for row in 2:
+		for i in 4:
+			var center := Vector3(0.5 + i * 1.6, 0.55 + row * 1.0, -11.3)
+			var open := (row == 1 and i == 0) or (row == 0 and i == 3)
+			_cage(center, open, row == 0 and i == 1)
+	_label3d_house("TEODORO\nALTA", Vector3(2.1, 1.25, -10.48), 0, Color(0.15, 0.15, 0.2))
+	_cat(Vector3(2.1, 0.14, -11.3), 0.0, 0).set("radius", 1.6)
+	_prop("blood", Vector3(5.2, 0.01, -9.8), 120)
+	_inspect(Vector3(5.3, 1.0, -10.2), ["Dos jaulas están abiertas, con los barrotes doblados hacia afuera. Lo que había adentro salió solo."], 1.2)
+	_prop("cardboardBoxOpen", Vector3(6.3, 0, -6.0), 30)
+	_pickup("Bandage", "medicine_bandage", Vector3(-6.6, 1.0, -9.0))
+	_pickup("Cloth", "material_cloth", Vector3(6.2, 0.45, -6.0), 2)
+	_pickup("Chocolate", "food_chocolate_bar", Vector3(4.6, 1.05, -3.6))
+	_stalker(Vector3(-4.0, 0.05, -10.4), 1.2)
+	_extra_enemy(Vector3(4.0, 0.05, -7.0), 1, 1.5)
+	_extra_enemy(Vector3(-5.0, 0.05, -2.0), 2, 1.0, "res://scenes/enemies/spitter.tscn")
+	# Quebrado: en la jaula vacía de al lado, algo te mira.
+	var gated := Node3D.new()
+	gated.set_script(GatedScript)
+	gated.set("threshold", 2)
+	_add(groups.Secrets, gated, "CageWriting")
+	_label3d_house("ÉL TAMBIÉN\nTE ESPERABA", Vector3(0.5, 2.6, -10.45), 0, Color(0.55, 0.05, 0.03), gated)
+	return 0.0
+
+
+## Una jaula de internación (caja de metal con barrotes al frente; abierta o no).
+func _cage(center: Vector3, open: bool, has_cat: bool) -> void:
+	var w := 1.4
+	var h := 0.9
+	var d := 0.9
+	_box(groups.Props, "CageFloor", center + Vector3(0, -h / 2 + 0.02, 0), Vector3(w, 0.04, d), "metal", true)
+	_box(groups.Props, "CageTop", center + Vector3(0, h / 2 - 0.02, 0), Vector3(w, 0.04, d), "metal", false)
+	for sx in [-1.0, 1.0]:
+		_box(groups.Props, "CageSide", center + Vector3(sx * (w / 2 - 0.02), 0, 0), Vector3(0.04, h, d), "metal", false)
+	if open:
+		# La puerta, arrancada, colgando de una bisagra.
+		var door := _box(groups.Props, "CageDoorOpen", center + Vector3(-w / 2 - 0.3, -0.1, d / 2 + 0.3), Vector3(0.6, 0.7, 0.03), "bars", false)
+		door.rotation_degrees = Vector3(10, 60, 15)
+	else:
+		for k in 7:
+			_box(groups.Props, "CageBar", center + Vector3(-w / 2 + 0.1 + k * 0.2, 0, d / 2), Vector3(0.025, h - 0.06, 0.025), "bars", false)
+	if has_cat:
+		_box(groups.Props, "CageBlanket", center + Vector3(0, -h / 2 + 0.06, 0), Vector3(w - 0.2, 0.04, d - 0.2), "blanket", false)
+
+
+func _label3d_house(text: String, pos: Vector3, yaw: float, color: Color, parent: Node = null) -> void:
+	var label := Label3D.new()
+	label.text = text
+	label.font = load("res://assets/fonts/pixel_operator/PixelOperator.ttf")
+	label.font_size = 32
+	label.pixel_size = 0.004
+	label.modulate = color
+	label.position = pos
+	label.rotation_degrees.y = yaw
+	_add(parent if parent else groups.Props, label, "Label")

@@ -39,6 +39,8 @@ const COURT_Z := 20.0
 ## Moreno sigue al sur, hacia el parque (una zona futura): cortada por un bloqueo policial.
 const PARK_ROAD_X := 96.0
 const PARK_ROAD_END := 52.0
+## La Veterinaria San Roque, en Rondeau (vereda norte, x 130-144): ahí está Teodoro.
+const VET_X0 := 130.0
 
 
 
@@ -180,7 +182,8 @@ func _blocks() -> void:
 	# Rondeau, vereda norte (frentes al sur): el autoservicio en x 60..84, la farmacia en 96..110.
 	_frontage(Vector3(B_X0, 0, B_Z - WALK), Vector3(LOT.position.x, 0, B_Z - WALK), 0)
 	_frontage(Vector3(LOT.end.x, 0, B_Z - WALK), Vector3(96.0, 0, B_Z - WALK), 0)
-	_frontage(Vector3(110.0, 0, B_Z - WALK), Vector3(B_X1, 0, B_Z - WALK), 0)
+	_frontage(Vector3(110.0, 0, B_Z - WALK), Vector3(VET_X0, 0, B_Z - WALK), 0)
+	_frontage(Vector3(VET_X0 + 14.0, 0, B_Z - WALK), Vector3(B_X1, 0, B_Z - WALK), 0)
 	# Las transversales: los edificios de las esquinas ponen el costado; en el medio de la
 	# cuadra, uno de frente y ladrillo en los huecos (Moreno tiene la boca del pasaje).
 	for cx: float in CROSS:
@@ -354,6 +357,7 @@ func _storefronts() -> void:
 	_box(groups.Props, "GreenCrossV", cross, Vector3(0.3, 1.0, 0.12), "pharma_green", false)
 	_box(groups.Props, "GreenCrossH", cross, Vector3(1.0, 0.3, 0.07), "pharma_green", false)
 	_light(cross + Vector3(0, 0, 0.6), Color(0.3, 1.0, 0.45), 0.8, 7.0, true)
+	_vet_front()
 	_inspect(pharmacy + Vector3(0, 1.2, 0.6), ["La farmacia de Don Aldo. Rompieron la vidriera y se llevaron todo, hasta los termómetros.",
 		"Acá venía con recetas que no eran mías. Él sabía y me vendía igual, hasta que mamá vino a hablar con él.",
 		"Después de eso me saludaba de lejos. Nunca supe si era vergüenza o lástima."], 1.4)
@@ -361,7 +365,7 @@ func _storefronts() -> void:
 
 ## Una fachada de local: ladrillo, el volumen del edificio, vidriera, cartel y una puerta
 ## con cadena. Devuelve el pie de la puerta.
-func _storefront(a: Vector3, b: Vector3, facing: float, title: String, subtitle: String, color: Color) -> Vector3:
+func _storefront(a: Vector3, b: Vector3, facing: float, title: String, subtitle: String, color: Color, chained := true) -> Vector3:
 	var holder := _add(groups.Buildings, Node3D.new(), "Storefront")
 	var basis := Basis(Vector3.UP, deg_to_rad(facing))
 	var front := basis * Vector3(0, 0, 1)
@@ -377,7 +381,8 @@ func _storefront(a: Vector3, b: Vector3, facing: float, title: String, subtitle:
 	_label(holder, title, mid + front * 0.23 + Vector3.UP * 3.38, facing, color, 0.008)
 	_label(holder, subtitle, mid + front * 0.23 + Vector3.UP * 3.0, facing, color.darkened(0.2), 0.0045)
 	var door := mid - right * (width * 0.27)
-	_door_prop(holder, "ChainedDoor", "door_chained", door + front * 0.05, facing, 1.3, 2.4)
+	if chained:
+		_door_prop(holder, "ChainedDoor", "door_chained", door + front * 0.05, facing, 1.3, 2.4)
 	return door
 
 
@@ -700,7 +705,7 @@ func _dressing() -> void:
 	# Árboles de vereda en Larrea, del lado de la plaza no (ya están las rejas).
 	for tx in [124.0, 138.0, 166.0]:
 		_nature("tree_thin_dark", Vector3(tx, 0, 5.0), 5.0)
-	for tx in [28.0, 76.0, 132.0]:
+	for tx in [28.0, 76.0, 156.0]:
 		_nature("tree_default_dark", Vector3(tx, 0, B_Z - 5.0), 5.5)
 	# Un banco de la vereda, contra la reja de la plaza.
 	_prop("res://assets/models/props/kenney/bench.glb", Vector3(20.0, 0, 5.4), 180, {"h": 0.45, "tint": Color(0.5, 0.42, 0.36)})
@@ -887,3 +892,26 @@ func _park_road() -> void:
 	_inspect(Vector3(cx, 1.0, bz - 3.2), ["Un bloqueo de la policía: patrulleros cruzados de vereda a vereda y cinta de \"NO PASAR\".",
 		"Del otro lado la calle sigue hacia el Parque Centenario. Entre los árboles se mueve algo alto, despacio.",
 		"Los patrulleros están vacíos. En la radio de uno, alguien repite un código que no conozco."], 2.6)
+
+
+## La Veterinaria San Roque (pedido del usuario): la puerta se abre, adentro está Teodoro.
+func _vet_front() -> void:
+	var front := Vector3.BACK
+	var door := _storefront(Vector3(VET_X0, 0, B_Z - WALK), Vector3(VET_X0 + 14.0, 0, B_Z - WALK), 0.0, "VETERINARIA SAN ROQUE",
+		"PERROS - GATOS - URGENCIAS", Color(0.75, 0.88, 0.95), false)
+	var zone := Area3D.new()
+	zone.set_script(load("res://scripts/world/zone_door.gd"))
+	zone.set("target_scene", "res://scenes/levels/street_houses/veterinaria.tscn")
+	zone.set("target_spawn", &"inside")
+	zone.set("radius", 1.3)
+	zone.position = door + front * 0.4 + Vector3.UP * 1.2
+	_add(groups.Inspectables, zone, "Door_veterinaria")
+	_zone_door_visuals(zone, door + front * 0.05, 0.0, "door_wood_open", "", 1.3, 2.4, true)
+	var spawn := Marker3D.new()
+	spawn.set_script(load("res://scripts/world/spawn_point.gd"))
+	spawn.set("spawn_id", &"house_veterinaria")
+	spawn.position = door + front * 2.6 + Vector3.UP * 0.05
+	spawn.rotation_degrees.y = 180.0
+	_add(scene_root, spawn, "SpawnHouse_veterinaria")
+	_inspect(door + Vector3(4.0, 1.4, 0.5), ["La vidriera de la veterinaria: bolsas de alimento, collares, un gato de yeso que saluda con la pata.",
+		"Adentro, en el fondo, algo maúlla. Conozco ese maullido. Es ronco, de cantor de bodegón."], 1.4)
