@@ -38,6 +38,9 @@ const PASAJE_END := 128.0
 const COURT_X := 180.0
 const HOSP_X := 206.0
 const COURT_Z := 20.0
+## Moreno sigue al sur, hacia el parque (una zona futura): cortada por un bloqueo policial.
+const PARK_ROAD_X := 96.0
+const PARK_ROAD_END := 52.0
 
 const MODELS := ["Building_Small_1", "Building_Medium_2_001", "Building_Large_2"]
 const TINTS := [Color(0.6, 0.6, 0.62), Color(0.66, 0.62, 0.6), Color(0.68, 0.64, 0.6),
@@ -73,6 +76,7 @@ func _initialize() -> void:
 	_park()
 	_fences()
 	_dressing()
+	_park_road()
 	_street_signs()
 	_park_lore()
 	_park_secrets()
@@ -303,7 +307,8 @@ func _park_ground() -> void:
 			_box(groups.Structure, "Crossing", Vector3(cx, -0.03, cz), Vector3(12.0, 0.04, 12.0), "asphalt", false)
 			# La vereda del lado sin calle sigue de largo.
 			var side := 1.0 if cz == 0.0 else -1.0
-			_box(groups.Structure, "SidewalkStrip", Vector3(cx, -0.01, cz + side * 4.5), Vector3(12.0, 0.02, 3.0), "sidewalk", false)
+			if not (cx == PARK_ROAD_X and cz == 0.0):
+				_box(groups.Structure, "SidewalkStrip", Vector3(cx, -0.01, cz + side * 4.5), Vector3(12.0, 0.02, 3.0), "sidewalk", false)
 			for arm in [-1.0, 1.0]:
 				_piece(CITY + "Decal_Crosswalk.gltf", Vector3(cx + arm * 7.5, 0.01, cz), 90.0, groups.Structure,
 					Color(0.7, 0.7, 0.68))
@@ -353,7 +358,9 @@ func _blocks() -> void:
 	_frontage(Vector3(102.0, 0, -WALK), Vector3(144.0, 0, -WALK), 0)
 	_frontage(Vector3(156.0, 0, -WALK), Vector3(A_END, 0, -WALK), 0)
 	# Larrea, vereda sur (frentes al norte), después de la plaza.
-	_frontage(Vector3(A_END, 0, WALK), Vector3(PLAZA_X, 0, WALK), 180)
+	_frontage(Vector3(A_END, 0, WALK), Vector3(PARK_ROAD_X + WALK, 0, WALK), 180)
+	_brick_facing(Vector3(PARK_ROAD_X - WALK, 0, WALK), Vector3(PLAZA_X, 0, WALK), Vector3.FORWARD, 2, groups.Buildings)
+	_blocker(PLAZA_X, WALK, PARK_ROAD_X - WALK, WALK + 0.4, 8.0)
 	# Rondeau, vereda sur (frentes al norte).
 	_frontage(Vector3(36.0, 0, B_Z + WALK), Vector3(B_X0, 0, B_Z + WALK), 180)
 	_frontage(Vector3(90.0, 0, B_Z + WALK), Vector3(48.0, 0, B_Z + WALK), 180)
@@ -972,6 +979,8 @@ func _park_enemies() -> void:
 	_instance(stalker, groups.Enemies, "StalkerMoreno", Vector3(96.0, 0.05, -38.0), {"wander_radius": 6.0})
 	_instance(stalker, groups.Enemies, "StalkerRondeau", Vector3(128.0, 0.05, B_Z), {"wander_radius": 8.0})
 	_instance(stalker, groups.Enemies, "StalkerLot", Vector3(70.0, 0.05, -80.0), {"wander_radius": 5.0})
+	# Un escupidor en Rondeau: desde lejos, entre los autos.
+	_instance("res://scenes/enemies/spitter.tscn", groups.Enemies, "SpitterRondeau", Vector3(150.0, 0.05, B_Z - 2.0), {"wander_radius": 4.0})
 	# Uno adentro de la plaza: no puede salir, pero mira desde las rejas.
 	_instance(stalker, groups.Enemies, "StalkerPark", Vector3(60.0, 0.05, 32.0), {"wander_radius": 8.0})
 	# Más según la dificultad.
@@ -1019,3 +1028,49 @@ func _park_systems() -> void:
 	_instance("res://scenes/effects/ps1_post_process.tscn", scene_root, "PS1PostProcess", Vector3.ZERO)
 	var ui: Node = load("res://scenes/ui/game_ui.tscn").instantiate()
 	_add(scene_root, ui, "GameUI")
+
+
+# --- Hacia el parque (pedido del usuario: una salida abierta pero bloqueada por la policía;
+#     más adelante va a ser otra zona) ---------------------------------------------------
+
+func _park_road() -> void:
+	var holder := _add(groups.Props, Node3D.new(), "ParkRoad")
+	var cx := PARK_ROAD_X
+	var z := WALK + 3.0
+	while z < PARK_ROAD_END:
+		_piece(CITY + "Street_2Lane.gltf", Vector3(cx, 0.0, z), 90.0, groups.Structure, Color(0.6, 0.6, 0.6))
+		z += 6.0
+	# Al oeste, la reja de la plaza (con una pared atrás); al este, una cuadra de edificios.
+	_brick_facing(Vector3(cx - WALK, 0, WALK), Vector3(cx - WALK, 0, PARK_ROAD_END), Vector3.RIGHT, 2, groups.Buildings)
+	_blocker(cx - WALK - 0.4, WALK, cx - WALK, PARK_ROAD_END, 8.0)
+	_frontage(Vector3(cx + WALK, 0, WALK + 16.5), Vector3(cx + WALK, 0, PARK_ROAD_END), -90)
+	_brick_facing(Vector3(cx + WALK + 0.3, 0, WALK), Vector3(cx + WALK + 0.3, 0, PARK_ROAD_END), Vector3.LEFT, 2, groups.Buildings)
+	_blocker(cx + WALK, WALK, cx + WALK + 0.4, PARK_ROAD_END, 8.0)
+	# Al fondo, entre la niebla, los árboles del parque.
+	for i in 9:
+		_nature(["tree_oak_dark", "tree_default_dark", "tree_tall_dark"].pick_random(),
+			Vector3(cx + randf_range(-5.0, 5.0), 0, PARK_ROAD_END - randf_range(0.5, 6.0)), randf_range(6.0, 8.5), -1.0, holder)
+	_box(holder, "ParkSignPole", Vector3(cx + 5.4, 1.4, 30.0), Vector3(0.08, 2.8, 0.08), "metal", false)
+	_box(holder, "ParkSign", Vector3(cx + 5.3, 2.5, 30.0), Vector3(0.04, 0.5, 1.6), "sign", false)
+	_label(holder, "PARQUE CENTENARIO", Vector3(cx + 5.27, 2.5, 30.0), -90, Color(0.85, 0.85, 0.8), 0.005)
+	_blocker(cx - WALK, PARK_ROAD_END, cx + WALK, PARK_ROAD_END + 0.4, 6.0)
+	# El bloqueo: dos patrulleros en V, una camioneta, vallas, conos y cinta. No se pasa.
+	var bz := WALK + 6.0
+	_car("police", Vector3(cx - 2.6, 0, bz), 35.0, Color(0.75, 0.74, 0.74))
+	_car("police", Vector3(cx + 2.6, 0, bz), -35.0, Color(0.7, 0.7, 0.72))
+	_car("van", Vector3(cx, 0, bz + 3.2), 90.0, Color(0.6, 0.6, 0.62))
+	for x in [cx - 4.8, cx + 4.8]:
+		_box(holder, "Barrier", Vector3(x, 0.9, bz - 1.6), Vector3(1.6, 0.25, 0.1), "tape", false)
+		_box(holder, "BarrierLeg", Vector3(x - 0.7, 0.45, bz - 1.6), Vector3(0.1, 0.9, 0.1), "plywood", false)
+		_box(holder, "BarrierLeg", Vector3(x + 0.7, 0.45, bz - 1.6), Vector3(0.1, 0.9, 0.1), "plywood", false)
+	for i in 6:
+		_prop(CARS + "cone.glb", Vector3(cx - 4.5 + i * 1.8, 0, bz - 2.6 + randf_range(-0.3, 0.3)), randf_range(0, 360),
+			{"s": 1.0, "col": false})
+	_box(holder, "PoliceTape", Vector3(cx, 0.95, bz - 1.9), Vector3(2 * WALK, 0.04, 0.02), "tape", false)
+	_box(holder, "BlockadeCollider", Vector3(cx, 1.5, bz), Vector3(2 * WALK, 3.0, 4.6), "collider", true, false)
+	# Las balizas de un patrullero, todavía girando.
+	_light(Vector3(cx - 2.6, 1.9, bz), Color(0.2, 0.35, 1.0), 1.0, 7.0, true)
+	_light(Vector3(cx + 2.6, 1.9, bz), Color(1.0, 0.15, 0.1), 0.8, 6.0, true)
+	_inspect(Vector3(cx, 1.0, bz - 3.2), ["Un bloqueo de la policía: patrulleros cruzados de vereda a vereda y cinta de \"NO PASAR\".",
+		"Del otro lado la calle sigue hacia el Parque Centenario. Entre los árboles se mueve algo alto, despacio.",
+		"Los patrulleros están vacíos. En la radio de uno, alguien repite un código que no conozco."], 2.6)

@@ -120,7 +120,7 @@ func _initialize() -> void:
 			["16_farmacia", Vector3(102.0, 0.05, -57.0), 20.0], ["17_autoservicio", Vector3(72.0, 0.05, -70.0), 0.0],
 			["18_rondeau", Vector3(140.0, 0.05, -60.0), -90.0], ["19_pichincha", Vector3(150.0, 0.05, -40.0), 180.0],
 			["20_larrea_este", Vector3(160.0, 0.05, 0.0), -90.0], ["21_guardia", Vector3(183.0, 0.05, 1.0), -90.0],
-			["22_guardia_puerta", Vector3(199.5, 0.5, 0.5), -90.0], ["22b_guardia_patio", Vector3(184.0, 0.05, -12.0), -60.0], ["23_carpa", Vector3(186.0, 0.05, 7.5), 180.0],
+			["22_guardia_puerta", Vector3(199.5, 0.5, 0.5), -90.0], ["22b_guardia_patio", Vector3(184.0, 0.05, -12.0), -60.0], ["23_carpa", Vector3(186.0, 0.05, 7.5), 180.0], ["23b_bloqueo_parque", Vector3(96.0, 0.05, 3.0), 180.0],
 			["24_camion", Vector3(10.0, 0.05, 1.0), 90.0]]:
 		place(s[1], s[2])
 		await shot(s[0])
@@ -138,6 +138,9 @@ func _initialize() -> void:
 	place(Vector3(97.0, 0.05, 0.0), -90.0)
 	await walk("move_forward", 200)
 	check(player().global_position.x < 102.6, "el socavón corta Larrea: x=%.2f" % player().global_position.x)
+	place(Vector3(96.0, 0.05, 3.0), 180.0)
+	await walk("move_forward", 200)
+	check(player().global_position.z < 9.6, "el bloqueo policial no deja ir al parque: z=%.2f" % player().global_position.z)
 	place(Vector3(32.0, 0.05, -60.0), 90.0)
 	await walk("move_forward", 200)
 	check(player().global_position.x > 26.5, "Rondeau termina en escombros: x=%.2f" % player().global_position.x)

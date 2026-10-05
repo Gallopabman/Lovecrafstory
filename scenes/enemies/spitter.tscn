@@ -1,0 +1,62 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/spitter.gd" id="1_spitter"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/tentacled/tentacled.glb" id="2_model"]
+[ext_resource type="Script" path="res://scripts/world/horror_sighting.gd" id="3_sighting"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.4
+height = 2.0
+
+[node name="Spitter" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_spitter")
+tint = Color(0.5, 0.56, 0.44, 1)
+anim_idle = &"CharacterArmature|Idle"
+anim_walk = &"CharacterArmature|Walk"
+anim_run = &"CharacterArmature|Run"
+run_anim_speed = 0.8
+anim_attack = &"CharacterArmature|Punch"
+anim_hit = &"CharacterArmature|HitReact"
+anim_death = &"CharacterArmature|Death"
+max_health = 70.0
+kill_sanity_reward = 6.0
+wander_speed = 0.8
+chase_speed = 2.4
+sight_range = 15.0
+sight_half_angle = 80.0
+hearing_range = 9.0
+lose_time = 6.0
+eye_height = 1.7
+attack_range = 1.4
+attack_damage = 8.0
+attack_hit_time = 0.35
+sound_idle = &"zombie_growl"
+sound_alert = &"zombie_growl"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Model" parent="Visual" instance=ExtResource("2_model")]
+transform = Transform3D(1.05, 0, 0, 0, 1.05, 0, 0, 0, 1.05, 0, 0, 0)
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.6
+target_desired_distance = 0.6
+height = 2.0
+radius = 0.45
+
+[node name="HorrorSighting" type="Node3D" parent="."]
+script = ExtResource("3_sighting")
+horror_id = &"escupidor"
+first_sight_sanity = 10.0
+eye_height = 1.7
+face_player = false
+
+[node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="HorrorSighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+aabb = AABB(-0.8, -1.0, -0.6, 1.6, 2.2, 1.2)
