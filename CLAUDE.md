@@ -409,7 +409,7 @@ Godot **4.7.2** (no está en el PATH):
 - **Test de la comisaría y la iglesia**: `<godot> --path . -s res://tests/avenue_places_test.gd` (entrada y
   salida, secretos por dificultad, bajar a la cripta).
 - **Test del sótano**: `<godot> --path . -s res://tests/basement_test.gd` (casa de Ferreyra y la llave, la puerta del
-  sótano, navmesh, recorrido, el jefe, la sala de guardia, la vuelta al hospital; `test_shotsbasement`).
+  sótano, navmesh, recorrido, el jefe, la sala de guardia, la vuelta al hospital; `test_shots/basement/`).
 - **Test del teatro**: `<godot> --path . -s res://tests/theater_test.gd` (llave, escopeta, jefe, camarín,
   mudarse, el sobreviviente nuevo llega al teatro).
 - Una `class_name` nueva no existe para los tests hasta correr `--import` (refresca la caché de clases).
