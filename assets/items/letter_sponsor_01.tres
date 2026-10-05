@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_envelope.glb" id="2_env"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"letter_sponsor_01"
+display_name = "Carta de tu padrino"
+short_name = "CARTA"
+description = "Un sobre metido por debajo de la puerta del Centro de Día. Tiene tu nombre, con la letra torcida de tu padrino del grupo."
+kind = 3
+max_sanity_bonus = 10.0
+letter_text = "Pibe:\n\nVine al centro y está cerrado. No hay nadie. Te dejo esto acá porque sé que tarde o temprano pasás por la puerta, aunque sea para mirarla.\n\nLa niebla no es excusa. Ya sé lo que te está diciendo: que si el mundo se termina, qué importa una más. Yo también lo escucho. Tiene la misma voz de siempre.\n\nAcordate de lo que hablamos: la depresión no es una opinión sobre tu vida. Es una enfermedad que miente. Y miente bien.\n\nSi te agarran las ganas, hacé lo de siempre. Llamá a alguien. Caminá. Comé algo. Contá hasta cien. Y si no queda nadie a quien llamar, hablale a esta carta.\n\nCiento doce días. No los tires por una noche fea.\n\nTu padrino"
+world_color = Color(0.92, 0.9, 0.82, 1)
+world_scene = ExtResource("2_env")
+world_size = 0.26
+world_rotation = Vector3(-90, 0, 0)

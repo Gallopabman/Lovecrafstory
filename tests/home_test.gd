@@ -114,8 +114,14 @@ func _initialize() -> void:
 	check(player().global_position.distance_to(Vector3(5.5, 0, -3.4)) < 0.5, "frente a la puerta de casa")
 	await shot("07_salida")
 	for s: Array in [["08_plaza", Vector3(20.0, 0.05, 3.5), 180.0], ["09_calle_este", Vector3(10.0, 0.05, 0.0), -90.0],
-			["10_casa", Vector3(8.0, 0.05, 4.5), 20.0], ["11_hospital", Vector3(50.0, 0.05, 1.0), -90.0],
-			["12_camion", Vector3(10.0, 0.05, 1.0), 90.0]]:
+			["10_casa", Vector3(8.0, 0.05, 4.5), 20.0], ["11_centro_de_dia", Vector3(54.0, 0.05, -1.5), 10.0],
+			["12_socavon", Vector3(99.0, 0.05, 0.5), -90.0], ["13_moreno", Vector3(97.0, 0.05, -18.0), 0.0],
+			["14_pasaje", Vector3(108.0, 0.05, -29.5), -90.0], ["15_pasaje_fondo", Vector3(122.0, 0.05, -29.5), -90.0],
+			["16_farmacia", Vector3(102.0, 0.05, -57.0), 20.0], ["17_autoservicio", Vector3(72.0, 0.05, -70.0), 0.0],
+			["18_rondeau", Vector3(140.0, 0.05, -60.0), -90.0], ["19_pichincha", Vector3(150.0, 0.05, -40.0), 180.0],
+			["20_larrea_este", Vector3(160.0, 0.05, 0.0), -90.0], ["21_guardia", Vector3(183.0, 0.05, 1.0), -90.0],
+			["22_guardia_puerta", Vector3(199.5, 0.5, 0.5), -90.0], ["22b_guardia_patio", Vector3(184.0, 0.05, -12.0), -60.0], ["23_carpa", Vector3(186.0, 0.05, 7.5), 180.0],
+			["24_camion", Vector3(10.0, 0.05, 1.0), 90.0]]:
 		place(s[1], s[2])
 		await shot(s[0])
 
@@ -123,41 +129,65 @@ func _initialize() -> void:
 	place(Vector3(20.0, 0.05, 3.5), 180.0)
 	await walk("move_forward", 150)
 	check(player().global_position.z < 6.3, "la reja de la plaza frena: z=%.2f" % player().global_position.z)
-	place(Vector3(30.0, 0.05, 3.5), 180.0)
+	place(Vector3(42.0, 0.05, 3.5), 180.0)
 	await walk("move_forward", 150)
 	check(player().global_position.z < 6.3, "el portón está cerrado: z=%.2f" % player().global_position.z)
 	place(Vector3(6.0, 0.05, 0.0), 90.0)
 	await walk("move_forward", 200)
 	check(player().global_position.x > 3.0, "la calle termina en el camión: x=%.2f" % player().global_position.x)
-	place(Vector3(56.0, 0.05, 0.0), -90.0)
+	place(Vector3(97.0, 0.05, 0.0), -90.0)
 	await walk("move_forward", 200)
-	check(player().global_position.x < 61.9, "el hospital es una pared: x=%.2f" % player().global_position.x)
+	check(player().global_position.x < 102.6, "el socavón corta Larrea: x=%.2f" % player().global_position.x)
+	place(Vector3(32.0, 0.05, -60.0), 90.0)
+	await walk("move_forward", 200)
+	check(player().global_position.x > 26.5, "Rondeau termina en escombros: x=%.2f" % player().global_position.x)
+	place(Vector3(70.0, 0.05, -2.0), 0.0)
+	await walk("move_forward", 150)
+	check(player().global_position.z > -6.4, "los edificios frenan: z=%.2f" % player().global_position.z)
+	place(Vector3(202.0, 0.05, 15.0), 0.0)
+	await walk("move_forward", 150)
+	check(player().global_position.y > 0.35, "la rampa sube al andén: y=%.2f" % player().global_position.y)
+	place(Vector3(194.5, 0.05, 1.5), -90.0)
+	await walk("move_forward", 90)
+	check(player().global_position.y > 0.35, "y los escalones también: y=%.2f" % player().global_position.y)
+	place(Vector3(200.4, 0.5, 6.0), -90.0)
+	await walk("move_forward", 200)
+	check(player().global_position.x < 206.0, "el hospital es una pared: x=%.2f" % player().global_position.x)
 	await physics_frame
 	var map: RID = player().get_world_3d().navigation_map
-	var path := NavigationServer3D.map_get_path(map, Vector3(20, 0, 0), Vector3(30, 0, 20), true)
-	check(path.size() == 0 or path[path.size() - 1].distance_to(Vector3(30, 0, 20)) > 3.0, "no hay camino a la plaza")
+	var path := NavigationServer3D.map_get_path(map, Vector3(42, 0, 20), Vector3(20, 0, 0), true)
+	check(path.size() == 0 or path[path.size() - 1].distance_to(Vector3(42, 0, 20)) > 3.0, "no hay camino a la plaza")
+	path = NavigationServer3D.map_get_path(map, Vector3(8, 0, 0), Vector3(190, 0, 0), true)
+	var north := 0.0
+	for p in path:
+		north = minf(north, p.z)
+	check(path.size() > 2 and path[path.size() - 1].distance_to(Vector3(190, 0, 0)) < 1.0 and north < -50.0,
+		"de casa a la guardia hay que dar la vuelta por Rondeau: %d puntos, z mín %.1f" % [path.size(), north])
 
 	print("-- Secreto")
 	sanity._set_current(sanity.maximum * 0.3)
 	await frames(5)
 	check(current_scene.get_node("Secrets/BenchLetter").visible, "Quebrado: aparece la carta debajo del banco")
+	check(current_scene.get_node("Secrets/PasajeDealer").visible, "Quebrado: el Flaco espera en el pasaje")
 	place(Vector3(20.0, 0.05, 3.2), 180.0, -25.0)
-	await shot("13_carta_banco")
+	await shot("25_carta_banco")
+	place(Vector3(118.0, 0.05, -29.5), -90.0)
+	await shot("26_pasaje_quebrado")
 	sanity._set_current(sanity.maximum)
 
 	print("-- Al hospital")
-	place(Vector3(60.5, 0.05, 0.0), -90.0)
+	place(Vector3(200.4, 0.5, 0.8), -90.0)
 	await frames(5)
 	current_scene.get_node("Inspectables/HospitalDoor").interact(player())
 	await settle()
 	check(current_scene.name == "Hospital", "la puerta de guardia lleva al hospital")
 	check(player().global_position.distance_to(Vector3(2.7, 0, 9.5)) < 0.5, "entra por el oeste del pasillo")
 	check(not sanity.in_refuge(), "la sala del personal ya no es el refugio")
-	await shot("14_guardia")
+	await shot("27_guardia_adentro")
 	current_scene.get_node("Inspectables/GuardDoor").interact(player())
 	await settle()
-	check(current_scene.name == "ParkStreet" and player().global_position.distance_to(Vector3(58.8, 0, 0)) < 0.5,
-		"y se vuelve a la calle de la plaza")
+	check(current_scene.name == "ParkStreet" and player().global_position.distance_to(Vector3(200.4, 0.45, 0.8)) < 0.5,
+		"y se vuelve a la guardia: %s" % player().global_position)
 
 	print("-- El que viene después llega a casa")
 	root.get_node("GameState").new_survivor()

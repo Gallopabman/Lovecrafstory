@@ -34,7 +34,7 @@ en vez de inventarlo.
 - **Refugio**: blueprints de slots fijos (fuego, electricidad, cama, decoración, ventanas,
   estaciones). Un solo refugio activo; mudarse es una decisión. Bono de llegada según logros de la salida.
 - **Mundo interconectado** ("lineal abierto", atajos estilo RE2/Dark Souls). Primer tramo:
-  refugio → edificio → calle → teatro. Hoy: **casa** (refugio inicial) → calle de la plaza → hospital →
+  refugio → edificio → calle → teatro. Hoy: **casa** (refugio inicial) → el barrio (la plaza) → hospital →
   avenida → teatro. Cada zona tiene un secreto visible solo con poca cordura.
 - **Cámaras**: fijas en interiores, libre en exteriores (pendiente).
 - **HUD** (cambio del usuario, antes no había): barras de **vida** y **locura** siempre visibles arriba a la
@@ -204,7 +204,7 @@ en vez de inventarlo.
 - Assets de terceros: registrar siempre en [CREDITS.md](CREDITS.md) (preferir CC0; los CC-BY
   necesitan atribución en los créditos del juego).
 
-## Zona 0: la casa y la calle de la plaza (el comienzo)
+## Zona 0: la casa y el barrio (el comienzo)
 
 **Historia** (del usuario): el protagonista era adicto a las drogas por una depresión severa y está en
 recuperación. Su madre es médica (en el juego, "Dra. M. Ibáñez", guardia del San Judas: el nombre lo
@@ -220,16 +220,29 @@ recaiga. La nota de mamá dice que la llamaron del San Judas por la niebla: eso 
   dormido, flag de muerte `attic_boss_dead`). Modelo: 3D Horror Game Monster (CC0, sin cara, boca vertical);
   no trae ataque ni muerte: se arman con `Stalker.generated_animations` (`AnimationRetarget.make_sequence`):
   ataque con dos cuadros de `Poses`, muerte = `Jump` al revés (se hunde en el piso), `Jump` = aparición.
-- **Calle de la plaza** ([scenes/levels/park_street.tscn](scenes/levels/park_street.tscn),
-  [tools/build_park.gd](tools/build_park.gd), extiende build_street.gd): la casa en la vereda norte; la plaza al
-  sur, rodeada de rejas (barrotes combinados en una sola malla: el shader PS1 no lee MultiMesh), con fuente,
-  árboles (Kenney Nature Kit), hamacas y un acechador encerrado; al oeste la calle termina en un camión
-  volcado; al este, la fachada oeste del hospital con la **puerta de guardia** (la única salida).
-  Secretos: una figura en las hamacas (Inquieto) y la "Carta a mí mismo" debajo del banco (Quebrado).
+- **El barrio** ([scenes/levels/park_street.tscn](scenes/levels/park_street.tscn),
+  [tools/build_park.gd](tools/build_park.gd), extiende build_street.gd; escena `ParkStreet`). Pedido del usuario:
+  "por lo menos 10 veces más grande" que la cuadra original y con los objetos espaciados. Cuadrícula de calles de
+  12 m: **Larrea** (z 0, x 0-180, la de casa), **Rondeau** (z -60, x 24-168) y tres transversales (Sarmiento x 42,
+  Moreno x 96, Pichincha x 150). Un **socavón** corta Larrea en x 103-114: para llegar al hospital hay que subir por
+  Moreno o Sarmiento, seguir por Rondeau y bajar por Pichincha. Sin salida: el camión volcado (oeste), escombros en
+  las dos puntas de Rondeau, el estacionamiento del Autoservicio Los Andes y el **Pasaje Ombú** (sale de Moreno).
+  Manzanas con `_frontage()` (edificios del kit uno al lado del otro, ladrillo en los huecos, límite invisible).
+  La plaza (x 0-84, z 6-46) sigue enrejada, con el portón en x 42 (Insane: pistola en la fuente).
+  **La guardia del San Judas** (x 180-206): patio de ambulancias con marquesina roja "GUARDIA" sobre columnas,
+  andén de 0.45 m con rampas y escalones, vestíbulo de vidrio con puertas corredizas (la `ZoneDoor`), cruz roja,
+  carpa de triage, garita con la barrera rota, la ambulancia de mamá (el gafete). Spawn `from_hospital` en el andén.
+  **Lore de la recuperación** (el protagonista es ex adicto con depresión): el Centro de Día Renacer (la carta del
+  padrino debajo de la puerta), la Farmacia Aldo (le vendía recetas truchas), el cartel de NA en el poste de Moreno
+  (reuniones en la parroquia), el banco de la plaza y el Pasaje Ombú, "la esquina del Flaco" (donde compraba):
+  "UNA SOLA NO ES NADA" en Inquieto y el Flaco esperándolo en Quebrado. Nombres inventados (Flaco, Don Aldo):
+  confirmar con el usuario. Pocos objetos (9), casi todos en rincones sin salida.
+  Secretos: una figura en las hamacas (Inquieto), la "Carta a mí mismo" debajo del banco (Quebrado) y "MAMÁ ESTÁ
+  ADENTRO" en el vidrio de la guardia (Inquieto).
 
 ## Zona 1: Hospital San Judas
 
-[scenes/levels/hospital.tscn](scenes/levels/hospital.tscn) es la segunda zona (se entra por la puerta de guardia, al oeste del pasillo, desde la calle de la plaza; la sala de
+[scenes/levels/hospital.tscn](scenes/levels/hospital.tscn) es la segunda zona (se entra por la puerta de guardia, al oeste del pasillo, desde el barrio; la sala de
 prueba queda para los tests). La generó [tools/build_hospital.gd](tools/build_hospital.gd), un andamio
 de **una sola pasada**: si ya se editó la escena en el editor, no volver a correrlo (pisa los cambios);
 modificar la escena a mano o actualizar el script y avisar.
@@ -355,7 +368,7 @@ Godot **4.7.2** (no está en el PATH):
   (o `build_street.gd`, `build_houses.gd`, `build_theater.gd`, `build_home.gd`, `build_park.gd`,
   `build_avenue_places.gd`). **Antes de regenerar, mirar `git status`**: si el usuario editó la escena en el
   editor, pasar sus cambios al generador primero (pasó con la tele de la casa).
-- **Test del comienzo**: `<godot> --path . -s res://tests/home_test.gd` (casa, ático, rejas, calle cortada, puerta
+- **Test del comienzo**: `<godot> --path . -s res://tests/home_test.gd` (casa, ático, rejas, socavón, la vuelta por Rondeau, rampa y puerta
   de guardia, el sobreviviente nuevo llega a casa). Los tests del refugio del hospital hacen `move_to(&"hospital")`.
 - **Test de la comisaría y la iglesia**: `<godot> --path . -s res://tests/avenue_places_test.gd` (entrada y
   salida, secretos por dificultad, bajar a la cripta).

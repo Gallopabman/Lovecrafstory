@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/ps1_spatial.gdshader" id="1_wbxvl"]
+[ext_resource type="Texture2D" path="res://assets/textures/hospital/concrete.png" id="2_vr1sm"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_wbxvl")
+shader_parameter/albedo_color = Color(0.5, 0.5, 0.49, 1)
+shader_parameter/emission_color = null
+shader_parameter/albedo_texture = ExtResource("2_vr1sm")
+shader_parameter/texture_resolution = null
+shader_parameter/uv_scale = null
+shader_parameter/world_uv = true
+shader_parameter/world_uv_scale = 0.35
+shader_parameter/vertex_snap = null
+shader_parameter/affine_mapping = null
+shader_parameter/fog_enabled = null
