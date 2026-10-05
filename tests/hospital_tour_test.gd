@@ -65,7 +65,7 @@ func _initialize() -> void:
 	check(sanity.in_refuge() and not sanity.has_electricity(), "arranca en el refugio, sin electricidad (el generador empieza roto)")
 	var props := current_scene.get_node("Props").get_child_count()
 	check(props > 150, "mobiliario: %d props" % props)
-	check(get_nodes_in_group(&"enemies").size() == 5, "5 acechadores (3 abajo, 2 en el 2° piso)")
+	check(get_nodes_in_group(&"enemies").size() == 6, "5 acechadores y un escupidor")
 
 	print("-- Navegación")
 	await physics_frame

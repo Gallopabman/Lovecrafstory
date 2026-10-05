@@ -1367,6 +1367,7 @@ func _enemies() -> void:
 	# P2: uno en el pasillo y otro en la sala de terapia.
 	_instance(stalker, groups.Enemies, "StalkerP2Corridor", Vector3(18.0, 2 * H + 0.05, 9.6), {"wander_radius": 6.0})
 	_instance(stalker, groups.Enemies, "StalkerGroup", Vector3(24.0, 2 * H + 0.05, 6.6), {"wander_radius": 1.5})
+	_instance("res://scenes/enemies/spitter.tscn", groups.Enemies, "SpitterDayRoom", Vector3(31.0, 2 * H + 0.05, 4.0), {"wander_radius": 2.0})
 	# Alucinación: la figura del quirófano que se ve en las cámaras (desde Inquieto).
 	var hallucination := Node3D.new()
 	hallucination.set_script(GatedScript)

@@ -7,6 +7,8 @@ extends SceneTree
 
 const OUT := "user://test_shots/theater/"
 const S := 1.1
+const UPY := 5.0
+const PITY := -3.5
 
 var fails := 0
 var sanity: Node
@@ -78,7 +80,7 @@ func _initialize() -> void:
 	door.interact(player())
 	await settle()
 	check(current_scene.name == "Theater", "con la llave de Sosa se entra al teatro")
-	check(player().global_position.distance_to(Vector3(2.8, 0, 7.0)) < 0.5, "aparece en la entrada del vestíbulo")
+	check(player().global_position.distance_to(Vector3(2.8, 0, 12.0)) < 0.5, "aparece en la entrada del vestíbulo: %s" % player().global_position)
 	var boss: Node3D = current_scene.get_node("Enemies/Singer")
 	check(boss.dormant and not boss.visual.visible, "la cantante duerme, invisible")
 	await shot("01_vestibulo")
@@ -112,16 +114,44 @@ func _initialize() -> void:
 	await shot("02_escopeta")
 
 	print("-- Recorrido")
-	for s: Array in [["03_sala", Vector3(16.0, 0.05, 7.0), -90.0], ["04_butacas", Vector3(24.0, 0.05, -1.0), -60.0],
-			["05_escenario", Vector3(36.0, S + 0.05, 13.0), -30.0], ["06_bambalinas", Vector3(43.5, S + 0.05, 1.0), 180.0],
-			["07_camarin_2", Vector3(46.5, S + 0.05, 2.0), -90.0]]:
+	for s: Array in [["03_sala", Vector3(27.0, 0.05, 0.5), -90.0], ["04_butacas", Vector3(46.0, 0.05, 16.5), -60.0],
+			["05_escenario", Vector3(64.0, S + 0.05, 22.0), -30.0], ["06_hombro", Vector3(81.0, S + 0.05, -2.0), 180.0],
+			["07_camarin_2", Vector3(88.5, S + 0.05, 10.5), -90.0], ["07b_vestibulo", Vector3(3.0, 0.05, 2.0), -120.0],
+			["07c_entrepiso", Vector3(20.0, UPY + 0.05, 2.0), 180.0], ["07d_pullman", Vector3(25.5, UPY + 0.05, 8.0), -90.0],
+			["07e_palcos", Vector3(40.0, UPY + 0.05, 24.8), -90.0], ["07f_espejos", Vector3(12.0, 0.05, -6.0), 0.0],
+			["07g_galeria", Vector3(12.0, 0.05, 30.0), 160.0], ["07h_ala_norte", Vector3(26.0, 0.05, -12.0), -90.0],
+			["07i_foso", Vector3(62.0, PITY + 0.05, 8.0), -90.0], ["07j_administracion", Vector3(17.0, UPY + 0.05, -12.0), 160.0]]:
 		place(s[1], s[2])
 		await shot(s[0])
+
+	print("-- Niveles")
+	place(Vector3(2.5, 0.05, 22.0), -90.0)
+	var top := 0.0
+	Input.action_press("move_forward")
+	for i in 700:
+		await physics_frame
+		top = maxf(top, player().global_position.y)
+	Input.action_release("move_forward")
+	check(top > UPY - 0.3, "la escalera imperial sube al entrepiso: y=%.2f" % top)
+	place(Vector3(78.5, S + 0.05, 26.5), 180.0)
+	var low := 10.0
+	Input.action_press("move_forward")
+	for i in 700:
+		await physics_frame
+		low = minf(low, player().global_position.y)
+	Input.action_release("move_forward")
+	check(low < PITY + 0.3, "se baja al foso de máquinas: y=%.2f" % low)
+	await physics_frame
+	var map: RID = player().get_world_3d().navigation_map
+	for t: Vector3 in [Vector3(25.5, UPY, 0.0), Vector3(50.0, UPY, -8.8), Vector3(70.0, PITY, 8.0), Vector3(81.0, S, -4.0),
+			Vector3(50.0, 0, 33.0), Vector3(12.0, UPY, -9.0), Vector3(85.0, PITY, 34.0), Vector3(86.0, PITY, 20.0)]:
+		var path := NavigationServer3D.map_get_path(map, Vector3(3.0, 0, 12.0), t, true)
+		check(path.size() > 1 and path[path.size() - 1].distance_to(t) < 1.2, "los enemigos llegan a %s (fin %s)" % [t, path[path.size() - 1] if path.size() > 0 else Vector3.ZERO])
 
 	print("-- Jefe")
 	var gate: Node3D = current_scene.get_node("Structure/CamarinGate")
 	check(not gate.is_open(), "el camarín principal está trabado")
-	place(Vector3(28.0, 0.05, 7.0), -90.0, -5.0)
+	place(Vector3(55.0, 0.05, 8.5), -90.0, -5.0)
 	await frames(10)
 	check(not boss.dormant and boss.visual.visible, "al acercarse al escenario, la cantante despierta")
 	boss.set_physics_process(false)
@@ -144,7 +174,7 @@ func _initialize() -> void:
 	await shot("09_derrotada")
 
 	print("-- El camarín: mudarse")
-	place(Vector3(49.0, S + 0.05, 12.5), 90.0)
+	place(Vector3(91.0, S + 0.05, 21.5), 90.0)
 	await frames(10)
 	check(not sanity.in_refuge(), "el camarín todavía no es refugio (vivo en el hospital)")
 	await shot("10_camarin")
@@ -169,7 +199,7 @@ func _initialize() -> void:
 	game_state.new_survivor()
 	await settle()
 	check(current_scene.name == "Theater", "el sobreviviente nuevo aparece en el teatro")
-	check(player().global_position.distance_to(Vector3(49.0, S, 12.0)) < 0.6, "en el camarín: %s" % player().global_position)
+	check(player().global_position.distance_to(Vector3(91.0, S, 21.0)) < 0.6, "en el camarín: %s" % player().global_position)
 	check(not current_scene.get_node("Enemies").has_node("Singer") or current_scene.get_node("Enemies/Singer").is_queued_for_deletion(),
 		"la cantante no vuelve")
 	var data: Dictionary = root.get_node("SaveGame").read()

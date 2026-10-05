@@ -495,6 +495,8 @@ func _basement_enemies() -> void:
 			["StalkerSouth", Vector3(30.0, 0.05, 32.5), 7.0], ["StalkerWorkshop", Vector3(40.0, 0.05, 37.0), 2.5],
 			["StalkerLaundry", Vector3(26.0, 0.05, 2.8), 2.0]]:
 		_instance(stalker, groups.Enemies, e[0], e[1], {"wander_radius": e[2]})
+	_instance("res://scenes/enemies/spitter.tscn", groups.Enemies, "SpitterPathology", Vector3(19.5, 0.05, 20.5), {"wander_radius": 2.0})
+	_instance("res://scenes/enemies/spitter.tscn", groups.Enemies, "SpitterSouth", Vector3(12.0, 0.05, 32.5), {"wander_radius": 4.0})
 	_extra_enemy(Vector3(27.5, 0.05, 20.0), 1, 6.0)
 	_extra_enemy(Vector3(48.0, 0.05, 7.5), 1, 4.0)
 	_extra_enemy(Vector3(6.5, 0.05, 27.0), 2, 2.0)

@@ -125,6 +125,13 @@ en vez de inventarlo.
   y muere (queda el cuerpo, `GameState.mark_killed`). Grupo `enemies`. Usa NavigationAgent3D.
   Sonidos por export (`sound_idle`, `sound_alert`...). Hooks para subclases: `_start_attack(anim)`,
   `_attack_connects()`, `_chase`, `_attack`, `_die`, `_key`.
+- **El Escupidor** ([scripts/enemies/spitter.gd](scripts/enemies/spitter.gd), `Spitter extends Stalker`,
+  [scenes/enemies/spitter.tscn](scenes/enemies/spitter.tscn); pedido del usuario: un enemigo con ataque de rango):
+  el Alien de Quaternius (CC0) oscurecido. Busca una distancia media (`preferred_distance` 5-9 m), retrocede si te
+  acercás, escupe a 4-13 m una bola de bilis (`SpitProjectile`, [scenes/enemies/spit_projectile.tscn](scenes/enemies/spit_projectile.tscn))
+  que viaja a 9 m/s con caída (se compensa al apuntar), se puede esquivar y deja una mancha. 70 de vida, 10 de daño.
+  Hay en todas las zonas desde el barrio. Los parámetros de la escupida se asignan **antes** de agregarla al árbol
+  (su `_ready` calcula la velocidad).
 - **El Perdido** ([scripts/enemies/lost_one.gd](scripts/enemies/lost_one.gd), `LostOne extends Stalker`,
   [scenes/enemies/lost_one.tscn](scenes/enemies/lost_one.tscn)): el Adventurer oscurecido con ojos rojos,
   220 de vida, +20 de cordura al matarlo. Lo crea `WorldPersistence` donde cayó el sobreviviente; lleva el
@@ -229,6 +236,10 @@ recaiga. La nota de mamá dice que la llamaron del San Judas por la niebla: eso 
   las dos puntas de Rondeau, el estacionamiento del Autoservicio Los Andes y el **Pasaje Ombú** (sale de Moreno).
   Manzanas con `_frontage()` (edificios del kit uno al lado del otro, ladrillo en los huecos, límite invisible).
   La plaza (x 0-84, z 6-46) sigue enrejada, con el portón en x 42 (Insane: pistola en la fuente).
+  **Hacia el parque** (pedido del usuario: "una parte abierta hacia el parque, cerrada por un bloqueo policial";
+  después va a ser otra zona): Moreno sigue al sur de Larrea (x 90-102, hasta z 52) hacia el Parque Centenario,
+  cortada en z ~12 por patrulleros en V, una camioneta, vallas, conos y cinta (`_park_road`, colisión
+  `BlockadeCollider`). Para abrirla: sacar ese collider y el límite del fondo (z 52).
   **La guardia del San Judas** (x 180-206): patio de ambulancias con marquesina roja "GUARDIA" sobre columnas,
   andén de 0.45 m con rampas y escalones, vestíbulo de vidrio con puertas corredizas (la `ZoneDoor`), cruz roja,
   carpa de triage, garita con la barrera rota, la ambulancia de mamá (el gafete). Spawn `from_hospital` en el andén.
@@ -282,28 +293,31 @@ modificar la escena a mano o actualizar el script y avisar.
 
 [scenes/levels/street.tscn](scenes/levels/street.tscn), generada por [tools/build_street.gd](tools/build_street.gd)
 (mismas reglas: una sola pasada). Exterior con niebla clara y espesa (fin a 20 m) y luz de cielo tapado.
-- Avenida de dos manos de x 0 (fachada trasera del hospital, ladrillo, puerta de emergencia) a x 65
-  (Teatro Imperio: marquesina con lamparitas prendidas, puertas encadenadas: **la próxima zona**).
-  Edificios del Downtown City MegaKit (Quaternius) a los dos lados, cada uno con su caja de colisión sin
-  el porche. Autos abandonados (Car Kit de Kenney, x1.5), la ambulancia del San Judas chocada,
-  faroles casi todos muertos.
-- Barricada policial en x ~50 (patrulleros, van, conos, vallas): se pasa solo por la vereda norte.
-- Callejón al norte (x 33–38) que lleva a un patio de servicio cerrado con un auto quemado.
+Pedido del usuario: "por lo menos 10 veces más grande" (era de 66 x 12 m). `build_street.gd` también guarda los
+helpers de calles y manzanas que hereda el barrio (`_frontage`, `_row` con edificios reservados, `_brick_facing`,
+`_cross_sides`, `_rubble`, `_lamp`, `_dumpster`, `_fence`...).
+- **Avenida Independencia**: cuatro carriles (`Street_4Lane`, veredas hasta |z| = 9) de x 0 (fachada trasera del
+  hospital, tres pisos, salida de emergencia) a x 216 (**Teatro Imperio**: marquesina, puertas encadenadas).
+  Transversales al norte (Paraná x 48, Uruguay x 120) hasta **Lavalle** (z -72), de la que sale el **callejón**
+  (x 60-66) al **patio de servicio** (x 54-74, z -112..-100). Al sur (Viamonte x 84, Talcahuano x 180) hasta
+  **Tucumán** (z 66). Barricada policial en x 160: se pasa solo por la vereda norte.
+- Las puertas que se abren son `specials` (id, modelo, origen, orientación, escena): Ibarra (avenida norte x 22),
+  comisaría (avenida sur x 50), almacén (avenida sur x 130), pensión (avenida norte x 190, pasando la barricada),
+  relojería (Uruguay), casa de Ferreyra (Lavalle) e iglesia (Tucumán). Carteles sobre las puertas. Las demás
+  puertas de los edificios están tapiadas o encadenadas. Frente a cada puerta no se estaciona nada (ahí aparece
+  el jugador al salir: `house_<id>`).
 - Secreto: en el patio, "ELLA TE ESPERA EN EL IMPERIO" (Inquieto) y un ladrillo flojo que desaparece en
-  Quebrado → nicho con la **segunda carta de Marta**. En el patrullero, el **parte del Cabo Ríos**.
-  Una revista (Inspector Aguirre), comida, balas y materiales. Cuatro acechadores; alucinación bajo la
-  marquesina.
+  Quebrado → nicho con la **segunda carta de Marta**. En el patrullero de la barricada, el **parte del Cabo Ríos**.
+  Nueve acechadores y tres escupidores; alucinación bajo la marquesina.
 - Piezas modulares con `Prop.anchor = ORIGIN` (respeta el origen del modelo). Paredes de ladrillo con
   piezas de una cara: `_brick_wall` pone otra de espaldas. Los `Label3D` no usan el shader PS1: se
   desvanecen con `visibility_range_end` para no atravesar la niebla.
-- **Casas** (pedido del usuario: "pequeñas casas" detrás de las puertas laterales): cuatro puertas de la
-  avenida son `ZoneDoor` a escenas chicas en [scenes/levels/street_houses/](scenes/levels/street_houses/),
+- **Casas** (pedido del usuario: "pequeñas casas"): escenas chicas en [scenes/levels/street_houses/](scenes/levels/street_houses/),
   generadas por [tools/build_houses.gd](tools/build_houses.gd) (que **extiende build_hospital.gd** para
   reusar muebles y paredes). Depto. de los Ibarra (living y cocina), Almacén La Estrella (un acechador entre
   los estantes), Relojería Kaufmann (relojes parados a las 3:15; texto que aparece en Quebrado) y Pensión
-  Doña Rosa, pasando la barricada (pieza del agente Sosa: su cuaderno, y un acechador). Las otras puertas
-  son `Inspectable` "cerrada". Spawn en la calle: `house_<id>`; adentro: `inside`.
-- **Casa del Dr. Ferreyra** (pedido del usuario; `ferreyra`, vereda sur, x 40.63, también en build_houses.gd):
+  Doña Rosa (pieza del agente Sosa: su cuaderno, la llave del teatro, y un acechador). Adentro: `inside`.
+- **Casa del Dr. Ferreyra** (pedido del usuario; `ferreyra`, en Lavalle, también en build_houses.gd):
   living (el retrato con los ojos tachados), escritorio (el **diario de Ferreyra** y la **llave del sótano**
   en el bolsillo del saco) y dormitorio (Ferreyra muerto en la cama, se fue con pastillas). Quebrado: "LOS
   ENCERRÉ ABAJO PORQUE ME LLAMABAN POR MI NOMBRE".
@@ -334,10 +348,14 @@ lugar para recorrer, una zona con un boss", solo con la llave de la casa de Ferr
 
 Generadas por [tools/build_avenue_places.gd](tools/build_avenue_places.gd) (extiende build_hospital.gd). Se entra por
 dos puertas de la avenida (spawn de vuelta `house_comisaria` / `house_iglesia`; adentro, `inside`).
-- **Comisaría 12** ([scenes/levels/police_station.tscn](scenes/levels/police_station.tscn)): mesa de entradas (el
-  **libro de guardia**: Kaufmann preso el día 3, desaparecido del calabozo 2), oficina del comisario (el expediente
-  de Elena de Sosa), sala de guardia (el locker de Sosa), tres calabozos. Secretos: el **depósito de evidencias**
-  detrás de la guardia (Difícil: cartuchos, balas, botiquín) y el **calabozo 3** (Insane: "ACÁ ESTUVO TU MADRE").
+- **Comisaría 12** ([scenes/levels/police_station.tscn](scenes/levels/police_station.tscn)), "10 veces más grande"
+  (pedido del usuario): dos plantas de 44 x 32 m (P1 a 3.6 m, escalera con `NavigationLink3D`). PB: mesa de entradas
+  (el **libro de guardia**), denuncias, sala de espera, archivo, vestuarios, sala de guardia (el locker de Sosa),
+  armería (cerrada), garaje con un patrullero y **seis calabozos** (el 2, de Kaufmann, cerrado). P1: oficina del
+  comisario (el expediente de Elena), investigaciones (el pizarrón del caso: "SE LO LLEVÓ LA MISMA CANCIÓN"),
+  observación + interrogatorio (vidrio espejado), comedor, baños, dormitorios, radio, causas, oficial de servicio y
+  la **brigada** (el escritorio de Sosa). Secretos: el **depósito de evidencias** (Difícil, x 24-34 z 0-8) y el
+  **calabozo 3** (Insane: "ACÁ ESTUVO TU MADRE").
 - **Parroquia San Judas Tadeo** ([scenes/levels/church.tscn](scenes/levels/church.tscn)): nave con bancos y vitrales,
   altar con la imagen del santo, confesionario (alguien respira del otro lado), sacristía (**diario del padre
   Ernesto**). En Insane se abre la trampa frente al altar: escalera a la **cripta** (a -3 m) con la **carta de
@@ -348,17 +366,26 @@ dos puertas de la avenida (spawn de vuelta `house_comisaria` / `house_iglesia`; 
 
 [scenes/levels/theater.tscn](scenes/levels/theater.tscn), generada por [tools/build_theater.gd](tools/build_theater.gd)
 (extiende build_hospital.gd). Se entra desde la avenida con la **llave del candado** (en la pieza de Sosa,
-pensión); flag `theater_unlocked`.
-- Vestíbulo (alfombra roja, araña, boletería, guardarropa, escalera al pullman derrumbada, la gorra de Sosa
-  y **la escopeta**), sala con 12 filas de butacas y pasillos, escenario a 1.1 m con rampas, telón, candilejas
-  y piano; bambalinas (camarín 2, depósito de utilería con un acechador) y el **camarín principal**.
+pensión); flag `theater_unlocked`. "10 veces más grande" (pedido del usuario): x 0-96, z -24..40, tres niveles.
+- PB: **vestíbulo** de doble altura (boletería, guardarropa, araña, la gorra de Sosa y **la escopeta**) con la
+  **escalera imperial** al entrepiso; **salón de los espejos** (arriba, la administración: el director de 1979);
+  **galería de retratos** con el bar; **alas** norte y sur (sala de ensayo, escuela de danza, máquinas / museo,
+  bar de artistas, partituras) con rampas al nivel del escenario; **platea** de 23 filas en tres bloques.
+- P1 (a 5 m): entrepiso, **pullman** y una **galería de palcos** en herradura (barandas con colisión).
+- Escenario (a 1.1 m, x 60-76) con telón, candilejas, piano, trampas y la **luz fantasma**; **hombro** (x 76-87)
+  con cuerdas y contrapesos; cuartos x 87-96: taller, sastrería, camarín 3, camarín 2, depósito, **camarín
+  principal**, camarín colectivo y muelle de carga. **Foso de máquinas** (a -3.5 m, bajo el escenario: trampas,
+  ruedas, utilería vieja, calderas), con escalera desde el hombro y un `NavigationLink3D`.
 - **La cantante** (`Enemies/Singer`, [scenes/enemies/boss.tscn](scenes/enemies/boss.tscn)): 700 de vida, despierta
   al acercarse al escenario. Al morir: `theater_boss_dead` → se destraba el camarín principal (`FlagGate`).
 - **Segundo refugio** (`theater`): el camarín principal, con sus 5 espacios (brasero/estufa, luces del espejo
   con el grupo electrógeno, cama, ventana, fotos y flores) y su plano. Arranca como "no es mi refugio": el
-  plano ofrece mudarse. Última carta de Marta en el tocador.
-- Secretos: "FILA 7 / BUTACA 13" (Inquieto) y una sala de ensayo detrás del vestíbulo (Quebrado) con el
-  programa de 1979; en Quebrado, figuras paradas en los pasillos y "ELLA CANTA PARA VOS" en el telón.
+  plano ofrece mudarse. Última carta de Marta en el tocador. Su código (`_camarin_refuge`) se armó para x 45-54,
+  z 9-16 y se corre con `CAM_DX` / `CAM_DZ`.
+- Secretos: "FILA 7 / BUTACA 13" (Inquieto), la sala de ensayo detrás de la galería (Quebrado) con el programa de
+  1979, el público en los pasillos y "ELLA CANTA PARA VOS" (Quebrado), y el **camarín 13** en el foso (Quebrado:
+  "Para cuando vuelvas, hijo").
+- Nueve acechadores y tres escupidores.
 - Lore: la soprano Elena M. de Sosa (la mamá del agente) cantó "La Paloma" en 1979 y no volvió; el maestro
   Kaufmann (el relojero) la acompañaba. La cantante "se viste con lo que recordamos".
 
@@ -402,12 +429,14 @@ Godot **4.7.2** (no está en el PATH):
   cargar y comparar todo, guardado automático al cambiar de zona, volver al menú).
 - Regenerar el hospital / la calle / las casas: `<godot> --headless --path . -s res://tools/build_hospital.gd`
   (o `build_street.gd`, `build_houses.gd`, `build_theater.gd`, `build_home.gd`, `build_park.gd`,
-  `build_avenue_places.gd`, `build_basement.gd`). **Antes de regenerar, mirar `git status`**: si el usuario editó la escena en el
+  `build_avenue_places.gd`, `build_basement.gd`; `build_park.gd` hereda de `build_street.gd`: regenerarlo después de tocar los helpers). **Antes de regenerar, mirar `git status`**: si el usuario editó la escena en el
   editor, pasar sus cambios al generador primero (pasó con la tele de la casa).
 - **Test del comienzo**: `<godot> --path . -s res://tests/home_test.gd` (casa, ático, rejas, socavón, la vuelta por Rondeau, rampa y puerta
   de guardia, el sobreviviente nuevo llega a casa). Los tests del refugio del hospital hacen `move_to(&"hospital")`.
 - **Test de la comisaría y la iglesia**: `<godot> --path . -s res://tests/avenue_places_test.gd` (entrada y
   salida, secretos por dificultad, bajar a la cripta).
+- **Test del Escupidor**: `<godot> --path . -s res://tests/spitter_test.gd` (escupe, lastima, se esquiva de costado,
+  retrocede si te acercás, muere; `test_shots/spitter/`).
 - **Test del sótano**: `<godot> --path . -s res://tests/basement_test.gd` (casa de Ferreyra y la llave, la puerta del
   sótano, navmesh, recorrido, el jefe, la sala de guardia, la vuelta al hospital; `test_shots/basement/`).
 - **Test del teatro**: `<godot> --path . -s res://tests/theater_test.gd` (llave, escopeta, jefe, camarín,
