@@ -4,6 +4,7 @@ extends CanvasLayer
 
 const LOST_TEXT := "Te perdiste.\n\nAlguien más llegará al refugio."
 const HEART_TEXT := "Su corazón no aguantó.\n\nAlguien más llegará al refugio."
+const MAD_DEATH_TEXT := "Moriste con la cabeza rota.\n\nLo que queda de vos sigue caminando por ahí.\nAlguien más llegará al refugio."
 const DEAD_TEXT := "Moriste.\n\nTu cuerpo queda ahí, con tus cosas.\nAlguien más llegará al refugio."
 
 @export var message_duration := 2.5
@@ -69,8 +70,14 @@ func _on_lost() -> void:
 	_begin_death(HEART_TEXT if Sanity.lost_in_refuge else LOST_TEXT)
 
 
-## Vida en 0: el cuerpo queda donde cayó, con todo lo que llevaba.
+## Vida en 0: el cuerpo queda donde cayó, con todo lo que llevaba. Pero si muere afuera con la
+## locura al 100 % (pedido del usuario), no queda un cuerpo: queda el Perdido, vagando por la zona.
 func _on_died() -> void:
+	if Sanity.dies_into_lost_one():
+		_death_by_damage = false
+		Sanity.lost_in_refuge = false
+		_begin_death(MAD_DEATH_TEXT)
+		return
 	_death_by_damage = true
 	_begin_death(DEAD_TEXT)
 

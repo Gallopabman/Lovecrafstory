@@ -153,6 +153,11 @@ func is_full_madness() -> bool:
 	return state == State.LOST and not full_madness_kills
 
 
+## Morir por daño afuera con la locura llena: el sobreviviente se convierte en el Perdido.
+func dies_into_lost_one() -> bool:
+	return is_full_madness() and not in_refuge()
+
+
 func in_refuge() -> bool:
 	return not _refuges.is_empty()
 

@@ -636,5 +636,25 @@ func _initialize() -> void:
 		"muerto por daño deja el cuerpo (no un Perdido)")
 	check(health.alive and is_equal_approx(health.current, health.maximum), "el nuevo sobreviviente llega con la vida llena")
 
+
+	print("-- Muerte con la locura al 100 %: el Perdido")
+	sanity.full_madness_kills = false
+	place(Vector3(0, 0.05, 6), 0.0)
+	await frames(10)
+	inventory.add(peaches)
+	sanity.add_madness(10000.0)
+	await frames(3)
+	check(sanity.is_full_madness() and health.alive, "al límite, todavía vivo")
+	corpses_before = game_state.corpses.size()
+	lost_before = game_state.lost_ones.size()
+	sanity.take_hit(10000.0)
+	await seconds(3.5)
+	check(current_scene.get_node("GameUI").lost_label.text.begins_with("Moriste con la cabeza rota"), "texto de la muerte loca")
+	await seconds(4.5)
+	await frames(30)
+	check(game_state.lost_ones.size() == lost_before + 1 and game_state.corpses.size() == corpses_before,
+		"morir con la locura al 100 % deja al Perdido (no un cuerpo)")
+	check(game_state.lost_ones[game_state.lost_ones.size() - 1].items.size() >= 1, "el Perdido lleva lo que tenía encima")
+
 	print("RESULT: %d fallas" % fails)
 	quit()
