@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/broom_held.tscn" id="2_held"]
+[ext_resource type="PackedScene" path="res://assets/models/props/polyhaven/wooden_broom/wooden_broom.gltf" id="3_world"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"weapon_broom"
+display_name = "Palo de escoba"
+short_name = "PAL"
+description = "La escoba de mamá. Largo, liviano, pega flojo pero mantiene las cosas a distancia. Peor es nada."
+kind = 4
+grid_size = Vector2i(1, 3)
+damage = 14.0
+attack_range = 2.3
+attack_cooldown = 0.7
+held_scene = ExtResource("2_held")
+world_color = Color(0.55, 0.4, 0.25, 1)
+world_scene = ExtResource("3_world")
+world_size = 1.2
+world_rotation = Vector3(90, 30, 0)

@@ -79,6 +79,35 @@ func _initialize() -> void:
 	check(current_scene.name == "Home", "se empieza en casa")
 	check(shelter.active == &"home" and sanity.in_refuge(), "la casa es el refugio activo")
 	check(current_scene.has_node("Items/LetterMother"), "la nota de mamá está en la mesa")
+
+	print("-- El palo de escoba")
+	var broom_item: Resource = load("res://assets/items/weapon_broom.tres")
+	check(current_scene.has_node("Items/Broom"), "en la pieza hay un palo de escoba")
+	place(Vector3(3.9, 0.05, 2.4), 180.0, -30.0)
+	await shot("00_palo_de_escoba")
+	current_scene.get_node("Items/Broom").interact(player())
+	await frames(3)
+	var inv: Node = root.get_node("Inventory")
+	var broom_entry: Dictionary = {}
+	for e: Dictionary in inv.entries:
+		if e.item == broom_item:
+			broom_entry = e
+	check(not broom_entry.is_empty(), "el palo entra en la mochila")
+	inv.use(broom_item, broom_entry)
+	check(inv.equipped_item() == broom_item, "palo de escoba en la mano")
+	var target: Node3D = load("res://scenes/enemies/stalker.tscn").instantiate()
+	current_scene.add_child(target)
+	target.global_position = Vector3(4.0, 0.05, 6.0)
+	target.set_physics_process(false)
+	place(Vector3(5.6, 0.05, 7.4), 45.0, -10.0)
+	await frames(5)
+	var hp: float = target.health
+	player().get_node("Combat").attack()
+	await create_timer(0.8).timeout
+	check(hp - target.health > 10.0 and hp - target.health < 20.0, "un palazo saca ~14 (sin arma, 6): %.0f" % (hp - target.health))
+	await shot("00b_palazo")
+	target.queue_free()
+	await frames(3)
 	for s: Array in [["01_pieza", Vector3(2.6, 0.05, 3.4), 0.0], ["02_living", Vector3(5.5, 0.05, 9.0), 40.0],
 			["03_cocina", Vector3(8.6, 0.05, 8.8), -40.0], ["04_escalera", Vector3(11.0, 0.05, 6.5), 10.0]]:
 		place(s[1], s[2])

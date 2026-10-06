@@ -153,6 +153,9 @@ en vez de inventarlo.
   `noise_radius`, `held_scene`, `pellets` + `pellet_spread` para la escopeta, `shot_sound`, `reload_sound`);
   munición = kind AMMO con `max_stack`. Escopeta: 7 perdigones de 11, 2 cartuchos, 14 m; los perdigones
   que pegan en el mismo enemigo se suman en un solo golpe. Kind KEY = llaves (`key_theater`).
+  **Palo de escoba** (`weapon_broom`, pedido del usuario: "para que no sea tan difícil el inicio"): en la pieza de
+  casa, al lado de la puerta; 14 de daño, 2.3 m de alcance, 0.7 s (sin arma: 6; barreta: 26). Modelo: la escoba de
+  Poly Haven (`scenes/weapons/broom_held.tscn`, inclinada hacia adelante y abajo); ícono propio en `ItemIcon._broom`.
 - **Capas de colisión**: 1 escenario + jugador, 2 enemigos, 3 interactuables.
 - **Interacción**: el jugador busca Areas del grupo `interactable` (capa 3) y llama `interact(player)`.
 - **UI** ([scenes/ui/game_ui.tscn](scenes/ui/game_ui.tscn), CanvasLayer 50): menú de inventario (pausa

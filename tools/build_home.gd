@@ -377,6 +377,9 @@ func _label(parent: Node, text: String, pos: Vector3, rot_y: float, color: Color
 func _home_items() -> void:
 	_pickup("LetterMother", "letter_mother_01", Vector3(9.8, 0.8, 6.2))
 	_pickup("LetterVet", "letter_vet_01", Vector3(9.2, 0.8, 6.7))
+	# El palo de escoba (pedido del usuario: un arma para que el comienzo no sea tan difícil),
+	# apoyado en el piso de la pieza, al lado de la puerta.
+	_pickup("Broom", "weapon_broom", Vector3(3.9, 0.06, 3.7))
 	# Teodoro, cuando vuelve de la veterinaria: en el living, al lado del hogar.
 	_cat(Vector3(1.8, 0.0, 6.4), 60.0, 1, &"home")
 	_box(groups.Props, "CatBowl", Vector3(10.6, 0.03, 9.4), Vector3(0.22, 0.06, 0.22), "metal", false)

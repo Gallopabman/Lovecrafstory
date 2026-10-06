@@ -45,6 +45,8 @@ static func draw_icon(canvas: CanvasItem, item: ItemData, rect: Rect2, alpha := 
 				_shotgun(canvas, rect, Color(0.36, 0.37, 0.4, alpha), Color(0.45, 0.3, 0.2, alpha), outline)
 			elif item.is_ranged:
 				_pistol(canvas, box, Color(0.42, 0.43, 0.46, alpha), outline)
+			elif id.contains("broom"):
+				_broom(canvas, rect, Color(0.58, 0.42, 0.26, alpha), Color(0.75, 0.62, 0.32, alpha), outline)
 			else:
 				_crowbar(canvas, box, Color(0.62, 0.16, 0.12, alpha), outline, rect)
 		ItemData.Kind.AMMO:
@@ -148,6 +150,22 @@ static func _crowbar(c: CanvasItem, b: Rect2, red: Color, o: Color, rect: Rect2)
 	var hook := z + (z - a).normalized().rotated(PI * 0.5) * width * 2.0
 	c.draw_line(z, hook, o, width + 2.0)
 	c.draw_line(z, hook, red, width)
+
+
+## El palo de escoba: un palo de madera en diagonal con el cepillo en la punta.
+static func _broom(c: CanvasItem, rect: Rect2, wood: Color, straw: Color, o: Color) -> void:
+	var inset := rect.grow(-minf(rect.size.x, rect.size.y) * 0.18)
+	var a := Vector2(inset.end.x, inset.position.y)
+	var z := Vector2(inset.position.x, inset.end.y)
+	var width := maxf(rect.size.x * 0.08, 2.0)
+	var head := a.lerp(z, 0.78)
+	c.draw_line(a, head, o, width + 2.0)
+	c.draw_line(a, head, wood, width)
+	var dir := (z - a).normalized()
+	var side := dir.rotated(PI * 0.5) * width * 2.2
+	var brush := PackedVector2Array([head - side, head + side, z + side * 1.6, z - side * 1.6])
+	c.draw_colored_polygon(brush, straw)
+	c.draw_polyline(brush + PackedVector2Array([brush[0]]), o, 1.0)
 
 
 static func _bullets(c: CanvasItem, b: Rect2, brass: Color, o: Color) -> void:
