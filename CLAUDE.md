@@ -19,7 +19,12 @@ en vez de inventarlo.
   - **Estados** (% de la cordura máxima): Lúcido 100–70, Inquieto 70–40, Quebrado 40–15,
     Al borde 15–1, Perdido 0. Menos cordura = más horrores, niebla, oscuridad y revelaciones;
     parte de los horrores extra son alucinaciones inofensivas.
-- **Cordura 0 fuera de casa** → el personaje se convierte en **el Perdido** (mini-jefe que vaga por
+- **Cambio del usuario: la locura al 100 % ya no mata.** El estado pasa a "Perdido" pero se sigue jugando, en
+  el escalón más difícil ("AL LÍMITE" en el HUD: se pega x0.5 y se recibe x2.2, `full_madness_*` de `Sanity`,
+  `Sanity.is_full_madness()`); se sale bajando la locura. Lo de abajo (el Perdido, el infarto) queda detrás de
+  `Sanity.full_madness_kills` (apagado; los tests lo prenden para probarlo). Hoy solo se muere por daño (vida en 0:
+  el cuerpo queda en el piso). Pregunta abierta: ¿cómo aparece ahora el Perdido?
+- **Cordura 0 fuera de casa** (solo con `full_madness_kills`) → el personaje se convierte en **el Perdido** (mini-jefe que vaga por
   la zona donde cayó, con lo que llevaba encima y habilidades según cómo se jugó) y un nuevo
   sobreviviente empieza en el mismo refugio. Se conservan refugio y mundo; se pierde el inventario.
 - **Cordura 0 dentro del refugio** (decisión del usuario, no está en el GDD) → muere de un ataque

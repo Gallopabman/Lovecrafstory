@@ -93,6 +93,16 @@ func _initialize() -> void:
 			["05_internacion", Vector3(2.0, 0.05, -8.5), 0.0]]:
 		place(s[1], s[2])
 		await shot(s[0])
+	# Se llega caminando de la sala de espera a la internación (antes una silla tapaba la puerta).
+	place(Vector3(3.0, 0.05, -1.5), 0.0, -10.0)
+	Input.action_press("move_forward")
+	for i in 180:
+		await physics_frame
+	Input.action_release("move_forward")
+	check(player().global_position.z < -6.0, "se entra caminando a la internación: z=%.2f" % player().global_position.z)
+	var nav_map: RID = player().get_world_3d().navigation_map
+	var nav_path := NavigationServer3D.map_get_path(nav_map, Vector3(0, 0, -1.5), Vector3(2.1, 0, -9.5), true)
+	check(nav_path.size() > 1 and nav_path[nav_path.size() - 1].distance_to(Vector3(2.1, 0, -9.5)) < 1.0, "y los enemigos también")
 	var caged: Node3D = current_scene.get_node("Props/Teodoro")
 	check(caged.visible, "Teodoro está en su jaula")
 	place(Vector3(2.1, 0.05, -9.6), 0.0, -25.0)

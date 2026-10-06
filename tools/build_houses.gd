@@ -380,9 +380,10 @@ func _house_veterinaria() -> float:
 	_bulb(-4.0, -8.5, 0.6)
 	_bulb(3.0, -8.5, 0.5, true)
 	# Sala de espera: mostrador, bancos, carteles, la pecera.
-	_counter(1.5, 6.0, -3.6, 0.0)
-	_prop("computerScreen", Vector3(3.0, 1.05, -3.5), 180)
-	_prop("chairDesk", Vector3(3.0, 0, -4.4), 0)
+	# El mostrador a la derecha: la puerta de la internación (x 3) queda libre desde la sala de espera.
+	_counter(4.4, 6.8, -3.4, 0.0)
+	_prop("computerScreen", Vector3(5.6, 1.05, -3.3), 180)
+	_prop("chairDesk", Vector3(5.8, 0, -4.3), 0)
 	for x in [-6.0, -4.8]:
 		_prop("bench", Vector3(x, 0, -1.0), 90)
 	_prop("pottedPlant", Vector3(-6.4, 0, -4.4))
@@ -391,7 +392,7 @@ func _house_veterinaria() -> float:
 	for i in 3:
 		_box(groups.Structure, "Poster", Vector3(-1.5 + i * 0.9, 1.6, -4.88), Vector3(0.6, 0.8, 0.02), "paper", false)
 	_inspect(Vector3(-6.0, 1.2, -3.0), ["La pecera. El agua está turbia y los peces nadan todos juntos, en círculo, sin parar."], 1.0)
-	_inspect(Vector3(3.6, 1.2, -3.2), ["En el mostrador, el libro de turnos. La última línea: \"Teodoro - ALTA - avisar a la familia\".",
+	_inspect(Vector3(5.0, 1.2, -3.0), ["En el mostrador, el libro de turnos. La última línea: \"Teodoro - ALTA - avisar a la familia\".",
 		"Al lado, alguien dibujó un gato con birome. Tiene cara de enojado. Es igualito."], 1.2)
 	_inspect(Vector3(-0.6, 1.5, -4.6), ["Carteles: \"VACUNACIÓN ANTIRRÁBICA\", \"CASTRÁ A TU MASCOTA\". Alguien escribió abajo, a mano: \"Teo, esto va por vos\"."], 1.2)
 	# Consultorio (x -7..-1): camilla de acero, armario, pileta, balanza.
@@ -414,7 +415,7 @@ func _house_veterinaria() -> float:
 	_prop("cardboardBoxOpen", Vector3(6.3, 0, -6.0), 30)
 	_pickup("Bandage", "medicine_bandage", Vector3(-6.6, 1.0, -9.0))
 	_pickup("Cloth", "material_cloth", Vector3(6.2, 0.45, -6.0), 2)
-	_pickup("Chocolate", "food_chocolate_bar", Vector3(4.6, 1.05, -3.6))
+	_pickup("Chocolate", "food_chocolate_bar", Vector3(6.4, 1.05, -3.4))
 	_stalker(Vector3(-4.0, 0.05, -10.4), 1.2)
 	_extra_enemy(Vector3(4.0, 0.05, -7.0), 1, 1.5)
 	_extra_enemy(Vector3(-5.0, 0.05, -2.0), 2, 1.0, "res://scenes/enemies/spitter.tscn")

@@ -49,6 +49,12 @@ const DIFFICULTY_NAMES := ["Normal", "Difícil", "Insane"]
 @export var uneasy_below := 0.7
 @export var broken_below := 0.4
 @export var brink_below := 0.15
+## Si la locura al 100 % mata (el Perdido / el infarto en el refugio, como pedía el GDD). Pedido del
+## usuario: no; con la locura llena el juego solo se pone mucho más difícil (ver `full_madness_*`).
+@export var full_madness_kills := false
+## Con la locura al 100 %: lo que pega el jugador y lo que recibe (un escalón más que Insane).
+@export var full_madness_damage_multiplier := 0.5
+@export var full_madness_damage_taken_multiplier := 2.2
 
 @export_group("Dificultad")
 ## Locura (0..1) desde la que el juego pasa a Difícil y a Insane.
@@ -131,11 +137,20 @@ func difficulty_name(d: int = difficulty) -> String:
 
 
 func player_damage_multiplier() -> float:
+	if is_full_madness():
+		return full_madness_damage_multiplier
 	return player_damage_multipliers[difficulty]
 
 
 func damage_taken_multiplier() -> float:
+	if is_full_madness():
+		return full_madness_damage_taken_multiplier
 	return damage_taken_multipliers[difficulty]
+
+
+## La locura llena (estado Perdido) sin morir: el juego en su punto más difícil.
+func is_full_madness() -> bool:
+	return state == State.LOST and not full_madness_kills
 
 
 func in_refuge() -> bool:
@@ -286,10 +301,12 @@ func _update_state() -> void:
 	var old_state := state
 	state = new_state
 	state_changed.emit(new_state, old_state)
-	if new_state == State.LOST:
+	if new_state == State.LOST and full_madness_kills:
 		active = false
 		lost_in_refuge = in_refuge()
 		lost.emit()
+	elif new_state == State.LOST:
+		GameState.post_message("La cabeza ya no da más. Todo late, todo habla. Pero sigo de pie.")
 
 
 func _update_difficulty() -> void:

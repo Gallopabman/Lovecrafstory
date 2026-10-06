@@ -511,6 +511,24 @@ func _initialize() -> void:
 	inventory.use(crowbar, e_bar)
 	check(inventory.equipped.is_empty() and combat._held_model == null, "guardar deja las manos vacías")
 
+	print("-- Locura llena (no mata)")
+	sanity.restore(1000.0)
+	place(Vector3(0, 0.05, 8), 0.0)
+	await frames(10)
+	sanity.add_madness(10000.0)
+	await frames(3)
+	check(sanity.state == 4 and sanity.active and health.alive and player().can_control, "con la locura al 100 % se sigue vivo")
+	check(sanity.player_damage_multiplier() == 0.5 and sanity.damage_taken_multiplier() > 2.0,
+		"pero se pega la mitad y se recibe más del doble")
+	var diff_label: Label = current_scene.get_node("GameUI").find_child("DifficultyLabel", true, false)
+	check(diff_label != null and diff_label.text == "AL LÍMITE", "el HUD avisa: %s" % (diff_label.text if diff_label else "?"))
+	await shot("07b_al_limite")
+	sanity.restore(1000.0)
+	await frames(3)
+	check(sanity.state != 4, "y se puede volver")
+	# Lo que sigue prueba la muerte por locura (opcional, apagada por defecto).
+	sanity.full_madness_kills = true
+
 	print("-- Muerte en el refugio")
 	sanity.restore(1000.0)
 	inventory.clear()

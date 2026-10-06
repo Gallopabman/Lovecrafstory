@@ -23,6 +23,7 @@ func _ready() -> void:
 	Health.changed.connect(func(_c: float, _m: float) -> void: _refresh())
 	Sanity.changed.connect(func(_c: float, _m: float) -> void: _refresh())
 	Sanity.difficulty_changed.connect(func(_l: int, _p: int) -> void: _refresh())
+	Sanity.state_changed.connect(func(_n: int, _o: int) -> void: _refresh())
 	_refresh()
 
 
@@ -31,7 +32,9 @@ func _process(_delta: float) -> void:
 	var t := Time.get_ticks_msec() / 1000.0
 	var low := Health.ratio() < low_health_ratio and Health.alive
 	health_bar.modulate.a = 0.55 + 0.45 * absf(sin(t * 4.0)) if low else 1.0
-	if Sanity.difficulty == Sanity.Difficulty.INSANE:
+	if Sanity.is_full_madness():
+		difficulty_label.modulate.a = 0.4 + 0.6 * absf(sin(t * 6.0))
+	elif Sanity.difficulty == Sanity.Difficulty.INSANE:
 		difficulty_label.modulate.a = 0.6 + 0.4 * absf(sin(t * 3.0))
 
 
@@ -54,6 +57,10 @@ func _refresh() -> void:
 		Sanity.Difficulty.INSANE:
 			difficulty_label.text = "INSANE"
 			difficulty_label.add_theme_color_override(&"font_color", Color(0.95, 0.2, 0.15))
+	# Locura llena (no mata, pedido del usuario): el escalón más difícil.
+	if Sanity.is_full_madness():
+		difficulty_label.text = "AL LÍMITE"
+		difficulty_label.add_theme_color_override(&"font_color", Color(0.7, 0.02, 0.02))
 
 
 static func _style(bar: ProgressBar, color: Color) -> void:
