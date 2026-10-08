@@ -411,7 +411,9 @@ func _police_cells() -> void:
 		if k < 5:
 			_wall("x", z0, CELL_X, PW, 0.0, PC, 0.15, [], "police_wall", false)
 		var number := k + 1
-		if number != 3:
+		if number == 5:
+			_flaco_cell(z0)
+		elif number != 3:
 			_cell_bars_x(CELL_X, z0, z0 + 3.0, z0 + 1.5, number != 2)
 		_prop("bench", Vector3(43.2, 0, z0 + 1.5), -90, {"tint": Color(0.5, 0.5, 0.5)})
 		_label3d(groups.Structure, str(number), Vector3(CELL_X - 0.08, 2.6, z0 + 1.5), -90, Color(0.8, 0.8, 0.75), 0.01)
@@ -495,6 +497,8 @@ func _police_upper_rooms() -> void:
 	for p in [Vector3(14.5, y, 6.5), Vector3(19.0, y, 6.8)]:
 		_prop("cardboardBoxClosed", p, randf_range(-30, 30))
 	_prop("desk", Vector3(29.0, y, 0.8), 180)
+	# La llave de los calabozos: la tenía el oficial de servicio (el Flaco lo sabe).
+	_pickup("KeyCells", "key_cells", Vector3(28.6, y + 0.78, 0.7))
 	_prop("chairDesk", Vector3(29.0, y, 1.7), 0)
 	_prop("first_aid_kit", Vector3(33.8, y + 1.5, 4.0), -90)
 
@@ -674,3 +678,44 @@ func _church() -> Array:
 
 	_street_door("iglesia", Vector3(8.0, 1.2, 25.5), Vector3(8.0, 0, 26.0 - TE / 2 - 0.02), 180.0, 1.8, 2.9)
 	return [Vector3(8.0, 1.2, 25.5), Vector3(8.0, 0.05, 23.4), &"drone"]
+
+
+# --- El Flaco (pedido del usuario: el tranza del barrio, preso en el calabozo 5) ------
+
+## El calabozo 5 (z0..z0+3): cerrado con llave, con el Flaco adentro. La reja va en un FlagGate
+## (`flaco_freed`) y la cerradura es un KeyLock que se abre con la llave de los calabozos.
+func _flaco_cell(z0: float) -> void:
+	var gate := Node3D.new()
+	gate.set_script(load("res://scripts/world/flag_gate.gd"))
+	gate.set("flag", &"flaco_freed")
+	gate.set("locked_text", "")
+	gate.set("radius", 0.01)
+	_add(groups.Structure, gate, "FlacoCellBars")
+	_cell_bars_x(CELL_X, z0, z0 + 3.0, z0 + 1.5, false, gate)
+	var lock := Area3D.new()
+	lock.set_script(load("res://scripts/world/key_lock.gd"))
+	lock.set("required_item", load("res://assets/items/key_cells.tres"))
+	lock.set("unlock_flag", &"flaco_freed")
+	lock.set("locked_texts", PackedStringArray([
+		"—¡Eh! ¡Pibe! ¿Sos vos? —Es el Flaco, el del pasaje. Está flaco de verdad ahora, con los ojos hundidos y la ropa colgando.",
+		"—Me trajeron el día dos, por las dudas, dijeron. Después los canas se fueron y no volvió nadie. Hace días que no como.",
+		"—Las llaves las tenía el oficial de servicio. Arriba, en su escritorio. Dale, pibe, sacame de acá.",
+		"—Ya sé. Yo te vendía. No te voy a pedir que me perdones. Te pido que no me dejes acá adentro con esa cosa respirando en el calabozo de al lado.",
+	]))
+	lock.set("unlock_text", "La llave gira. El Flaco sale despacio, como si la reja todavía estuviera ahí. —Gracias, pibe. En serio. Me vuelvo al pasaje, a mi rincón. Pasá cuando quieras: te debo una.")
+	lock.set("radius", 1.4)
+	lock.position = Vector3(CELL_X - 0.4, 1.1, z0 + 1.5)
+	_add(groups.Inspectables, lock, "FlacoCellLock")
+	_npc("Flaco", "flaco", Vector3(42.4, 0.05, z0 + 1.5), -90.0, {
+		"hidden_flag": &"flaco_freed",
+		"talk_radius": 0.6,
+	})
+	_box(groups.Props, "FlacoBlanket", Vector3(43.3, 0.03, z0 + 1.0), Vector3(1.0, 0.04, 1.6), "cloth", false)
+	# Un foco pelado que todavía anda: para que se lo vea desde la reja.
+	var bulb := OmniLight3D.new()
+	bulb.set_script(FlickerScript)
+	bulb.light_color = Color(1.0, 0.85, 0.6)
+	bulb.light_energy = 0.6
+	bulb.omni_range = 4.0
+	bulb.position = Vector3(41.2, 2.5, z0 + 1.5)
+	_add(groups.Lights, bulb, "FlacoBulb")

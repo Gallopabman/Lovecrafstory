@@ -162,3 +162,13 @@ Armadas en Godot con piezas CC0 (las cadenas son eslabones generados en Godot).
 | Asset | Autor | Licencia | Fuente | Ubicación |
 | --- | --- | --- | --- | --- |
 | Cat (Animal Pack Vol.2; el .blend convertido a .glb, con colores puestos a mano) | Quaternius | CC0 | [opengameart.org/content/animated-animales-low-poly](https://opengameart.org/content/animated-animales-low-poly) | `assets/models/animals/cat/` |
+
+## Personajes (el Flaco, el Dr. Ferreyra, el mendigo)
+
+Piezas del mismo set que el sobreviviente (mismo rig), combinadas y recoloreadas en Godot.
+
+| Personaje | Piezas | Autor | Licencia | Fuente | Ubicación |
+| --- | --- | --- | --- | --- | --- |
+| El Flaco | Hoodie Character + piernas de Casual Character | Quaternius (Ultimate Modular Men) | CC0 | [poly.pizza/m/gKLBoRsyKe](https://poly.pizza/m/gKLBoRsyKe), [poly.pizza/m/kZ3DmIoGip](https://poly.pizza/m/kZ3DmIoGip) | `assets/models/characters/npcs/flaco.glb` |
+| Dr. Ferreyra | Business Man (pelo y cejas canosos) | Quaternius (Ultimate Modular Men) | CC0 | [poly.pizza/m/JFrLIKqvCH](https://poly.pizza/m/JFrLIKqvCH) | `assets/models/characters/npcs/ferreyra.glb` |
+| El mendigo | Casual Character + cabeza de King (sin corona) + pantalón de Worker + botas de Farmer | Quaternius (Ultimate Modular Men) | CC0 | [poly.pizza/m/kZ3DmIoGip](https://poly.pizza/m/kZ3DmIoGip), [I1gTjmuK2m](https://poly.pizza/m/I1gTjmuK2m), [Yg2bQZO6Hj](https://poly.pizza/m/Yg2bQZO6Hj), [7pn3R6hPvE](https://poly.pizza/m/7pn3R6hPvE) | `assets/models/characters/npcs/mendigo.glb` |

@@ -142,6 +142,7 @@ func _initialize() -> void:
 	_first_floor_rooms()
 	_second_floor_rooms()
 	_basement_door()
+	_ferreyra()
 	_details()
 	_secrets()
 	_difficulty_secrets()
@@ -1624,3 +1625,36 @@ func _cat(pos: Vector3, yaw: float, mode: int, refuge := &"home", parent: Node =
 
 ## Escala, animación y color del modelo del gato (se completan al elegir el modelo).
 var cat_settings := {"model_scale": 1.3, "anim_idle": &"Idle_CatArmature", "tint": Color(0.95, 0.92, 0.88)}
+
+
+# --- NPC (pedido del usuario: el Flaco, el Dr. Ferreyra, el mendigo) -------------------
+
+## Un NPC (scripts/world/npc.gd) con el modelo de su papel (tools/npc_models.gd) y lo que
+## haga falta en `props` (comportamiento, textos, flags...).
+func _npc(base_name: String, role: String, pos: Vector3, yaw: float, props := {}, parent: Node = null) -> Node3D:
+	var npc := CharacterBody3D.new()
+	npc.set_script(load("res://scripts/world/npc.gd"))
+	load("res://tools/npc_models.gd").configure(npc, role)
+	for k: String in props:
+		npc.set(k, props[k])
+	npc.position = pos
+	npc.rotation_degrees.y = yaw
+	return _add(parent if parent else groups.Props, npc, base_name)
+
+
+## El Dr. Ferreyra (pedido del usuario): está en el pasillo de PB cuando uno entra al hospital y,
+## apenas lo ve, sale corriendo y desaparece por una puerta (la salida de emergencia o la de la
+## escalera, la que quede más lejos). Una sola vez (`ferreyra_fled`).
+func _ferreyra() -> void:
+	for m: Array in [["FerreyraExitEast", Vector3(35.0, 0.05, 9.5)], ["FerreyraExitWest", Vector3(1.5, 0.05, 8.5)]]:
+		var marker := Marker3D.new()
+		marker.position = m[1]
+		_add(scene_root, marker, m[0])
+	_npc("Ferreyra", "ferreyra", Vector3(15.5, 0.05, 9.5), -90.0, {
+		"behavior": 2,
+		"flee_targets": Array([NodePath("../../FerreyraExitEast"), NodePath("../../FerreyraExitWest")], TYPE_NODE_PATH, &"", null),
+		"flee_flag": &"ferreyra_fled",
+		"flee_sight": 16.0,
+		"flee_text": "Al fondo del pasillo, un hombre de traje, canoso. Es el doctor Ferreyra, el director. Me ve, grita algo que no entiendo y sale corriendo.",
+		"texts": PackedStringArray(["—¡No te acerques! ¡No me hables con esa voz!"]),
+	})

@@ -114,6 +114,7 @@ func _initialize() -> void:
 	_items()
 	_enemies()
 	_street_extras()
+	_beggar()
 	_systems()
 
 	var packed := PackedScene.new()
@@ -1099,3 +1100,44 @@ func _zone_door_visuals(door: Node3D, wall_pos: Vector3, yaw: float, open_model:
 	_door_prop(door, "OpenDoor", open_model, rel, open_yaw, width, height, true)
 	if locked_model != "":
 		_door_prop(door, "LockedDoor", locked_model, rel, yaw, width, height, true)
+
+
+# --- NPC (pedido del usuario: el Flaco, el Dr. Ferreyra, el mendigo) -------------------
+
+## Un NPC (scripts/world/npc.gd) con el modelo de su papel (tools/npc_models.gd) y lo que
+## haga falta en `props` (comportamiento, textos, flags...).
+func _npc(base_name: String, role: String, pos: Vector3, yaw: float, props := {}, parent: Node = null) -> Node3D:
+	var npc := CharacterBody3D.new()
+	npc.set_script(load("res://scripts/world/npc.gd"))
+	load("res://tools/npc_models.gd").configure(npc, role)
+	for k: String in props:
+		npc.set(k, props[k])
+	npc.position = pos
+	npc.rotation_degrees.y = yaw
+	return _add(parent if parent else groups.Props, npc, base_name)
+
+
+## El mendigo (pedido del usuario: "un mendigo misterioso durmiendo que no se despierta si le
+## hablamos"), sobre unos cartones en la vereda norte de la avenida, antes de Uruguay.
+func _beggar() -> void:
+	var p := Vector3(106.0, 0.06, -AVE + 1.0)
+	_box(groups.Props, "Cardboard", p + Vector3(0, 0.0, 0), Vector3(2.2, 0.04, 1.0), "plywood", false)
+	_box(groups.Props, "BeggarBlanket", p + Vector3(0.28, 0.24, 0.0), Vector3(1.4, 0.08, 0.75), "sign_board", false)
+	_prop(_ph("cardboard_box_01"), p + Vector3(-2.0, 0, -0.3), 20, {"h": 0.45})
+	_prop(POLYHAVEN + "trashbag/trashbag.gltf", p + Vector3(1.6, 0, -0.1), 60, {"h": 0.6})
+	_npc("Beggar", "mendigo", p + Vector3(0, 0.02, 0), 90.0, {
+		"behavior": 1,
+		"talk_radius": 1.8,
+		"texts": PackedStringArray([
+			"Un hombre duerme sobre unos cartones, tapado hasta la nariz. Le hablo. No se despierta.",
+			"Le toco el hombro. Ni se mueve. Respira lento, tranquilo, como si la niebla no existiera.",
+			"Murmura algo en sueños: \"fila siete... butaca trece...\". Después sonríe.",
+			"En la mano tiene un boleto del Teatro Imperio, sin cortar. La fecha: 14 de marzo de 1979.",
+			"A su lado, nadie le robó nada. Ni los acechadores se le acercan. Lo esquivan, como a un charco.",
+		]),
+		"texts_broken": PackedStringArray([
+			"Sigue dormido, pero dice mi nombre. Mi nombre completo, el que solo usa mamá cuando se enoja.",
+			"Abre los ojos. Son los míos. Los cierra otra vez y se da vuelta, como fastidiado.",
+			"\"Todavía no\", dice sin despertarse. \"Todavía no te toca.\"",
+		]),
+	})

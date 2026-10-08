@@ -130,6 +130,22 @@ en vez de inventarlo.
   y su colisión según el estado), `HorrorSighting` (baja cordura la primera vez que se ve),
   `WorldPersistence` (reconstruye objetos tirados y cuerpos al cargar), `Corpse`,
   `RuntimeNavBake` (hornea el navmesh al cargar desde el grupo `nav_source`).
+- **NPC** (pedido del usuario; [scripts/world/npc.gd](scripts/world/npc.gd), `Npc`): `behavior` TALK (con E dice sus
+  `texts` en orden; `texts_broken` desde Quebrado), SLEEP (acostado en el último cuadro de `anim_pose`, no se
+  despierta) o FLEE (al verte se queda `flee_delay` mirándote, corre al `flee_targets` más lejos de vos, desaparece y
+  marca `flee_flag`). Está según `visible_flag` / `hidden_flag`; regalo único (`gift_item` x `gift_count`, `gift_flag`).
+  El área de interacción es un `InteractProxy`. Modelos y animaciones por rol en [tools/npc_models.gd](tools/npc_models.gd)
+  (Quaternius, mismo rig que el sobreviviente, miran a +Z); helper `_npc` en build_hospital.gd y build_street.gd.
+  `KeyLock` ([scripts/world/key_lock.gd](scripts/world/key_lock.gd)): cerradura que habla (`locked_texts`) hasta que
+  tenés `required_item`, y entonces marca `unlock_flag`.
+  - **El Flaco** (el tranza del barrio): preso en el **calabozo 5** de la comisaría (un foco pelado). La **llave de los
+    calabozos** (`key_cells`) está en el escritorio del oficial de servicio (P1). Liberarlo (`flaco_freed`) lo manda a
+    su rincón del Pasaje Ombú: la primera vez te da 12 balas de 9 mm (`flaco_gift`, inventado), después charla.
+  - **El Dr. Ferreyra** (está vivo): en el pasillo de PB del hospital (x 15.5, bajo un tubo que anda); al verte corre a
+    la salida de emergencia o a la puerta oeste (la más lejos) y desaparece (`ferreyra_fled`, una sola vez). En su
+    casa, la cama está deshecha y vacía.
+  - **El mendigo**: duerme sobre cartones en la vereda norte de la avenida (x 106). Frases misteriosas (el boleto del
+    Imperio de 1979, "fila siete... butaca trece"); en Quebrado dice tu nombre y "todavía no te toca". No se despierta.
 - **Enemigos** (`scripts/enemies/`): `Stalker` — deambula, persigue si ve, oye correr u oye un
   disparo (`hear_noise`), golpea la cordura; tiene vida (`take_damage`), se tambalea, destella en rojo
   y muere (queda el cuerpo, `GameState.mark_killed`). Grupo `enemies`. Usa NavigationAgent3D.
@@ -342,7 +358,8 @@ helpers de calles y manzanas que hereda el barrio (`_frontage`, `_row` con edifi
   Doña Rosa (pieza del agente Sosa: su cuaderno, la llave del teatro, y un acechador). Adentro: `inside`.
 - **Casa del Dr. Ferreyra** (pedido del usuario; `ferreyra`, en Lavalle, también en build_houses.gd):
   living (el retrato con los ojos tachados), escritorio (el **diario de Ferreyra** y la **llave del sótano**
-  en el bolsillo del saco) y dormitorio (Ferreyra muerto en la cama, se fue con pastillas). Quebrado: "LOS
+  en el bolsillo del saco) y dormitorio (la cama deshecha y vacía: se acostó a morirse y se levantó; Ferreyra sigue
+  vivo, ver NPC). Quebrado: "LOS
   ENCERRÉ ABAJO PORQUE ME LLAMABAN POR MI NOMBRE".
 
 ## Zona 1b: el sótano del San Judas
@@ -458,6 +475,8 @@ Godot **4.7.2** (no está en el PATH):
   de guardia, el sobreviviente nuevo llega a casa). Los tests del refugio del hospital hacen `move_to(&"hospital")`.
 - **Test de la comisaría y la iglesia**: `<godot> --path . -s res://tests/avenue_places_test.gd` (entrada y
   salida, secretos por dificultad, bajar a la cripta).
+- **Test de los NPC**: `<godot> --path . -s res://tests/npc_test.gd` (el Flaco: llave, calabozo, regalo en el pasaje;
+  Ferreyra huye y no vuelve; el mendigo no se despierta; `test_shots/npcs/`).
 - **Test de Teodoro**: `<godot> --path . -s res://tests/cat_test.gd` (la nota, la veterinaria, el rescate, el gato en casa,
   las caricias, el bono del refugio, la mudanza; `test_shots/cat/`).
 - **Test del Escupidor**: `<godot> --path . -s res://tests/spitter_test.gd` (escupe, lastima, se esquiva de costado,

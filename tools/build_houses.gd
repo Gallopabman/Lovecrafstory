@@ -338,15 +338,16 @@ func _house_ferreyra() -> float:
 	_inspect(Vector3(-2.5, 1.0, -7.6), ["Sobre la silla, el saco de Ferreyra, doblado. En el bolsillo hay algo duro, frío y largo."], 1.0)
 	_inspect(Vector3(-4.2, 1.3, -6.3), ["Tratados de psiquiatría, de neurología, de anatomía patológica. Un estante entero sobre el sueño.",
 		"Los lomos de los últimos están marcados con la misma palabra, a mano: \"NIEBLA\"."], 1.1)
-	# Dormitorio (x 0..5, z -9..-4.5): Ferreyra no salió nunca de acá.
+	# Dormitorio (x 0..5, z -9..-4.5): la cama donde Ferreyra se acostó a morir... y de la que se levantó
+	# (está vivo: escondido en el hospital, ver build_hospital._ferreyra).
 	_prop("bedSingle", Vector3(3.2, 0, -7.7), 90)
 	_prop("cabinetBedDrawerTable", Vector3(4.6, 0, -5.2), -90)
 	_prop("chair", Vector3(1.0, 0, -8.3), 30)
 	_prop("trashbag", Vector3(0.6, 0, -5.0), 70)
 	_prop("blood", Vector3(2.4, 0.01, -6.2), 40)
-	_inspect(Vector3(3.2, 0.9, -7.7), ["Ferreyra está acostado, vestido, con los zapatos puestos. Tiene las manos cruzadas sobre el pecho.",
-		"En la mesa de luz, frascos vacíos y un vaso de agua. Se fue durmiendo. Eligió no ver lo que venía.",
-		"No sé si siento lástima o bronca. Las dos cosas pesan lo mismo."], 1.3)
+	_inspect(Vector3(3.2, 0.9, -7.7), ["La cama está deshecha. En el colchón quedó la forma de alguien que estuvo acostado mucho tiempo, vestido, con los zapatos puestos.",
+		"En la mesa de luz, frascos vacíos y un vaso de agua. Se acostó a morirse. Y después, por algún motivo, se levantó.",
+		"En el piso, un zapato. Se fue tan apurado que se fue descalzo de un pie."], 1.3)
 	_pickup("Kit", "medicine_kit", Vector3(4.6, 0.58, -5.2))
 	_pickup("Shells", "ammo_shells", Vector3(-4.0, 0.05, -2.0), 4)
 	_stalker(Vector3(1.0, 0.05, -1.6), 1.2)

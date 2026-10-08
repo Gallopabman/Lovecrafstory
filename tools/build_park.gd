@@ -77,6 +77,7 @@ func _initialize() -> void:
 	_street_signs()
 	_park_lore()
 	_park_secrets()
+	_flaco_corner()
 	_park_items()
 	_park_places()
 	_park_enemies()
@@ -915,3 +916,25 @@ func _vet_front() -> void:
 	_add(scene_root, spawn, "SpawnHouse_veterinaria")
 	_inspect(door + Vector3(4.0, 1.4, 0.5), ["La vidriera de la veterinaria: bolsas de alimento, collares, un gato de yeso que saluda con la pata.",
 		"Adentro, en el fondo, algo maúlla. Conozco ese maullido. Es ronco, de cantor de bodegón."], 1.4)
+
+
+## El Flaco, de vuelta en su rincón del pasaje (solo si se lo sacó del calabozo de la comisaría).
+func _flaco_corner() -> void:
+	var mid_z := (PASAJE_Z0 + PASAJE_Z1) / 2
+	_npc("Flaco", "flaco", Vector3(PASAJE_END - 2.4, 0.05, mid_z + 0.8), -90.0, {
+		"visible_flag": &"flaco_freed",
+		"gift_item": load("res://assets/items/ammo_9mm.tres"),
+		"gift_count": 12,
+		"gift_flag": &"flaco_gift",
+		"gift_text": "—Tomá. Se las saqué a un cana antes de que me encerraran. Vos las vas a usar mejor que yo. —Me da una caja de balas envuelta en una media.",
+		"texts": PackedStringArray([
+			"—¿Querés algo? Por los viejos tiempos, de onda... —Lo miro. Levanta las manos y se ríe. —Era joda, pibe. Ya sé. Ciento y pico de días, ¿no? Bien ahí.",
+			"—Tu vieja me vino a buscar una vez, acá mismo. Me dijo que si te volvía a vender me mataba. Le creí.",
+			"—La niebla me habla, ¿sabés? Con la voz de mi hermano. Le digo que se calle. A veces me hace caso.",
+			"—Andá tranquilo. Si alguien pregunta, yo no te vi. Como siempre.",
+		]),
+		"texts_broken": PackedStringArray([
+			"—Pibe, estás blanco. Sentate un toque. No te voy a ofrecer nada, quedate tranquilo. Respirá conmigo.",
+			"—No me mires así. Yo ya no vendo. Ya no hay a quién.",
+		]),
+	})
