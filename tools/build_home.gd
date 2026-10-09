@@ -165,16 +165,18 @@ func _shell_home() -> void:
 	# La escalera: pared contra la cocina (con el paso abajo, al este) y la rampa que sube al oeste.
 	_wall("x", 2.0, 7.5, 11.8, 0.0, TOP, T, [], "home_wall", false)
 	_floor(7.5, 0, 13, 2, 0.0, "wood")
-	var run := 12.8 - 8.6
-	var ramp := _box(groups.Structure, "StairRamp", Vector3((12.8 + 8.6) / 2, AF / 2 - 0.05, 1.0),
+	# Abajo queda un descanso de 1 m (x 12-13) frente al paso de la cocina: antes la rampa arrancaba
+	# en x 12.8 y, entrando desde la cocina, ya estaba a media altura (había que saltar).
+	var run := 12.0 - 8.6
+	var ramp := _box(groups.Structure, "StairRamp", Vector3((12.0 + 8.6) / 2, AF / 2 - 0.05, 1.0),
 		Vector3(Vector2(run, AF).length(), 0.1, 1.5), "dark_wood" if mats.has("dark_wood") else "wood", true, false)
 	ramp.rotation.z = -atan2(AF, run)
 	for i in 10:
 		var h := AF * (i + 1) / 10.0
-		var x := 12.8 - run * (i + 0.5) / 10.0
+		var x := 12.0 - run * (i + 0.5) / 10.0
 		_box(groups.Structure, "Step", Vector3(x, h / 2, 1.0), Vector3(run / 10.0, h, 1.5), "wood", false)
 	_slab(7.6, 0.15, 8.6, 1.85, AF, 0.1, "wood")
-	_box(groups.Structure, "Handrail", Vector3(10.6, 1.9, 1.75), Vector3(4.6, 0.05, 0.05), "rail", false)
+	_box(groups.Structure, "Handrail", Vector3(10.3, 1.9, 1.75), Vector3(3.8, 0.05, 0.05), "rail", false)
 	_bulb(Vector3(9.5, 4.6, 1.0), 0.6, true)
 	_inspect(Vector3(12.3, 1.2, 1.4), ["La escalera al ático. Arriba algo se arrastra sobre las cajas.",
 		"Siempre le dije a mamá que eran ratas. Ella nunca me contestó."], 1.0)
@@ -193,19 +195,20 @@ func _rooms() -> void:
 	_bulb(Vector3(3.8, HC - 0.55, 7.0), 0.8, false, null, false)
 	_inspect(Vector3(4.61, 0.9, 9.4), ["La tele vieja de la abuela. Mamá nunca quiso tirarla."])
 	# Cocina (x 7.5-13, z 2-10).
-	for p in [[Vector3(12.6, 0, 3.0), -90], [Vector3(12.6, 0, 3.9), -90]]:
+	# Todo contra la pared este, corrido al sur: así queda paso libre hasta la escalera (z 2-3.3).
+	for p in [[Vector3(12.6, 0, 3.8), -90], [Vector3(12.6, 0, 4.7), -90]]:
 		_prop("kitchenCabinet", p[0], p[1])
-	_prop("kitchenSink", Vector3(12.6, 0, 4.8), -90)
-	_prop("electric_stove", Vector3(12.6, 0, 5.8), -90)
-	_prop("kitchenFridge", Vector3(12.55, 0, 7.0), -90)
-	_prop("kitchenMicrowave", Vector3(12.65, 0.9, 3.0), -90)
+	_prop("kitchenSink", Vector3(12.6, 0, 5.6), -90)
+	_prop("electric_stove", Vector3(12.6, 0, 6.5), -90)
+	_prop("kitchenFridge", Vector3(12.55, 0, 7.5), -90)
+	_prop("kitchenMicrowave", Vector3(12.65, 0.9, 3.8), -90)
 	_prop("table", Vector3(9.8, 0, 6.5), 0)
 	_prop("chair", Vector3(9.8, 0, 7.4), 180)
 	_prop("chair", Vector3(9.8, 0, 5.6), 0)
 	_prop("chair", Vector3(8.9, 0, 6.5), 90)
 	_prop("trashcan", Vector3(8.0, 0, 9.4))
 	_bulb(Vector3(9.8, HC - 0.55, 6.5), 0.8, false, null, false)
-	_inspect(Vector3(12.5, 1.3, 7.0), ["Imanes de farmacias en la heladera. Una foto: mamá con guardapolvo, sonriendo cansada.",
+	_inspect(Vector3(12.5, 1.3, 7.5), ["Imanes de farmacias en la heladera. Una foto: mamá con guardapolvo, sonriendo cansada.",
 		"Abajo, con su letra: \"Dr. M. Ibáñez - Guardia, San Judas\"."], 1.0)
 	# Pieza (x 0-5, z 0-4.5).
 	_prop("desk", Vector3(3.8, 0, 0.5), 180)
@@ -386,8 +389,8 @@ func _home_items() -> void:
 	_cat(Vector3(1.8, 0.0, 6.4), 60.0, 1, &"home")
 	_box(groups.Props, "CatBowl", Vector3(10.6, 0.03, 9.4), Vector3(0.22, 0.06, 0.22), "metal", false)
 	_inspect(Vector3(10.6, 0.4, 9.4), ["El plato de Teodoro, vacío. Tiene su nombre escrito con marcador, en letra de mamá."], 0.8)
-	_pickup("Peaches1", "food_canned_peaches", Vector3(12.6, 0.95, 3.9))
-	_pickup("Peaches2", "food_canned_peaches", Vector3(12.6, 0.95, 3.0))
+	_pickup("Peaches1", "food_canned_peaches", Vector3(12.6, 0.95, 4.7))
+	_pickup("Peaches2", "food_canned_peaches", Vector3(12.6, 0.95, 3.8))
 	_pickup("Water", "food_water_bottle", Vector3(10.2, 0.8, 6.8))
 	_pickup("Chocolate", "food_chocolate_bar", Vector3(3.8, 0.47, 6.6))
 	_pickup("Comic", "comic_lighthouse", Vector3(3.4, 0.78, 0.5))

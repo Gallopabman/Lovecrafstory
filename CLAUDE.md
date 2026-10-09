@@ -11,7 +11,7 @@ en vez de inventarlo.
 ## Resumen del GDD
 
 - **La cordura es todo**: no hay hambre ni sed; comida, refugio y entretenimiento desembocan en un medidor.
-  - **Baja**: goteo constante (más lento en el refugio, según su nivel "cozy"), ver horrores
+  - **Baja**: ver enemigos y que te persigan (cambio del usuario: ya no hay goteo constante), ver horrores
     (sobre todo por primera vez), recibir daño, eventos perturbadores.
   - **Sube**: comida (consumible, cocinada rinde más), cómics/libros (reutilizables, rinden menos
     al releer), películas/música (reutilizables, requieren electricidad), **cartas** (únicas: llenan
@@ -23,9 +23,16 @@ en vez de inventarlo.
   el escalón más difícil ("AL LÍMITE" en el HUD: se pega x0.5 y se recibe x2.2, `full_madness_*` de `Sanity`,
   `Sanity.is_full_madness()`); se sale bajando la locura. Lo de abajo (el Perdido, el infarto) queda detrás de
   `Sanity.full_madness_kills` (apagado; los tests lo prenden para probarlo). Hoy solo se muere por daño (vida en 0:
-  el cuerpo queda en el piso). **El Perdido** (decisión del usuario): si se muere por daño **afuera** con la locura al
-  100 % (`Sanity.dies_into_lost_one()`), no queda cuerpo: el sobreviviente se convierte en el Perdido, con lo que
-  llevaba ("Moriste con la cabeza rota"). En el refugio, aunque esté al límite, queda el cuerpo.
+  el cuerpo queda en el piso, **siempre**).
+- **El Perdido al morir: APAGADO** (pedido del usuario: "que ya no aparezca nada cuando morimos, al menos por ahora";
+  el código queda para reusarlo). Con `Sanity.lost_one_on_death = true`, morir por daño **afuera** con la locura al
+  100 % (`Sanity.dies_into_lost_one()`) no deja cuerpo: el sobreviviente se convierte en el Perdido, con lo que
+  llevaba ("Moriste con la cabeza rota", `GameUI.MAD_DEATH_TEXT`). Cómo funciona, por si se vuelve a prender:
+  `GameUI._on_died` elige el texto y `_restart` llama `GameState.add_lost_one(posición, objetos)` en vez de
+  `add_corpse`; `GameState.lost_ones` (por escena, persiste y se guarda) lo lee `WorldPersistence` al cargar la
+  zona e instancia `scenes/enemies/lost_one.tscn` ahí (ver "El Perdido" en Decisiones técnicas: estilos según
+  `GameState.playstyle`, el arma que tenía, suelta todo al morir, `defeated`). Los tests (`sanity_loop_test`) lo
+  prenden y lo prueban entero.
 - **Cordura 0 fuera de casa** (solo con `full_madness_kills`) → el personaje se convierte en **el Perdido** (mini-jefe que vaga por
   la zona donde cayó, con lo que llevaba encima y habilidades según cómo se jugó) y un nuevo
   sobreviviente empieza en el mismo refugio. Se conservan refugio y mundo; se pierde el inventario.
@@ -69,9 +76,11 @@ en vez de inventarlo.
 - **Autoloads**:
   - `Sanity` ([scripts/autoload/sanity_manager.gd](scripts/autoload/sanity_manager.gd)): por dentro, la
     cordura (`current`, estados, refugios, horrores vistos, `lost` + `lost_in_refuge`); **en pantalla es la
-    locura** (`madness()` = 1 - cordura, pedido del usuario): afuera sube con el goteo (`drain_per_second` 0.45 =
-    la barra se llena en ~3.7 min; x2 `chase_drain_multiplier` mientras un enemigo te persigue o ataca a menos de
-    15 m, `is_chased()`), en el refugio activo baja de a poco (`refuge_recovery_per_second` 0.12 x
+    locura** (`madness()` = 1 - cordura, pedido del usuario): **ya no sube sola** (cambio del usuario: "solo en presencia
+    de enemigos y cuando los veamos"; `drain_per_second` = 0, antes 0.45): sube 0.6/s mientras se ve un enemigo vivo
+    (`enemy_seen_drain_per_second`; `is_enemy_seen()`: en pantalla, a menos de `sight_range` 20 m, sin escenario en el
+    medio, revisado cada 0.2 s) y x1.5 (0.9/s) si alguno te persigue o ataca a menos de 15 m aunque no lo veas
+    (`chase_drain_multiplier`, `is_chased()`); en el refugio activo baja de a poco (`refuge_recovery_per_second` 0.12 x
     `RefugeZone.current_recovery_multiplier()`, que en los refugios sale del cozy: x1 pelado → x3 completo, o sea de
     ~14 a ~4.6 min para vaciarla). Pedido del usuario: "más violenta la subida" y "que en el refugio baje de a
     poco". `add_madness()` = susto/grito. `take_hit()` = golpe físico: lo pasa a `Health` y además suma
@@ -270,7 +279,8 @@ inventé yo, confirmarlo con el usuario) y guardó sus insumos médicos bajo lla
 recaiga. La nota de mamá dice que la llamaron del San Judas por la niebla: eso lleva al hospital.
 - **Casa** ([scenes/levels/home.tscn](scenes/levels/home.tscn), [tools/build_home.gd](tools/build_home.gd)): refugio
   inicial `home` (13 x 10 m): pieza (cama y alijo), baño (la cajita azul), living (hogar = fuego, tele, radio,
-  ventanas), cocina (plano en el corcho, la nota de mamá) y la escalera al ático. El ático (x 0-7.5, piso a
+  ventanas), cocina (plano en el corcho, la nota de mamá) y la escalera al ático (se entra caminando desde la cocina:
+  descanso de 1 m al pie y los muebles de la pared este corridos al sur). El ático (x 0-7.5, piso a
   2.9 m) está cerrado: `FlagGate` con el flag `attic_open`, que nadie marca todavía. Mensaje (texto del
   usuario, ajustado): "No puedo entrar ahí. Mi madre se llevó la llave cuando guardó sus estúpidos
   medicamentos. Piensa que voy a recaer." Adentro: cajas, sueros, oxígeno, jeringas, una cama de hospital y
@@ -514,7 +524,8 @@ Godot **4.7.2** (no está en el PATH):
   ninguna superficie visible a menos de ~4 cm de otra paralela; las losas van 10 cm debajo del piso y 5 cm arriba
   del cielorraso (`[y-0.25, y-0.10]`); el terreno de las calles a -0.02, los tramos de calle subidos 5 cm
   (`TILE_LIFT`, lo hace `_piece`), los asfaltos encima del terreno con tope a 0.03 (`OVERLAY_Y`/`OVERLAY_H`), las
-  líneas y sendas a 0.07-0.08; los calcos (`DECALS`: manchas, alfombras) los sube `_prop`; los marcos de puertas
+  líneas y sendas a 0.07-0.08 (las sendas peatonales son franjas sueltas, `_zebra` de build_street.gd: el calco
+  texturado del kit se deformaba con el mapeo afín); los calcos (`DECALS`: manchas, alfombras) los sube `_prop`; los marcos de puertas
   van adentro del hueco (`_opening_trim`); `_wall` corta en franjas sin superponer (ventanas de distintos pisos);
   las paredes secretas que tapan un hueco, 8 cm más chicas por lado. Detector: `<godot> --headless --path . -s
   res://tools/find_zfight.gd [-- escena.tscn]` (lista pares superpuestos; lo que queda son caras que no se ven:

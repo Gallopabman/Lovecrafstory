@@ -124,9 +124,8 @@ func _park_ground() -> void:
 			else:
 				_box(groups.Structure, "Crossing", Vector3(cx, OVERLAY_Y, cz), Vector3(12.0, OVERLAY_H, 12.0), "asphalt", false)
 			for arm in [-1.0, 1.0]:
-				_piece(CITY + "Decal_Crosswalk.gltf", Vector3(cx + arm * 7.5, 0.01, cz), 90.0, groups.Structure,
-					Color(0.7, 0.7, 0.68))
-			_piece(CITY + "Decal_Crosswalk.gltf", Vector3(cx, 0.01, cz - side * 7.5), 0.0, groups.Structure, Color(0.7, 0.7, 0.68))
+				_zebra(Vector3(cx + arm * 7.5, 0.0, cz), true, 2.0 * (WALK - 3.0))
+			_zebra(Vector3(cx, 0.0, cz - side * 7.5), false, 2.0 * (WALK - 3.0))
 	for p in [Vector3(18, 0.01, 1.4), Vector3(66, 0.01, -1.2), Vector3(130, 0.01, 1.2), Vector3(70, 0.01, B_Z + 1.0),
 			Vector3(96, 0.01, -30.0), Vector3(150, 0.01, -20.0)]:
 		_prop(CITY + "Prop_ManholeCover.gltf", p, 0, {"col": false})

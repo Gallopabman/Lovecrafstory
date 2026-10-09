@@ -138,25 +138,38 @@ func _initialize() -> void:
 	var refuge_rate: float = (in_refuge_before - sanity.madness()) * sanity.maximum
 	check(refuge_rate < 0.4, "en el refugio baja de a poco: %.2f por segundo" % refuge_rate)
 	place(Vector3(0, 0.05, 8), 0.0)
+	# Pedido del usuario: la locura ya no sube sola; solo con enemigos a la vista o persiguiéndote.
+	var enemies := get_nodes_in_group(&"enemies")
+	var homes := {}
+	for e: Node3D in enemies:
+		homes[e] = e.global_position
+		e.global_position += Vector3(300, 0, 0)
 	await frames(10)
 	var before: float = sanity.madness()
-	await seconds(1.0)
-	check(not sanity.in_refuge() and sanity.madness() > before, "afuera la locura sube: %.3f -> %.3f" % [before, sanity.madness()])
-	# Las velocidades (pedido del usuario: subir más rápido afuera, bajar de a poco en el refugio).
+	await seconds(1.5)
+	check(not sanity.in_refuge() and absf(sanity.madness() - before) < 0.002,
+		"afuera, sin enemigos, la locura no sube: %.3f -> %.3f" % [before, sanity.madness()])
+	var seer: Node3D = enemies[0]
+	seer.global_position = player().global_position + Vector3(0, 0, -7)
+	seer.set("state", 0)
+	await seconds(0.5)
 	var c0: float = sanity.current
 	await seconds(2.0)
-	var out_rate: float = (c0 - sanity.current) / 2.0
-	check(out_rate > 0.35 and out_rate < 0.6, "afuera sube ~0.45 por segundo: %.2f" % out_rate)
-	var chaser: Node3D = get_nodes_in_group(&"enemies")[0]
-	var chaser_pos := chaser.global_position
-	chaser.global_position = player().global_position + Vector3(4, 0, 0)
-	chaser.set("state", 1)
+	var seen_rate: float = (c0 - sanity.current) / 2.0
+	check(sanity.is_enemy_seen() and seen_rate > 0.45 and seen_rate < 0.75, "si veo un enemigo, sube: %.2f por segundo" % seen_rate)
+	seer.global_position = player().global_position + Vector3(0, 0, 7)
+	await seconds(0.5)
+	c0 = sanity.current
+	await seconds(1.5)
+	check(not sanity.is_enemy_seen() and absf(c0 - sanity.current) < 0.05, "si está a mis espaldas y no me persigue, no")
+	seer.set("state", 1)
 	c0 = sanity.current
 	await seconds(2.0)
 	var chase_rate: float = (c0 - sanity.current) / 2.0
-	check(chase_rate > out_rate * 1.6, "si te persiguen, sube el doble: %.2f" % chase_rate)
-	chaser.set("state", 0)
-	chaser.global_position = chaser_pos
+	check(chase_rate > seen_rate * 1.3, "si me persigue (aunque no lo vea), sube más: %.2f" % chase_rate)
+	seer.set("state", 0)
+	for e: Node3D in enemies:
+		e.global_position = homes[e]
 	sanity.restore(1000.0)
 
 	print("-- Golpe")
@@ -637,8 +650,25 @@ func _initialize() -> void:
 	check(health.alive and is_equal_approx(health.current, health.maximum), "el nuevo sobreviviente llega con la vida llena")
 
 
-	print("-- Muerte con la locura al 100 %: el Perdido")
+	print("-- Muerte con la locura al 100 %: por ahora, el cuerpo (el Perdido está apagado)")
 	sanity.full_madness_kills = false
+	check(not sanity.lost_one_on_death, "el Perdido al morir viene apagado")
+	place(Vector3(0, 0.05, 6), 0.0)
+	await frames(10)
+	sanity.add_madness(10000.0)
+	await frames(3)
+	corpses_before = game_state.corpses.size()
+	lost_before = game_state.lost_ones.size()
+	sanity.take_hit(10000.0)
+	await seconds(3.5)
+	check(current_scene.get_node("GameUI").lost_label.text.begins_with("Moriste.\n"), "texto de la muerte común")
+	await seconds(4.5)
+	await frames(30)
+	check(game_state.corpses.size() == corpses_before + 1 and game_state.lost_ones.size() == lost_before,
+		"morir con la locura al 100 % deja el cuerpo, no un Perdido")
+
+	print("-- Muerte con la locura al 100 %: el Perdido (prendido)")
+	sanity.lost_one_on_death = true
 	place(Vector3(0, 0.05, 6), 0.0)
 	await frames(10)
 	inventory.add(peaches)
@@ -655,6 +685,7 @@ func _initialize() -> void:
 	check(game_state.lost_ones.size() == lost_before + 1 and game_state.corpses.size() == corpses_before,
 		"morir con la locura al 100 % deja al Perdido (no un cuerpo)")
 	check(game_state.lost_ones[game_state.lost_ones.size() - 1].items.size() >= 1, "el Perdido lleva lo que tenía encima")
+	sanity.lost_one_on_death = false
 
 	print("RESULT: %d fallas" % fails)
 	quit()

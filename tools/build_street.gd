@@ -151,6 +151,7 @@ func _make_materials() -> void:
 		"attic_glow": ["", Color(0.4, 0.12, 0.08), 1.0],
 		"swing": ["metal_green", Color(0.45, 0.2, 0.15), 1.0],
 		"asphalt": ["concrete", Color(0.2, 0.2, 0.21), 0.3],
+		"road_paint": ["", Color(0.7, 0.69, 0.66), 1.0],
 		"sidewalk": ["concrete", Color(0.42, 0.41, 0.4), 0.5],
 		"pit": ["", Color(0.01, 0.01, 0.012), 1.0],
 		"rubble": ["concrete", Color(0.36, 0.33, 0.3), 0.7],
@@ -565,7 +566,7 @@ func _ground() -> void:
 		_box(groups.Structure, "SidewalkStrip", Vector3(cx, TILE_LIFT - 0.01, (AVE - 1.5) * band),
 			Vector3(12.0, 0.02, 3.0), "sidewalk", false)
 		for arm in [-1.0, 1.0]:
-			_piece(CITY + "Decal_Crosswalk.gltf", Vector3(cx + arm * 7.5, 0.01, 0), 90.0, groups.Structure, Color(0.7, 0.7, 0.68))
+			_zebra(Vector3(cx + arm * 7.5, 0.0, 0.0), true, 2.0 * (AVE - 3.0))
 		# La transversal, hasta la paralela (Lavalle al norte, Tucumán al sur).
 		var sign_z := -1.0 if north else 1.0
 		var end_z := LAVALLE_Z + WALK if north else TUCUMAN_Z - WALK
@@ -580,7 +581,7 @@ func _ground() -> void:
 			"asphalt", false)
 		_box(groups.Structure, "SidewalkStrip", Vector3(cx, TILE_LIFT - 0.01, par_z + sign_z * (WALK - 1.5)), Vector3(12.0, 0.02, 3.0),
 			"sidewalk", false)
-		_piece(CITY + "Decal_Crosswalk.gltf", Vector3(cx, 0.01, sign_z * (AVE + 1.5)), 0.0, groups.Structure, Color(0.7, 0.7, 0.68))
+		_zebra(Vector3(cx, 0.0, sign_z * (AVE + 1.5)), false, 2.0 * (WALK - 3.0))
 	# Lavalle y Tucumán.
 	for par: Array in [[LAVALLE_Z, LAVALLE_X, NORTH_X], [TUCUMAN_Z, TUCUMAN_X, SOUTH_X]]:
 		var span: Vector2 = par[1]
@@ -1141,3 +1142,16 @@ func _beggar() -> void:
 			"\"Todavía no\", dice sin despertarse. \"Todavía no te toca.\"",
 		]),
 	})
+
+
+## Senda peatonal: franjas blancas de 0.5 m cada 1 m, largas en el sentido del tránsito, de vereda a
+## vereda. Antes era el calco texturado del kit, que con el mapeo afín PS1 se deformaba según desde
+## dónde se lo mirara (y quedaba mal orientado). `traffic_along_x`: la calle que se cruza va de este a oeste.
+func _zebra(center: Vector3, traffic_along_x: bool, road_width: float) -> void:
+	var n := int((road_width - 0.6) / 1.0)
+	for i in n:
+		var offset := (i - (n - 1) / 2.0) * 1.0
+		var pos := center + (Vector3(0.0, 0.0, offset) if traffic_along_x else Vector3(offset, 0.0, 0.0))
+		pos.y = 0.075
+		var size := Vector3(3.0, 0.01, 0.5) if traffic_along_x else Vector3(0.5, 0.01, 3.0)
+		_box(groups.Structure, "Zebra", pos, size, "road_paint", false)

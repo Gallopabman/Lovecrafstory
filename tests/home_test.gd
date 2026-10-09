@@ -114,6 +114,14 @@ func _initialize() -> void:
 		await shot(s[0])
 
 	print("-- Ático")
+	# Desde la cocina se entra a la escalera caminando (antes había que saltar).
+	place(Vector3(11.0, 0.05, 4.5), -26.0)
+	await walk("move_forward", 110)
+	check(player().global_position.z < 1.6 and player().global_position.y < 0.3,
+		"de la cocina al pie de la escalera, caminando: z=%.2f y=%.2f" % [player().global_position.z, player().global_position.y])
+	place(Vector3(player().global_position.x, player().global_position.y, 1.0), 90.0)
+	await walk("move_forward", 240)
+	check(player().global_position.y > AF - 0.3, "se sube al descanso del ático sin saltar: x=%.2f y=%.2f" % [player().global_position.x, player().global_position.y])
 	var gate: Node = current_scene.get_node("Structure/AtticGate")
 	place(Vector3(8.2, AF + 0.05, 1.0), 90.0)
 	await frames(5)

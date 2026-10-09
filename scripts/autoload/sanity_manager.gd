@@ -35,11 +35,16 @@ enum Difficulty { NORMAL, HARD, INSANE }
 const DIFFICULTY_NAMES := ["Normal", "Difícil", "Insane"]
 
 @export var base_maximum := 100.0
-## Goteo constante fuera del refugio: la locura llena la barra en ~3.7 minutos (pedido del usuario:
-## "más violenta la subida"; antes, 0.15 = ~11 minutos).
-@export var drain_per_second := 0.45
-## Mientras algún enemigo te persigue o te ataca cerca, la locura sube más rápido.
-@export var chase_drain_multiplier := 2.0
+## Goteo sin enemigos a la vista. Pedido del usuario: la locura ya no crece sola, solo en presencia de
+## enemigos y cuando se los ve (antes 0.45 = la barra se llenaba en ~3.7 minutos).
+@export var drain_per_second := 0.0
+## Mientras se ve algún enemigo vivo (en pantalla, a menos de `sight_range`, sin nada en el medio).
+@export var enemy_seen_drain_per_second := 0.6
+@export var sight_range := 20.0
+## Cada cuánto se revisa si hay enemigos a la vista (rayos contra el escenario).
+@export var sight_check_interval := 0.2
+## Si algún enemigo te persigue o te ataca cerca (aunque no lo veas), sube más rápido.
+@export var chase_drain_multiplier := 1.5
 @export var chase_range := 15.0
 ## Locura que suma cada golpe (además de la vida que saca).
 @export var hit_madness := 4.0
@@ -55,6 +60,10 @@ const DIFFICULTY_NAMES := ["Normal", "Difícil", "Insane"]
 ## Con la locura al 100 %: lo que pega el jugador y lo que recibe (un escalón más que Insane).
 @export var full_madness_damage_multiplier := 0.5
 @export var full_madness_damage_taken_multiplier := 2.2
+## El Perdido al morir (pedido del usuario, después sacado "al menos por ahora"): si está prendido, morir
+## por daño afuera con la locura llena convierte al sobreviviente en el Perdido en vez de dejar el cuerpo.
+## Apagado, al morir siempre queda el cuerpo. Todo el código del Perdido sigue (ver CLAUDE.md).
+@export var lost_one_on_death := false
 
 @export_group("Dificultad")
 ## Locura (0..1) desde la que el juego pasa a Difícil y a Insane.
@@ -77,6 +86,8 @@ var lost_in_refuge := false
 
 var _refuges: Array[RefugeZone] = []
 var _seen_horrors: Dictionary = {}
+var _enemy_seen := false
+var _sight_timer := 0.0
 
 
 func _process(delta: float) -> void:
@@ -85,8 +96,42 @@ func _process(delta: float) -> void:
 	if in_refuge():
 		_set_current(current + refuge_recovery_per_second * recovery_multiplier() * delta)
 	else:
-		var rate := drain_per_second * (chase_drain_multiplier if is_chased() else 1.0)
+		_sight_timer -= delta
+		if _sight_timer <= 0.0:
+			_sight_timer = sight_check_interval
+			_enemy_seen = _check_enemy_seen()
+		var rate := drain_per_second
+		if is_chased():
+			rate = maxf(rate, enemy_seen_drain_per_second * chase_drain_multiplier)
+		elif _enemy_seen:
+			rate = maxf(rate, enemy_seen_drain_per_second)
 		_set_current(current - rate * delta)
+
+
+## Si hay algún enemigo vivo a la vista (lo sube la locura). Se revisa cada `sight_check_interval`.
+func is_enemy_seen() -> bool:
+	return _enemy_seen
+
+
+func _check_enemy_seen() -> bool:
+	var player := get_tree().get_first_node_in_group(&"player") as Node3D
+	var camera := get_viewport().get_camera_3d()
+	if player == null or camera == null:
+		return false
+	var space := player.get_world_3d().direct_space_state
+	for enemy: Node3D in get_tree().get_nodes_in_group(&"enemies"):
+		if not enemy.is_visible_in_tree() or (enemy.has_method(&"is_dead") and enemy.is_dead()):
+			continue
+		if enemy.global_position.distance_to(player.global_position) > sight_range:
+			continue
+		var point: Vector3 = enemy.aim_point() if enemy.has_method(&"aim_point") else enemy.global_position + Vector3.UP
+		if not camera.is_position_in_frustum(point):
+			continue
+		var query := PhysicsRayQueryParameters3D.create(camera.global_position, point, 1)
+		query.exclude = [(player as CollisionObject3D).get_rid()]
+		if space.intersect_ray(query).is_empty():
+			return true
+	return false
 
 
 ## Si algún enemigo te está persiguiendo o atacando a menos de `chase_range`.
@@ -155,7 +200,7 @@ func is_full_madness() -> bool:
 
 ## Morir por daño afuera con la locura llena: el sobreviviente se convierte en el Perdido.
 func dies_into_lost_one() -> bool:
-	return is_full_madness() and not in_refuge()
+	return lost_one_on_death and is_full_madness() and not in_refuge()
 
 
 func in_refuge() -> bool:
