@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_notebook.glb" id="2_nb"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"diary_page_02"
+display_name = "Diario: página arrancada (2)"
+short_name = "DIA"
+description = "Otra hoja del mismo cuaderno. La letra es más torcida, como si la hubiera escrito temblando."
+kind = 9
+max_sanity_bonus = 0.0
+letter_text = "Día 58. Ya no me dejan ver a mamá. Dicen que es por mi bien, que ella \"ensucia la señal\".
+
+Hoy abrieron el Umbral del todo. Tres segundos, dijeron. Algo del otro lado me miró, y yo lo empujé de vuelta. No con las manos: con la cabeza. Los dos técnicos volaron contra la pared del cuarto de control. El vidrio se rajó de punta a punta.
+
+El doctor V. no estaba enojado. Estaba contento. Anotaba y sonreía.
+
+Los locos no están locos. Ven lo que hay y la cabeza no les da. A mí me da. Por eso me eligieron.
+
+Creo que ellos no quieren hablar con el otro lado. Creo que quieren abrirlo.
+
+Si me vuelvo a olvidar de todo: cuando algo se te venga encima, no retrocedas. Empujá."
+power = &"push"
+world_color = Color(0.8, 0.78, 0.72, 1)
+world_scene = ExtResource("2_nb")
+world_size = 0.24
+world_tint = Color(0.75, 0.68, 0.85, 1)

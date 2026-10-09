@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_item"]
+[ext_resource type="PackedScene" path="res://assets/models/items/letter_notebook.glb" id="2_nb"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"diary_page_01"
+display_name = "Diario: página arrancada (1)"
+short_name = "DIA"
+description = "Una hoja de cuaderno escrita con birome, apretada, de los dos lados. Es mi letra. No me acuerdo de haberla escrito."
+kind = 9
+max_sanity_bonus = 0.0
+letter_text = "No sé quién va a leer esto. Seguramente yo, sin acordarme de haberlo escrito. Me avisaron que iba a pasar.
+
+Día 31 en el Instituto. Los de guardapolvo gris le dicen \"el Umbral\". Yo le digo el otro lado, porque eso es: está acá, pegado a todo, como el revés de una tela. Los otros internos lo ven y se rompen. Gritan, se arrancan las uñas, se van. Yo lo veo y aguanto. No sé por qué. Ellos tampoco, y eso les encanta.
+
+Hoy me hicieron agarrar un caño en la sala blanca y pensar en el revés de las cosas. El caño se puso a brillar, violeta, como un moretón. Le pegué al muñeco de pruebas y lo partí al medio. Me dolió la cabeza tres días.
+
+Si sos yo: agarrá algo fuerte y dejá entrar al otro lado. Un ratito nada más. Cuesta. Siempre cuesta."
+power = &"empower"
+world_color = Color(0.8, 0.78, 0.72, 1)
+world_scene = ExtResource("2_nb")
+world_size = 0.24
+world_tint = Color(0.75, 0.68, 0.85, 1)

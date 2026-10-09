@@ -35,6 +35,8 @@ const HAND_BONE := SurvivorRig.HAND_BONE
 
 @export_group("Efectos")
 @export var muzzle_flash_time := 0.06
+## Color del otro lado (el brillo del arma y la onda del empujón).
+@export var power_color := Color(0.55, 0.25, 1.0)
 
 var aiming := false
 ## Enemigo al que apunta el auto-apuntado (o null).
@@ -45,6 +47,10 @@ var _default_camera_distance := 0.0
 var _held_attachment: BoneAttachment3D
 var _held_model: Node3D
 var _muzzle_flash: OmniLight3D
+var _held_materials: Array[ShaderMaterial] = []
+## Brillo del Filo del otro lado: una luz en la mano y el arma que emite.
+var _aura: OmniLight3D
+var _aura_boost := 0.0
 
 @onready var player: Player = get_parent()
 
@@ -63,6 +69,12 @@ func setup() -> void:
 	_muzzle_flash.position = Vector3(0.2, 1.45, -0.7)
 	_muzzle_flash.visible = false
 	player.visual.add_child(_muzzle_flash)
+	_aura = OmniLight3D.new()
+	_aura.light_color = power_color
+	_aura.light_energy = 0.0
+	_aura.omni_range = 1.8
+	_aura.visible = false
+	_held_attachment.add_child(_aura)
 	Inventory.equipped_changed.connect(_on_equipped_changed)
 	_on_equipped_changed(Inventory.equipped)
 
@@ -77,6 +89,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		attack()
 	elif event.is_action_pressed("reload"):
 		reload()
+	elif event.is_action_pressed("power_1"):
+		use_power(Powers.EMPOWER)
+	elif event.is_action_pressed("power_2"):
+		use_power(Powers.PUSH)
 
 
 ## Lo llama Player en cada frame de física, antes de moverse.
@@ -90,6 +106,7 @@ func physics_update(delta: float) -> void:
 		_face(aim_at, aim_turn_speed, delta)
 	var camera_distance := aim_camera_distance if aiming else _default_camera_distance
 	player.spring_arm.spring_length = lerpf(player.spring_arm.spring_length, camera_distance, 1.0 - exp(-10.0 * delta))
+	_update_aura()
 
 
 func attack() -> void:
@@ -155,7 +172,7 @@ func _shoot(weapon: ItemData) -> void:
 		if not hit.is_empty() and hit.collider.has_method(&"take_damage"):
 			damage_by_target[hit.collider] = damage_by_target.get(hit.collider, 0.0) + weapon.damage
 	for enemy: Node in damage_by_target:
-		enemy.take_damage(damage_by_target[enemy] * Sanity.player_damage_multiplier())
+		enemy.take_damage(damage_by_target[enemy] * Sanity.player_damage_multiplier() * Powers.damage_multiplier())
 
 
 func _melee(damage: float, reach: float, cooldown: float, anim: StringName, anim_speed := 1.0) -> void:
@@ -174,7 +191,7 @@ func _melee(damage: float, reach: float, cooldown: float, anim: StringName, anim
 	if not enemies.is_empty():
 		Audio.play_sfx(&"melee_hit", player.global_position)
 	for enemy in enemies:
-		enemy.take_damage(damage * Sanity.player_damage_multiplier())
+		enemy.take_damage(damage * Sanity.player_damage_multiplier() * Powers.damage_multiplier())
 
 
 func _find_target() -> Node3D:
@@ -253,4 +270,94 @@ func _on_equipped_changed(entry: Dictionary) -> void:
 		_held_model = item.held_scene.instantiate() as Node3D
 		_held_attachment.add_child(_held_model)
 		_held_model.scale = Vector3.ONE / _held_attachment.global_transform.basis.get_scale()
-		PS1Materials.apply(_held_model)
+		_held_materials = PS1Materials.apply(_held_model)
+	else:
+		_held_materials.clear()
+
+
+## Poderes (Powers): 1 = Filo del otro lado, 2 = Empujón. Cuestan locura.
+func use_power(power: StringName) -> void:
+	if player.is_busy() or not Powers.knows(power):
+		return
+	if not Powers.activate(power):
+		return
+	match power:
+		Powers.EMPOWER:
+			Audio.play_sfx(&"power_empower", player.global_position)
+			_pulse_aura(3.0)
+		Powers.PUSH:
+			_push()
+
+
+func _push() -> void:
+	player.play_action(ANIM_PUNCH, 1.6)
+	Audio.play_sfx(&"swing", player.global_position)
+	Audio.play_sfx(&"power_push", player.global_position)
+	_shockwave()
+	var origin := player.global_position
+	var damage := Powers.push_damage * Sanity.player_damage_multiplier()
+	for enemy in _enemies_in_arc(Powers.push_range, Powers.push_half_angle):
+		var away := enemy.global_position - origin
+		away.y = 0.0
+		# Los más cerca salen más lejos.
+		var strength := lerpf(1.0, 0.5, clampf(away.length() / Powers.push_range, 0.0, 1.0))
+		if enemy.has_method(&"knock_back"):
+			enemy.knock_back(away.normalized() * Powers.push_speed * strength, damage)
+		else:
+			enemy.take_damage(damage)
+	get_tree().call_group(&"enemies", &"hear_noise", origin, Powers.push_range * 2.0)
+
+
+## La onda del empujón: un anillo que se abre hacia adelante y se desvanece.
+func _shockwave() -> void:
+	var ring := MeshInstance3D.new()
+	var mesh := TorusMesh.new()
+	mesh.inner_radius = 0.45
+	mesh.outer_radius = 0.6
+	mesh.rings = 16
+	mesh.ring_segments = 6
+	ring.mesh = mesh
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(power_color, 0.8)
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	ring.material_override = material
+	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	player.get_parent().add_child(ring)
+	var forward := -player.visual.global_basis.z
+	ring.global_position = player.global_position + Vector3.UP * 1.1 + forward * 0.6
+	# El anillo queda de frente, perpendicular a hacia donde mira.
+	ring.look_at(ring.global_position + Vector3.UP, forward)
+	var flash := OmniLight3D.new()
+	flash.light_color = power_color
+	flash.light_energy = 3.0
+	flash.omni_range = 5.0
+	ring.add_child(flash)
+	var tween := ring.create_tween().set_parallel()
+	tween.tween_property(ring, "global_position", ring.global_position + forward * Powers.push_range * 0.7, 0.35)
+	tween.tween_property(ring, "scale", Vector3.ONE * 3.5, 0.35)
+	tween.tween_property(material, "albedo_color:a", 0.0, 0.35)
+	tween.tween_property(flash, "light_energy", 0.0, 0.35)
+	tween.chain().tween_callback(ring.queue_free)
+
+
+func _pulse_aura(amount: float) -> void:
+	_aura_boost = amount
+
+
+## El arma (o el puño) brilla mientras dura el Filo; parpadea cuando se está por terminar.
+func _update_aura() -> void:
+	var active := Powers.is_empowered()
+	var t := Time.get_ticks_msec() / 1000.0
+	var glow := 0.0
+	if active:
+		glow = 0.75 + 0.25 * sin(t * 6.0)
+		if Powers.empower_left < 5.0 and fmod(t, 0.4) < 0.15:
+			glow *= 0.2
+	_aura_boost = move_toward(_aura_boost, 0.0, get_physics_process_delta_time() * 6.0)
+	_aura.visible = active
+	_aura.light_energy = glow * 0.9 + _aura_boost
+	var emission := Color(power_color * (glow * 0.8 + _aura_boost * 0.3), 1.0)
+	for material in _held_materials:
+		material.set_shader_parameter(&"emission_color", emission if active else Color.BLACK)

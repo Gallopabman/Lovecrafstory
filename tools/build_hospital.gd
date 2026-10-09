@@ -1369,6 +1369,8 @@ func _items() -> void:
 		["Ammo3", "ammo_9mm", Vector3(3.0, 2 * H + 0.76, 17.8), 6],
 		["Bandage3", "medicine_bandage", Vector3(9.0, 2 * H + 1.05, 13.3), 1],
 		["Cable4", "material_cable", Vector3(25.0, 2 * H, 18.6), 1],
+		# Diario del protagonista (poderes): la segunda página, en el rincón del aislamiento.
+		["DiaryPage2", "diary_page_02", Vector3(20.3, 2 * H + 0.03, 0.8), 1],
 		# Materiales para el refugio (alcanzan para las primeras mejoras, no para todas).
 		["Wood1", "material_wood", Vector3(10.4, 0.0, 6.9), 2],
 		["Wood2", "material_wood", Vector3(16.8, 0.0, 18.5), 1],

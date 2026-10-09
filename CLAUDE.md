@@ -114,6 +114,20 @@ en vez de inventarlo.
     si no existe, no suena y no falla). `play_sfx(nombre, posición 3D opcional)`, `play_ui`,
     `set_ambience`, `play_music`, latido automático desde Quebrado, susto al ver un horror nuevo.
     Buses Master / Music / SFX / Ambience (se crean en runtime). Volumen general en `user://settings.cfg`.
+  - `Powers` ([scripts/autoload/powers.gd](scripts/autoload/powers.gd)): **poderes** (pedido del usuario). Se aprenden
+    leyendo **páginas del diario** del protagonista (`ItemData` kind DIARY = 9, campo `power`; van con las cartas, se
+    leen solas al recogerlas: el menú se abre con la página y al cerrarla se vuelve a jugar). Usarlos **sube la locura**.
+    `known`, `activate(power)` (cobra la locura y el tiempo de espera), `damage_multiplier()`; los efectos los hace
+    `PlayerCombat.use_power`. Se conservan entre sobrevivientes, igual que las páginas (`Inventory.clear` no las borra
+    y no quedan en el cuerpo); al morir solo se corta el Filo. Guardado en `SaveGame`.
+    - **Filo del otro lado** (`empower`, tecla 1 / cruceta izquierda): x1.35 de daño durante 40 s, +10 % de locura;
+      el arma (o el puño) brilla violeta (`emission_color` + luz en la mano), parpadea los últimos 5 s.
+    - **Empujón** (`push`, tecla 2 / cruceta derecha): onda violeta hacia adelante (4.5 m, ±70°), 6 de daño y los tira
+      ~2 m (`Stalker.knock_back`; los jefes que no se tambalean casi no se mueven), +6 % de locura, 2.5 s de espera.
+    - HUD: arriba a la derecha, los poderes aprendidos y los segundos del Filo. Sonidos `power_empower` / `power_push`
+      (todavía no hay archivos; el empujón suena con `swing`).
+    - Páginas: la 1 en el escritorio de la pieza de casa, la 2 en el aislamiento acolchado (P2 del hospital).
+    - El lector de cartas pagina los textos largos (`GameMenu.letter_lines`, "E: seguir leyendo").
   - `SaveGame` ([scripts/autoload/save_game.gd](scripts/autoload/save_game.gd)): **guardado a disco**, un solo
     espacio en `user://save.dat` (texto de `var_to_str`; objetos por ruta de recurso). Junta `save_data()` /
     `load_data()` de GameState, Inventory, Sanity y Shelter + escena + posición del jugador. Manual desde la
@@ -219,7 +233,8 @@ en vez de inventarlo.
   locura; `LoopSound` es un sonido en loop en un punto (fuego, generador).
 - **Input** (teclado / gamepad): `move_*`, `look_*` (stick der.), `run` (Shift / B), `jump`
   (Espacio / A), `crouch` (C o Ctrl / L3, alterna), `interact` (E / X), `flashlight` (F / cruceta arriba), `reload` (R / Y),
-  `aim` (clic der. / L2), `attack` (clic izq. / R2), `menu` (Tab o I / Back), `pause` (Esc / Start).
+  `aim` (clic der. / L2), `attack` (clic izq. / R2), `menu` (Tab o I / Back), `pause` (Esc / Start),
+  `power_1` / `power_2` (1 y 2 / cruceta izquierda y derecha).
   En el menú: usar (E, Enter / A), `inventory_move` (R / X), `inventory_rotate` (Q / RB),
   `inventory_drop` (X / Y). En el menú "usar" solo acepta la E del teclado, no `interact` del gamepad.
 - **Personajes**:
@@ -239,6 +254,13 @@ en vez de inventarlo.
   Debug: F3 overlay, F9 golpe, F10 −25 %, F11 +25 %.
 - Assets de terceros: registrar siempre en [CREDITS.md](CREDITS.md) (preferir CC0; los CC-BY
   necesitan atribución en los créditos del juego).
+
+**El otro lado** (lore del usuario, "ampliaremos más adelante"): una realidad alterna lovecraftiana chocó con la
+nuestra. Los locos no están locos: tienen acceso a esa otra realidad y la mente casi nunca lo resiste. El protagonista
+sí lo resiste y puede usarlo (los poderes). No recuerda los últimos meses: estuvo en un laboratorio del gobierno que lo
+usaba para comunicarse con esa dimensión o investigarla, y por esos experimentos las realidades se fusionaron y el mundo
+se destruyó. Inventado (confirmar): el laboratorio se llama "el Instituto", el pasaje se llama "el Umbral", hay técnicos
+de guardapolvo gris y un "doctor V.", y las páginas están fechadas por día de internación (31, 58).
 
 ## Zona 0: la casa y el barrio (el comienzo)
 
@@ -475,6 +497,8 @@ Godot **4.7.2** (no está en el PATH):
   de guardia, el sobreviviente nuevo llega a casa). Los tests del refugio del hospital hacen `move_to(&"hospital")`.
 - **Test de la comisaría y la iglesia**: `<godot> --path . -s res://tests/avenue_places_test.gd` (entrada y
   salida, secretos por dificultad, bajar a la cripta).
+- **Test de los poderes**: `<godot> --path . -s res://tests/powers_test.gd` (las páginas, el Filo, el Empujón, la locura,
+  la espera, la muerte y el guardado; `test_shots/powers/`).
 - **Test de los NPC**: `<godot> --path . -s res://tests/npc_test.gd` (el Flaco: llave, calabozo, regalo en el pasaje;
   Ferreyra huye y no vuelve; el mendigo no se despierta; `test_shots/npcs/`).
 - **Test de Teodoro**: `<godot> --path . -s res://tests/cat_test.gd` (la nota, la veterinaria, el rescate, el gato en casa,

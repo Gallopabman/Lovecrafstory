@@ -182,6 +182,18 @@ func take_damage(amount: float) -> void:
 	anim_player.play(anim_hit, 0.05)
 
 
+## El Empujón (poder del jugador): un poco de daño y sale despedido hacia `push`
+## (velocidad horizontal; frena solo). Los jefes que no se tambalean casi no se mueven.
+func knock_back(push: Vector3, amount: float) -> void:
+	if state == State.DEAD:
+		return
+	take_damage(amount)
+	if state == State.STAGGER:
+		velocity.x = push.x
+		velocity.z = push.z
+		velocity.y = maxf(velocity.y, 2.0)
+
+
 ## Un ruido fuerte (disparo) dentro de `radius` lo pone a perseguir.
 func hear_noise(origin: Vector3, radius: float) -> void:
 	if state == State.WANDER and global_position.distance_to(origin) <= radius:

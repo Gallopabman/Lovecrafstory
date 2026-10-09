@@ -38,6 +38,8 @@ static func draw_icon(canvas: CanvasItem, item: ItemData, rect: Rect2, alpha := 
 			_book(canvas, box, base, light, outline)
 		ItemData.Kind.MOVIE:
 			_tape(canvas, box, base, outline)
+		ItemData.Kind.DIARY:
+			_page(canvas, box, base, dark, outline)
 		ItemData.Kind.LETTER:
 			_envelope(canvas, box, base, dark, outline)
 		ItemData.Kind.WEAPON:
@@ -250,3 +252,13 @@ static func _medicine(c: CanvasItem, b: Rect2, bandage: bool, o: Color, alpha: f
 	c.draw_rect(_r(b, 0.42, 0.33, 0.16, 0.4), red)
 	c.draw_rect(_r(b, 0.3, 0.45, 0.4, 0.16), red)
 	c.draw_rect(_r(b, 0.38, 0.17, 0.24, 0.09), Color(0.5, 0.5, 0.5, alpha))
+
+
+## Página arrancada de un cuaderno: renglones y una mancha.
+static func _page(c: CanvasItem, b: Rect2, base: Color, dark: Color, o: Color) -> void:
+	var r := _r(b, 0.2, 0.1, 0.6, 0.8)
+	_framed(c, r, base, o)
+	for i in 5:
+		var y := r.position.y + r.size.y * (0.2 + i * 0.15)
+		c.draw_line(Vector2(r.position.x + 2.0, y), Vector2(r.end.x - 2.0 - (i % 2) * 3.0, y), dark, 1.0)
+	c.draw_circle(_p(b, 0.66, 0.74), b.size.x * 0.05, Color(0.35, 0.15, 0.5, base.a))

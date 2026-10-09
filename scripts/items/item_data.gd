@@ -6,7 +6,8 @@ extends Resource
 ## MATERIAL: para las mejoras del refugio (se descarga solo al llegar a casa).
 ## KEY: abre algo del mundo (ZoneDoor.required_item); no se "usa" desde la mochila.
 ## MEDICINE: vendas, botiquines: curan vida (`health_restore`).
-enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL, KEY, MEDICINE }
+## DIARY: páginas del diario del protagonista: se leen como las cartas y enseñan un poder (`power`).
+enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL, KEY, MEDICINE, DIARY }
 
 @export var id: StringName
 @export var display_name := ""
@@ -32,6 +33,8 @@ enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL, KEY, MEDICINE }
 
 @export_group("Carta")
 @export_multiline var letter_text := ""
+## Páginas del diario: el poder que enseña la primera vez que se lee (ver Powers).
+@export var power: StringName = &""
 
 @export_group("Arma")
 ## De fuego (se apunta y dispara) o cuerpo a cuerpo.
@@ -70,7 +73,12 @@ enum Kind { FOOD, COMIC, MOVIE, LETTER, WEAPON, AMMO, MATERIAL, KEY, MEDICINE }
 
 
 func is_letter() -> bool:
-	return kind == Kind.LETTER
+	# Las páginas del diario van con las cartas: no ocupan lugar y se releen desde la lista.
+	return kind == Kind.LETTER or kind == Kind.DIARY
+
+
+func is_diary() -> bool:
+	return kind == Kind.DIARY
 
 
 func is_weapon() -> bool:

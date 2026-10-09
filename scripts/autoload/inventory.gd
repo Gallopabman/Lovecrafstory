@@ -55,6 +55,9 @@ func add(item: ItemData) -> bool:
 				"count": 1, "loaded": item.magazine_size})
 	item_added.emit(item)
 	changed.emit()
+	# Las páginas del diario se leen apenas se encuentran (así se aprende el poder).
+	if item.is_diary():
+		use.call_deferred(item)
 	return true
 
 
@@ -156,13 +159,15 @@ func all_items() -> Array[ItemData]:
 	for entry in entries:
 		for i in entry.count:
 			items.append(entry.item)
-	items.append_array(letters)
+	# Las páginas del diario no quedan en el cuerpo: son recuerdos, siguen con el próximo.
+	items.append_array(letters.filter(func(item: ItemData) -> bool: return not item.is_diary()))
 	return items
 
 
+## Las páginas del diario se conservan (los poderes también: ver Powers).
 func clear() -> void:
 	entries.clear()
-	letters.clear()
+	letters.assign(letters.filter(func(item: ItemData) -> bool: return item.is_diary()))
 	_use_counts.clear()
 	equip({})
 	changed.emit()
@@ -289,6 +294,12 @@ func use(item: ItemData, entry: Dictionary = {}) -> String:
 			var times: int = _use_counts.get(item.id, 0)
 			Sanity.restore(item.sanity_restore * pow(item.reuse_falloff, times))
 			result = "Me distrae." if times == 0 else "Ya me lo sé de memoria..."
+		ItemData.Kind.DIARY:
+			# Mi letra, cosas que no me acuerdo de haber escrito: leerla me devuelve un poder.
+			if Powers.learn(item.power):
+				result = "Ahora me acuerdo. %s (tecla %s)." % [Powers.display_name(item.power),
+					Powers.INFO.get(item.power, {}).get("key", "?")]
+			letter_opened.emit(item)
 		ItemData.Kind.LETTER:
 			if _use_counts.get(item.id, 0) == 0:
 				Sanity.increase_maximum(item.max_sanity_bonus)

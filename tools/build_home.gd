@@ -380,6 +380,8 @@ func _home_items() -> void:
 	# El palo de escoba (pedido del usuario: un arma para que el comienzo no sea tan difícil),
 	# apoyado en el piso de la pieza, al lado de la puerta.
 	_pickup("Broom", "weapon_broom", Vector3(3.9, 0.06, 3.7))
+	# La primera página del diario (poderes), en el escritorio de mi pieza: mi letra, cosas que no recuerdo.
+	_pickup("DiaryPage1", "diary_page_01", Vector3(4.3, 0.78, 0.55))
 	# Teodoro, cuando vuelve de la veterinaria: en el living, al lado del hogar.
 	_cat(Vector3(1.8, 0.0, 6.4), 60.0, 1, &"home")
 	_box(groups.Props, "CatBowl", Vector3(10.6, 0.03, 9.4), Vector3(0.22, 0.06, 0.22), "metal", false)

@@ -11,15 +11,28 @@ extends Control
 @export var health_color := Color(0.7, 0.12, 0.1)
 @export var madness_color := Color(0.5, 0.25, 0.65)
 @export var low_health_ratio := 0.3
+@export var power_color := Color(0.7, 0.5, 1.0)
 
 @onready var health_bar: ProgressBar = %HealthBar
 @onready var madness_bar: ProgressBar = %MadnessBar
 @onready var difficulty_label: Label = %DifficultyLabel
 
+## Los poderes aprendidos, arriba a la derecha (y cuánto le queda al Filo).
+var powers_label: Label
+
 
 func _ready() -> void:
 	_style(health_bar, health_color)
 	_style(madness_bar, madness_color)
+	powers_label = Label.new()
+	powers_label.name = "PowersLabel"
+	powers_label.position = Vector2(200, 4)
+	powers_label.size = Vector2(114, 30)
+	powers_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	powers_label.add_theme_color_override(&"font_color", power_color)
+	powers_label.add_theme_color_override(&"font_shadow_color", Color.BLACK)
+	powers_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(powers_label)
 	Health.changed.connect(func(_c: float, _m: float) -> void: _refresh())
 	Sanity.changed.connect(func(_c: float, _m: float) -> void: _refresh())
 	Sanity.difficulty_changed.connect(func(_l: int, _p: int) -> void: _refresh())
@@ -36,6 +49,7 @@ func _process(_delta: float) -> void:
 		difficulty_label.modulate.a = 0.4 + 0.6 * absf(sin(t * 6.0))
 	elif Sanity.difficulty == Sanity.Difficulty.INSANE:
 		difficulty_label.modulate.a = 0.6 + 0.4 * absf(sin(t * 3.0))
+	_update_powers(t)
 
 
 func _refresh() -> void:
@@ -73,3 +87,18 @@ static func _style(bar: ProgressBar, color: Color) -> void:
 	bar.add_theme_stylebox_override(&"fill", fill)
 	bar.add_theme_stylebox_override(&"background", back)
 	bar.show_percentage = false
+
+
+func _update_powers(t: float) -> void:
+	var lines: PackedStringArray = []
+	for power: StringName in Powers.known:
+		var info: Dictionary = Powers.INFO.get(power, {})
+		var line := "%s %s" % [info.get("key", ""), info.get("short", "")]
+		if power == Powers.EMPOWER and Powers.is_empowered():
+			line += " %ds" % ceili(Powers.empower_left)
+		elif Powers.cooldown_left(power) > 0.0:
+			line += " ..."
+		lines.append(line)
+	powers_label.text = "\n".join(lines)
+	# Brilla mientras el Filo está activo.
+	powers_label.modulate.a = 0.75 + 0.25 * absf(sin(t * 4.0)) if Powers.is_empowered() else 0.8

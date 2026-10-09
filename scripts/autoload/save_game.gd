@@ -41,6 +41,7 @@ func save_game() -> bool:
 		"sanity": Sanity.save_data(),
 		"health": Health.save_data(),
 		"shelter": Shelter.save_data(),
+		"powers": Powers.save_data(),
 		"date": Time.get_datetime_string_from_system(false, true),
 	}
 	var file := FileAccess.open(path, FileAccess.WRITE)
@@ -85,6 +86,7 @@ func load_game() -> bool:
 	Sanity.load_data(data.sanity)
 	Health.load_data(data.get("health", {}))
 	Shelter.load_data(data.shelter)
+	Powers.load_data(data.get("powers", {}))
 	GameState.pending_player = data.player
 	GameState.change_scene(data.scene)
 	return true
@@ -97,3 +99,4 @@ func new_game() -> void:
 	Sanity.new_game()
 	Health.reset()
 	Shelter.new_game()
+	Powers.new_game()

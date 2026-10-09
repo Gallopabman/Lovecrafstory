@@ -40,10 +40,14 @@ const DIRECTIONS := {
 @export var bar_max_width := 122.0
 ## Segundos que el resultado de una acción reemplaza a la ayuda del pie.
 @export var result_seconds := 3.0
+## Renglones que entran en la hoja del lector: los textos más largos se leen por partes.
+@export var letter_lines := 13
 
 var _section := Section.GRID
 var _last_result := ""
 var _result_timer := 0.0
+var _letter_only := false
+var _letter_item: ItemData
 
 @onready var sanity_bar: ProgressBar = %SanityBar
 @onready var state_label: Label = %StateLabel
@@ -55,6 +59,7 @@ var _result_timer := 0.0
 @onready var hint_label: RichTextLabel = %HintLabel
 @onready var letter_panel: Panel = %LetterPanel
 @onready var letter_label: Label = %LetterLabel
+@onready var letter_hint: Label = $LetterPanel/LetterHint
 @onready var survivor_label: Label = %SurvivorLabel
 @onready var menu_title: Label = %MenuTitle
 @onready var space_label: Label = %SpaceLabel
@@ -82,9 +87,10 @@ func _input(event: InputEvent) -> void:
 	# Mientras el menú está abierto, toda la entrada es del menú.
 	get_viewport().set_input_as_handled()
 	if letter_panel.visible:
-		if _pressed(event, ["ui_cancel", "pause", "interact", "ui_accept"]):
-			letter_panel.hide()
-			Audio.play_ui(&"menu_back")
+		if _pressed(event, ["ui_cancel", "pause"]):
+			_close_letter()
+		elif _pressed(event, ["interact", "ui_accept"]):
+			_advance_letter()
 		return
 	var direction := _direction(event)
 	if direction != Vector2i.ZERO:
@@ -111,6 +117,7 @@ func close() -> void:
 	if visible:
 		Audio.play_ui(&"inventory_close")
 	grid.cancel_move()
+	_letter_only = false
 	letter_panel.hide()
 	hide()
 	get_tree().paused = false
@@ -261,8 +268,46 @@ func _letter_index() -> int:
 
 
 func _open_letter(item: ItemData) -> void:
+	# Una página del diario recién encontrada se lee en el momento: el menú se abre solo
+	# con la página y, al cerrarla, se vuelve a jugar.
+	if not visible:
+		open()
+		_letter_only = true
+		_letter_item = item
 	letter_label.text = item.letter_text
+	letter_label.lines_skipped = 0
+	letter_label.max_lines_visible = letter_lines
 	letter_panel.show()
+	_update_letter_hint()
+
+
+## E / Enter: la parte que sigue, o guardarla si ya se leyó todo. Esc la guarda de una.
+func _advance_letter() -> void:
+	if letter_label.lines_skipped + letter_lines < letter_label.get_line_count():
+		letter_label.lines_skipped += letter_lines
+		Audio.play_ui(&"menu_move")
+		_update_letter_hint()
+	else:
+		_close_letter()
+
+
+func _update_letter_hint() -> void:
+	var more := letter_label.lines_skipped + letter_lines < letter_label.get_line_count()
+	letter_hint.text = "E: seguir leyendo" if more else "E: guardar la carta"
+
+
+func _close_letter() -> void:
+	letter_panel.hide()
+	Audio.play_ui(&"menu_back")
+	if not _letter_only:
+		return
+	_letter_only = false
+	close()
+	if _letter_item and _letter_item.is_diary() and Powers.knows(_letter_item.power):
+		var info: Dictionary = Powers.INFO.get(_letter_item.power, {})
+		GameState.post_message("Aprendí: %s. Tecla %s o %s. Usarlo me sube la locura." % [
+			info.get("name", ""), info.get("key", "?"), info.get("pad", "")])
+	_letter_item = null
 
 
 ## Usar: A / Enter / Espacio, o la E del teclado. En el gamepad "interact" es X,

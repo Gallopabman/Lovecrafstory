@@ -106,4 +106,5 @@ func _restart() -> void:
 	Inventory.clear()
 	Sanity.reset()
 	Health.reset()
+	Powers.end_life()
 	GameState.new_survivor()
